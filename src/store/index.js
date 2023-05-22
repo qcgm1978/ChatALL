@@ -76,6 +76,9 @@ export default createStore({
     setMoss(state, token) {
       state.moss.token = token;
     },
+    setClaudeInSlack(state, { slackUserToken , botUserId }) {
+      state.claudeInSlack = { slackUserToken, botUserId };
+    },
     setWenxinQianfan(state, { apiKey, secretKey }) {
       state.wenxinQianfan = { apiKey, secretKey };
     },

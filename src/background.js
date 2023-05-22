@@ -32,6 +32,7 @@ async function createWindow() {
   });
 
   mainWindow = win;
+  win.setFullScreen(true)
 
   // Force the SameSite attribute to None for all cookies
   // This is required for the cross-origin request to work
