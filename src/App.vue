@@ -123,7 +123,7 @@ import VicunaBot from "@/bots/lmsys/VicunaBot";
 import ChatGLMBot from "@/bots/lmsys/ChatGLMBot";
 import AlpacaBot from "@/bots/lmsys/AlpacaBot";
 import ClaudeBot from "@/bots/lmsys/ClaudeBot";
-// import ClaudeInSlackBot from "@/bots/ClaudeInSlackBot";
+import ClaudeInSlackBot from "@/bots/ClaudeInSlackBot";
 import DevBot from "@/bots/DevBot";
 import GradioAppBot from "@/bots/huggingface/GradioAppBot";
 import HuggingChatBot from "@/bots/huggingface/HuggingChatBot";
@@ -149,7 +149,7 @@ export default {
         BingChatBalancedBot.getInstance(),
         BingChatPreciseBot.getInstance(),
         ClaudeBot.getInstance(),
-        // ClaudeInSlackBot.getInstance(), todo js implement
+        ClaudeInSlackBot.getInstance(), 
         BardBot.getInstance(),
         WenxinQianfanBot.getInstance(),
         SparkBot.getInstance(),

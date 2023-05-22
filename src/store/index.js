@@ -29,6 +29,7 @@ export default createStore({
       VicunaBot: true,
       AlpacaBot: true,
       ClaudeBot: true,
+      ClaudeInSlackBot: true,
     },
     openaiApi: {
       apiKey: "",
@@ -48,6 +49,10 @@ export default createStore({
     wenxinQianfan: {
       apiKey: "",
       secretKey: "",
+    },
+    claudeInSlack: {
+      slackUserToken:'',
+      botUserId:''
     },
     messages: [],
     updateCounter: 0,
