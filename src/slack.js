@@ -1,6 +1,11 @@
 import store from "@/store";
 const { ipcMain } = require("electron");
 const { WebClient } = require("@slack/web-api");
+const http = require('http');
+const server = http.createServer((req, res) => {
+  res.end('Hello World!');
+});
+server.listen(3000);
 
 // your bot token
 const slackToken = "xoxb-<your-token>";
