@@ -101,5 +101,8 @@
   },
   "dev": {
     "name": "开发专用 Bot"
+  },
+  "ClaudeInSlack":{
+    "name":"Slack应用Claude"
   }
 }

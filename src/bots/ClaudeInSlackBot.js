@@ -47,13 +47,16 @@ export default class ClaudeInSlackBot extends Bot {
       //
       // When everything is done, call resolve()
       // If there is an error, call reject(error)
-
       try {
-        onUpdateResponse(callbackParam, {
-          content: "Hello, world!",
-          done: true,
-        });
-        resolve();
+        fetch(`http://127.0.0.1:8010/ask_claude?prompt=${prompt}`)
+          .then((res) => res.json())
+          .then((answer) => {
+            onUpdateResponse(callbackParam, {
+              content: answer,
+              done: true,
+            });
+            resolve();
+          });
       } catch (error) {
         reject(error);
       }

@@ -101,5 +101,8 @@
   },
   "dev": {
     "name": "Dev Bot"
+  },
+  "ClaudeInSlack":{
+    "name":"Slack Claude"
   }
 }
