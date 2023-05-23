@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { handle_IPC } from "./slack";
 import App from "./App.vue";
 import i18n from "./i18n";
 import store from "./store";
@@ -156,3 +157,4 @@ createApp(App)
     crossOrigin: undefined,
   })
   .mount("#app");
+handle_IPC();
