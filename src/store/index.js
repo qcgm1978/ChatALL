@@ -25,6 +25,9 @@ export default createStore({
     columns: 2,
     selectedBots: {
       // Active bots which no login required
+      BingChatCreativeBot: true,
+      BingChatBalancedBot: true,
+      BingChatPreciseBot: true,
       ChatGLMBot: true,
       VicunaBot: true,
       AlpacaBot: true,
@@ -33,6 +36,7 @@ export default createStore({
     openaiApi: {
       apiKey: "",
       temperature: 1,
+      pastRounds: 5,
       alterUrl: "",
     },
     chatgpt: {
@@ -48,6 +52,7 @@ export default createStore({
     wenxinQianfan: {
       apiKey: "",
       secretKey: "",
+      pastRounds: 5,
     },
     messages: [],
     updateCounter: 0,
@@ -79,8 +84,8 @@ export default createStore({
     setClaudeInSlack(state, { slackUserToken , botUserId }) {
       state.claudeInSlack = { slackUserToken, botUserId };
     },
-    setWenxinQianfan(state, { apiKey, secretKey }) {
-      state.wenxinQianfan = { apiKey, secretKey };
+    setWenxinQianfan(state, values) {
+      state.wenxinQianfan = { ...state.wenxinQianfan, ...values };
     },
     setGradio(state, values) {
       state.gradio = { ...state.gradio, ...values };
