@@ -9,8 +9,8 @@
     :loading="message.done ? false : 'primary'"
   >
     <v-card-title v-if="message.type === 'response'" class="title">
-      <img :src="message.logo" alt="Bot Icon" />
-      {{ message.name }}
+      <img :src="botLogo" alt="Bot Icon" />
+      {{ botFullname }}
       <v-spacer></v-spacer>
       <v-btn
         flat
@@ -36,13 +36,16 @@
       @click="handleClick"
     />
   </v-card>
+  <ConfirmModal ref="confirmModal" />
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from "vue";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
-import { useMatomo } from '@/composables/matomo';
+import { useMatomo } from "@/composables/matomo";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import bots from "@/bots";
 
 import "highlight.js/styles/github.css";
 import "github-markdown-css/github-markdown-light.css";
@@ -56,21 +59,35 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-})
+});
 
 const emits = defineEmits(["update-message"]);
 
 const matomo = useMatomo();
 
 const root = ref();
+const confirmModal = ref(null);
 
-watch(() => props.columns, () => {
-  root.value.$el.style.setProperty("--columns", props.columns);
-})
+const botLogo = computed(() => {
+  const bot = bots.getBotByClassName(props.message.className);
+  return bot ? bot.getLogo() : "";
+});
+
+const botFullname = computed(() => {
+  const bot = bots.getBotByClassName(props.message.className);
+  return bot ? bot.getFullname() : "";
+});
+
+watch(
+  () => props.columns,
+  () => {
+    root.value.$el.style.setProperty("--columns", props.columns);
+  },
+);
 
 onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
-}) 
+});
 
 function copyToClipboard() {
   navigator.clipboard.writeText(props.message.content);
@@ -89,8 +106,11 @@ function toggleHighlight() {
   );
 }
 
-function hide() {
-  if (window.confirm(i18n.global.t("modal.confirmHide"))) {
+async function hide() {
+  const result = await confirmModal.value.showModal(
+    i18n.global.t("modal.confirmHide"),
+  );
+  if (result) {
     emits("update-message", props.message.index, { hide: true });
     matomo.value.trackEvent("vote", "hide", props.message.className, 1);
   }

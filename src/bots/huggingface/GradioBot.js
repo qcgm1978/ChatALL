@@ -11,7 +11,6 @@ export default class GradioBot extends Bot {
   static _fnIndexes = [0]; // Indexes of the APIs to call in order. Sniffer it by devtools.
 
   config = {};
-  session_hash = "";
 
   constructor() {
     super();
@@ -39,10 +38,6 @@ export default class GradioBot extends Bot {
         this.config = response.data;
         this.config.path = response.data.path ?? "";
         this.config.root = this.constructor._loginUrl;
-
-        if (this.session_hash === "") {
-          this.session_hash = await this.createConversation();
-        }
 
         this.constructor._isAvailable = true;
       } catch (err) {
@@ -75,11 +70,11 @@ export default class GradioBot extends Bot {
 
   async _sendFnIndex(fn_index, prompt, onUpdateResponse, callbackParam) {
     const config = this.config;
+    const session_hash = await this.getChatContext();
     return new Promise((resolve, reject) => {
       try {
         const url = new URL(config.root + config.path + "/queue/join");
         url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-        const session_hash = this.session_hash;
 
         const data = this.makeData(fn_index, prompt);
 
@@ -168,7 +163,7 @@ export default class GradioBot extends Bot {
    * @param null
    * @returns {any} - Conversation structure. null if not supported.
    */
-  async createConversation() {
+  async createChatContext() {
     return Math.random().toString(36).substring(2);
   }
 }

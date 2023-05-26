@@ -9,8 +9,6 @@ export default class OpenAIAPIBot extends Bot {
   static _loginUrl = ""; // URL for the login button on the bots page
   static _model = "";
 
-  messages = [];
-
   constructor() {
     super();
   }
@@ -25,9 +23,10 @@ export default class OpenAIAPIBot extends Bot {
   }
 
   async _sendPrompt(prompt, onUpdateResponse, callbackParam) {
+    let messages = await this.getChatContext();
     // Remove old messages if exceeding the pastRounds limit
-    while (this.messages.length > store.state.openaiApi.pastRounds * 2) {
-      this.messages.shift();
+    while (messages.length > store.state.openaiApi.pastRounds * 2) {
+      messages.shift();
     }
 
     // Send the prompt to the OpenAI API
@@ -37,19 +36,19 @@ export default class OpenAIAPIBot extends Bot {
         Authorization: `Bearer ${store.state.openaiApi.apiKey}`,
       };
 
-      this.messages.push({ role: "user", content: `‘${prompt}’` });
+      messages.push({ role: "user", content: `‘${prompt}’` });
       const is_less_than_restrict = true;
       const maximum_context_length = 4097;
       while (is_less_than_restrict) {
-        const mes = JSON.stringify(this.messages);
+        const mes = JSON.stringify(messages);
         if (mes.length < maximum_context_length) {
           break
         }
-        this.messages.shift()
+        messages.shift()
       }
       const payload = JSON.stringify({
         model: this.constructor._model,
-        messages: this.messages,
+        messages,
         temperature: store.state.openaiApi.temperature,
         stream: true,
       });
@@ -71,7 +70,8 @@ export default class OpenAIAPIBot extends Bot {
           const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}$/;
           if (event.data === "[DONE]") {
             onUpdateResponse(callbackParam, { done: true });
-            this.messages.push({ role: "assistant", content: res });
+            messages.push({ role: "assistant", content: res });
+            this.setChatContext(messages);
             source.close();
             resolve();
           } else if (regex.test(event.data)) {
@@ -80,12 +80,10 @@ export default class OpenAIAPIBot extends Bot {
           } else {
             const data = JSON.parse(event.data);
             const partialText = data.choices?.[0]?.delta?.content;
-            if (!partialText) {
-              console.warn("No partial text in ChatGPT response:", data);
-              return;
+            if (partialText) {
+              res += partialText;
+              onUpdateResponse(callbackParam, { content: res, done: false });
             }
-            res += partialText;
-            onUpdateResponse(callbackParam, { content: res, done: false });
           }
         });
         source.addEventListener("error", (error) => {
@@ -102,5 +100,9 @@ export default class OpenAIAPIBot extends Bot {
     } catch (error) {
       console.error("Error sending prompt to OpenAIAPI:", error);
     }
+  }
+
+  async createChatContext() {
+    return [];
   }
 }
