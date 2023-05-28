@@ -35,6 +35,7 @@
       :source="message.content"
       @click="handleClick"
     />
+    <VueVega />
   </v-card>
   <ConfirmModal ref="confirmModal" />
 </template>
@@ -43,6 +44,7 @@
 import { onMounted, ref, watch, computed } from "vue";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
+import VueVega from "./VueVega";
 import { useMatomo } from "@/composables/matomo";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
