@@ -91,10 +91,6 @@ export default class OpenAIAPIBot extends Bot {
           source.close();
           reject(data.error.message);
         });
-        source.addEventListener("done", () => {
-          source.close();
-          resolve();
-        });
         source.stream();
       });
     } catch (error) {
