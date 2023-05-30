@@ -4,6 +4,7 @@
     "forExample": "E.g. { example }",
     "title": "Settings",
     "general": "General",
+    "enableScroll": "Automatic scrolling of chat window",
     "auto": "Automatic",
     "language": "Language",
     "languagePrompt": "Relaunch the app to apply the new language",
@@ -14,6 +15,8 @@
   },
   "header": {
     "clearMessages": "Clear all messages?",
+    "yes": "Yes",
+    "no": "No",
     "singleColumn": "Single Column",
     "doubleColumn": "Double Column",
     "tripleColumn": "Triple Column"
@@ -30,19 +33,25 @@
     "confirmHide": "Delete this message?",
     "done": "Done"
   },
+  "chat":{
+    "newChat": "New Chat"
+  },
   "bot": {
     "creatingConversation": "Creating conversation...",
     "failedToCreateConversation": "Failed to create conversation",
     "name": "Null Bot",
     "notImplemented": "Under construction...",
     "notAvailable": "The bot is not available because not login or not configured correctly.",
-    "waiting": "Waiting for other { botName } request(s) to complete..."
+    "waiting": "Waiting for other { botName } request(s) to complete...",
+    "pastRounds": "How many rounds of past chats to carry?",
+    "pastRoundsPrompt": "The more historical chats carried, the better the effect of multi-round dialogue, but it will also consume more costs"
   },
   "bard": {
     "name": "Bard"
   },
   "bingChat": {
     "name": "Bing Chat",
+    "loginToContinue": "Request is throttled. <a { attributes }>Log in</a> to continue.",
     "h3imaginative": "Creative",
     "galileo": "Balanced",
     "h3precise": "Precise"
@@ -101,5 +110,8 @@
   },
   "dev": {
     "name": "Dev Bot"
+  },
+  "ClaudeInSlack":{
+    "name":"Slack Claude"
   }
 }

@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 import VuexPersist from "vuex-persist";
-import i18n from "../i18n";
+import i18n from "@/i18n";
 import messagesPersist from "./messagesPersist";
 
 const getMatomo = function () {
@@ -13,7 +13,7 @@ const vuexPersist = new VuexPersist({
   storage: window.localStorage, // 使用 localStorage，你还可以选择其他存储方式，如 sessionStorage
   reducer: (state) => {
     // eslint-disable-next-line
-    const { messages, ...persistedState } = state;
+    const { messages, chats, ...persistedState } = state;
     return persistedState;
   },
 });
@@ -22,9 +22,13 @@ export default createStore({
   state: {
     uuid: "",
     lang: "auto",
+    enableScroll: true,
     columns: 2,
     selectedBots: {
       // Active bots which no login required
+      BingChatCreativeBot: true,
+      BingChatBalancedBot: true,
+      BingChatPreciseBot: true,
       ChatGLMBot: true,
       VicunaBot: true,
       AlpacaBot: true,
@@ -34,6 +38,7 @@ export default createStore({
     openaiApi: {
       apiKey: "",
       temperature: 1,
+      pastRounds: 5,
       alterUrl: "",
     },
     chatgpt: {
@@ -49,12 +54,15 @@ export default createStore({
     wenxinQianfan: {
       apiKey: "",
       secretKey: "",
+      pastRounds: 5,
     },
     claudeInSlack: {
       slackUserToken:'',
       botUserId:''
     },
     messages: [],
+    chats: [{ title: "New Chat", contexts: {}, messages: [] }],
+    currentChatIndex: 0,
     updateCounter: 0,
   },
   mutations: {
@@ -72,6 +80,10 @@ export default createStore({
       state.lang = language;
       i18n.global.locale = language;
     },
+    setCurrentScroll(state, scroll) {
+      state.enableScroll = scroll;
+      i18n.global.locale = scroll;
+    },
     setChatgpt(state, refreshCycle) {
       state.chatgpt.refreshCycle = refreshCycle;
     },
@@ -81,27 +93,56 @@ export default createStore({
     setMoss(state, token) {
       state.moss.token = token;
     },
-    setClaudeInSlack(state, { slackUserToken , botUserId }) {
+    setClaudeInSlack(state, { slackUserToken, botUserId }) {
       state.claudeInSlack = { slackUserToken, botUserId };
     },
-    setWenxinQianfan(state, { apiKey, secretKey }) {
-      state.wenxinQianfan = { apiKey, secretKey };
+    setWenxinQianfan(state, values) {
+      state.wenxinQianfan = { ...state.wenxinQianfan, ...values };
     },
     setGradio(state, values) {
       state.gradio = { ...state.gradio, ...values };
     },
-
     addMessage(state, message) {
-      state.messages.push(message);
+      const currentChat = state.chats[state.currentChatIndex];
+      currentChat.messages.push(message);
     },
-    updateMessage(state, { index, message }) {
-      state.messages[index] = { ...state.messages[index], ...message };
+    updateMessage(state, { indexes, message }) {
+      const { chatIndex, messageIndex } = indexes;
+      const i = chatIndex == -1 ? state.currentChatIndex : chatIndex;
+      const chat = state.chats[i];
+      chat.messages[messageIndex] = {
+        ...chat.messages[messageIndex],
+        ...message,
+      };
     },
     setMessages(state, messages) {
-      state.messages = messages;
+      const currentChat = state.chats[state.currentChatIndex];
+      currentChat.messages = messages;
     },
     incrementUpdateCounter(state) {
       state.updateCounter += 1;
+    },
+    setChatContext(state, { botClassname, context }) {
+      const currentChat = state.chats[state.currentChatIndex];
+      if (currentChat.contexts == undefined) currentChat.contexts = {};
+      currentChat.contexts[botClassname] = context;
+    },
+    clearMessages(state) {
+      const currentChat = state.chats[state.currentChatIndex];
+      currentChat.contexts = {};
+      currentChat.messages = [];
+    },
+    init(state) {
+      // Upgrade messages data structure
+      if (state.messages.length > 0) {
+        const chat = {
+          title: i18n.global.t("chat.newChat"),
+          contexts: {},
+          messages: state.messages,
+        };
+        state.chats[0] = chat;
+        state.messages = [];
+      }
     },
   },
   actions: {
@@ -119,40 +160,44 @@ export default createStore({
           type: "response",
           content: "",
           format: bot.getOutputFormat(),
-          logo: bot.getLogo(),
-          name: bot.getFullname(),
           model: bot.constructor._model,
           done: false,
           highlight: false,
           hide: false,
-          className: bot.constructor._className,
+          className: bot.getClassname(),
         };
 
         // workaround for tracking message position
-        message.index = state.messages.push(message) - 1;
+        const currentChat = state.chats[state.currentChatIndex];
+        message.index = currentChat.messages.push(message) - 1;
 
         bot.sendPrompt(
           prompt,
-          (index, values) =>
-            dispatch("updateMessage", { index, message: values }),
-          message.index,
+          (indexes, values) =>
+            dispatch("updateMessage", { indexes, message: values }),
+          { chatIndex: state.currentChatIndex, messageIndex: message.index },
         );
 
         $matomo.trackEvent(
           "prompt",
           "sendTo",
-          bot.constructor._className,
+          bot.getClassname(),
           prompt.length,
         );
       }
     },
-    updateMessage({ commit, state }, { index, message: values }) {
-      commit("updateMessage", { index, message: values });
+    updateMessage({ commit, state }, { indexes, message: values }) {
+      commit("updateMessage", { indexes, message: values });
 
       // workaround for notifing the message window to scroll to bottom
-      commit("incrementUpdateCounter");
+      if (state.enableScroll) {
+        commit("incrementUpdateCounter");
+      }
 
-      const message = { ...state.messages[index], ...values };
+      const i =
+        indexes.chatIndex == -1 ? state.currentChatIndex : indexes.chatIndex;
+      const chat = state.chats[i];
+      const message = { ...chat.messages[indexes.messageIndex], ...values };
       if (values.done) {
         getMatomo().trackEvent(
           "prompt",
@@ -162,8 +207,13 @@ export default createStore({
         );
       }
     },
-    clearMessages({ commit }) {
-      commit("setMessages", []);
+  },
+  getters: {
+    currentChat: (state) => {
+      if (state.chats.length === 0) {
+        return null;
+      }
+      return state.chats[state.currentChatIndex];
     },
   },
   modules: {

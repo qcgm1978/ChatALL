@@ -8,7 +8,7 @@ const SLACK_CALL_CHANNEL = 'slack-call'
 export default class ClaudeInSlackBot extends Bot {
   static _brandId = "ClaudeInSlack"; // Brand id of the bot, should be unique. Used in i18n.
   static _className = "ClaudeInSlackBot"; // Class name of the bot
-  static _logoFilename = "default-logo.svg"; // Place it in assets/bots/
+  static _logoFilename = "slack.svg"; // Place it in assets/bots/
   static _loginUrl = "https://example.com/";
   static _lock = new AsyncLock(); // AsyncLock for prompt requests
 
@@ -64,13 +64,16 @@ export default class ClaudeInSlackBot extends Bot {
       //
       // When everything is done, call resolve()
       // If there is an error, call reject(error)
-
       try {
-        onUpdateResponse(callbackParam, {
-          content: "Hello, world!",
-          done: true,
-        });
-        resolve();
+        fetch(`http://127.0.0.1:8010/ask_claude?prompt=${prompt}`)
+          .then((res) => res.json())
+          .then((answer) => {
+            onUpdateResponse(callbackParam, {
+              content: answer,
+              done: true,
+            });
+            resolve();
+          });
       } catch (error) {
         reject(error);
       }

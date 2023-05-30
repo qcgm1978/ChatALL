@@ -10,7 +10,6 @@ export default class WenxinQianfanBot extends Bot {
   static _logoFilename = "wenxin-qianfan-logo.png"; // Place it in assets/bots/
 
   accessToken = "";
-  messages = [];
 
   constructor() {
     super();
@@ -42,15 +41,21 @@ export default class WenxinQianfanBot extends Bot {
   }
 
   async _sendPrompt(prompt, onUpdateResponse, callbackParam) {
+    let messages = await this.getChatContext();
+    // Remove old messages if exceeding the pastRounds limit
+    while (messages.length > store.state.wenxinQianfan.pastRounds * 2) {
+      messages.shift();
+    }
+
     try {
       const headers = {
         "Content-Type": "application/json",
       };
       const url = `https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token=${this.accessToken}`;
 
-      this.messages.push({ role: "user", content: `‘${prompt}’` });
+      messages.push({ role: "user", content: `‘${prompt}’` });
       const payload = JSON.stringify({
-        messages: this.messages,
+        messages,
         stream: true,
         user: "chatall",
       });
@@ -76,23 +81,23 @@ export default class WenxinQianfanBot extends Bot {
             });
 
             if (data.is_end) {
-              this.messages.push({ role: "assistant", content: fullResult });
+              messages.push({ role: "assistant", content: fullResult });
+              this.setChatContext(messages);
               source.close();
               resolve();
             }
           } else {
             // To capture random errors
             console.error("Error Wenxin Qianfan:", event);
+            const response = JSON.parse(event.source.xhr.responseText);
+            source.close();
+            reject(new Error(`${response.error_code} ${response.error_msg}`));
           }
         });
         source.addEventListener("error", (error) => {
           const data = JSON.parse(error.data);
           source.close();
-          reject(`${data.error_code}: ${data.error_msg}`);
-        });
-        source.addEventListener("done", () => {
-          source.close();
-          resolve();
+          reject(new Error(`${data.error_code} ${data.error_msg}`));
         });
         source.stream();
       });
@@ -100,5 +105,9 @@ export default class WenxinQianfanBot extends Bot {
       console.error("Error sending prompt to OpenAIAPI:", error);
       throw error;
     }
+  }
+
+  async createChatContext() {
+    return [];
   }
 }

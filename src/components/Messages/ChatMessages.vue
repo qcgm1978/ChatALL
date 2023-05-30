@@ -31,13 +31,13 @@ const props = defineProps({
 
 const autoScroll = ref(true);
 const gridTemplateColumns = computed(() => `repeat(${props.columns}, 1fr)`);
-const filteredMessages = computed(() =>
-  store.state.messages.filter((message) => !message.hide),
-);
+const filteredMessages = computed(() => {
+  return store.getters.currentChat.messages.filter((message) => !message.hide);
+});
 
 const updateMessage = (index, values) => {
   store.dispatch("updateMessage", {
-    index,
+    indexes: { chatIndex: store.state.currentChatIndex, messageIndex: index },
     message: values,
   });
 };
@@ -57,7 +57,7 @@ const autoScrollToBottom = () => {
   }
 };
 
-watch(() => store.state.messages.length, autoScrollToBottom);
+watch(() => store.getters.currentChat.messages.length, autoScrollToBottom);
 watch(() => store.state.updateCounter, autoScrollToBottom);
 
 const onScroll = () => {
@@ -67,7 +67,7 @@ const onScroll = () => {
 };
 
 onMounted(() => {
-  store.state.messages.forEach((message) => {
+  store.getters.currentChat.messages.forEach((message) => {
     message.done = true;
   });
   window.addEventListener("scroll", onScroll);

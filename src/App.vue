@@ -73,7 +73,7 @@
       <div class="bot-logos margin-bottom">
         <img
           v-for="(bot, index) in bots"
-          :class="{ selected: activeBots[bot.constructor._className] }"
+          :class="{ selected: activeBots[bot.getClassname()] }"
           :key="index"
           :src="bot.getLogo()"
           :alt="bot.getFullname()"
@@ -91,196 +91,164 @@
       v-model:open="isSettingsOpen"
       @done="checkAllBotsAvailability()"
     />
+    <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 
-<script>
-import "@mdi/font/css/materialdesignicons.css";
-import { mapState, mapMutations } from "vuex";
+<script setup>
+import { ref, computed, onMounted, onBeforeMount, reactive } from 'vue';
+import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 
 import i18n from "./i18n";
+import _bots from "./bots";
 
 // Components
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
-// Bots
-import ChatGPT35Bot from "@/bots/openai/ChatGPT35Bot";
-import ChatGPT4Bot from "@/bots/openai/ChatGPT4Bot";
-import ChatGPTBrowsingBot from "@/bots/openai/ChatGPTBrowsingBot";
-import BingChatPreciseBot from "@/bots/microsoft/BingChatPreciseBot";
-import BingChatBalancedBot from "@/bots/microsoft/BingChatBalancedBot";
-import BingChatCreativeBot from "@/bots/microsoft/BingChatCreativeBot";
-import SparkBot from "@/bots/SparkBot";
-import BardBot from "@/bots/BardBot";
-import OpenAIAPI35Bot from "@/bots/openai/OpenAIAPI35Bot";
-import OpenAIAPI4Bot from "@/bots/openai/OpenAIAPI4Bot";
-import MOSSBot from "@/bots/MOSSBot";
-import WenxinQianfanBot from "@/bots/baidu/WenxinQianfanBot";
-import VicunaBot from "@/bots/lmsys/VicunaBot";
-import ChatGLMBot from "@/bots/lmsys/ChatGLMBot";
-import AlpacaBot from "@/bots/lmsys/AlpacaBot";
-import ClaudeBot from "@/bots/lmsys/ClaudeBot";
-import ClaudeInSlackBot from "@/bots/ClaudeInSlackBot";
-import DevBot from "@/bots/DevBot";
-import GradioAppBot from "@/bots/huggingface/GradioAppBot";
-import HuggingChatBot from "@/bots/huggingface/HuggingChatBot";
-import store from "./store";
+// Composables
+import { useMatomo } from '@/composables/matomo';
 
-export default {
-  name: "App",
-  components: {
-    ChatMessages,
-    MakeAvailableModal,
-    SettingsModal,
-  },
-  data() {
-    return {
-      prompt: "",
-      bots: [
-        ChatGPT35Bot.getInstance(),
-        ChatGPT4Bot.getInstance(),
-        ChatGPTBrowsingBot.getInstance(),
-        OpenAIAPI35Bot.getInstance(),
-        OpenAIAPI4Bot.getInstance(),
-        BingChatCreativeBot.getInstance(),
-        BingChatBalancedBot.getInstance(),
-        BingChatPreciseBot.getInstance(),
-        ClaudeBot.getInstance(),
-        ClaudeInSlackBot.getInstance(), 
-        BardBot.getInstance(),
-        WenxinQianfanBot.getInstance(),
-        SparkBot.getInstance(),
-        HuggingChatBot.getInstance(),
-        VicunaBot.getInstance(),
-        AlpacaBot.getInstance(),
-        ChatGLMBot.getInstance(),
-        MOSSBot.getInstance(),
-        GradioAppBot.getInstance(),
-      ],
-      activeBots: {},
+// Styles
+import "@mdi/font/css/materialdesignicons.css";
 
-      clickedBot: null,
-      isMakeAvailableOpen: false,
+const store = useStore();
+const matomo = useMatomo();
 
-      isSettingsOpen: false,
-    };
-  },
-  methods: {
-    async sendPromptToBots() {
-      if (this.prompt.trim() === "") return;
-      if (Object.values(this.activeBots).every((bot) => !bot)) return;
+const confirmModal = ref(null);
+const prompt = ref("");
+const bots = ref(_bots.all);
+const activeBots = reactive({});
+const clickedBot = ref(null);
+const isSettingsOpen = ref(false);
+const isMakeAvailableOpen = ref(false);
 
-      const bots = this.bots.filter(
-        (bot) => this.activeBots[bot.constructor._className],
+const columns = computed(() => store.state.columns);
+const selectedBots = computed(() => store.state.selectedBots);
+
+const changeColumns = (columns) => store.commit("changeColumns", columns);
+const setUuid = (uuid) => store.commit("setUuid", uuid);
+const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
+
+function sendPromptToBots() {
+  if (prompt.value.trim() === "") return;
+  if (Object.values(activeBots).every((bot) => !bot)) return;
+
+  const toBots = bots.value.filter(
+    (bot) => activeBots[bot.getClassname()],
+  );
+
+  store.dispatch("sendPrompt", {
+    prompt: prompt.value,
+    bots: toBots,
+  });
+
+  matomo.value && matomo.value.trackEvent(
+    "prompt",
+    "send",
+    "Active bots count",
+    toBots.length,
+  );
+  // Clear the textarea after sending the prompt
+  prompt.value = "";
+}
+
+function toggleSelected(bot) {
+  const botId = bot.getClassname();
+  var selected = false;
+  if (!bot.isAvailable()) {
+    clickedBot.value = bot;
+    // Open the bot's settings dialog
+    isMakeAvailableOpen.value = true;
+    selected = true;
+  } else {
+    selected = !selectedBots.value[botId];
+  }
+  setBotSelected({ botId, selected });
+  updateActiveBots();
+}
+
+function updateActiveBots() {
+  for (const bot of bots.value) {
+    activeBots[bot.getClassname()] =
+      bot.isAvailable() && selectedBots.value[bot.getClassname()];
+  }
+}
+
+async function checkAllBotsAvailability(specifiedBot = null) {
+  try {
+    let botsToCheck = bots.value;
+    if (specifiedBot) {
+      // If a bot is specified, only check bots of the same brand
+      botsToCheck = bots.value.filter(
+        (bot) =>
+          bot.constructor._brandId === specifiedBot.constructor._brandId,
       );
-
-      this.$store.dispatch("sendPrompt", {
-        prompt: this.prompt,
-        bots,
-      });
-
-      this.$matomo.trackEvent(
-        "prompt",
-        "send",
-        "Active bots count",
-        bots.length,
-      );
-      // Clear the textarea after sending the prompt
-      this.prompt = "";
-    },
-    ...mapMutations(["changeColumns"]),
-    ...mapMutations(["setUuid"]),
-    ...mapMutations(["SET_BOT_SELECTED"]),
-    toggleSelected(bot) {
-      const botId = bot.constructor._className;
-      var selected = false;
-      if (!bot.isAvailable()) {
-        this.clickedBot = bot;
-        // Open the bot's settings dialog
-        this.isMakeAvailableOpen = true;
-        selected = true;
-      } else {
-        selected = !this.selectedBots[botId];
-      }
-      this.SET_BOT_SELECTED({ botId, selected });
-      this.updateActiveBots();
-    },
-    updateActiveBots() {
-      for (const bot of this.bots) {
-        this.activeBots[bot.constructor._className] =
-          bot.isAvailable() && this.selectedBots[bot.constructor._className];
-      }
-    },
-    async checkAllBotsAvailability(specifiedBot = null) {
-      try {
-        let botsToCheck = this.bots;
-        if (specifiedBot) {
-          // If a bot is specified, only check bots of the same brand
-          botsToCheck = this.bots.filter(
-            (bot) =>
-              bot.constructor._brandId === specifiedBot.constructor._brandId,
-          );
-        }
-
-        const checkAvailabilityPromises = botsToCheck.map((bot) =>
-          bot
-            .checkAvailability()
-            .then(() => this.updateActiveBots())
-            .catch((error) => {
-              console.error(
-                `Error checking login status for ${bot.getFullname()}:`,
-                error,
-              );
-            }),
-        );
-        await Promise.allSettled(checkAvailabilityPromises);
-      } catch (error) {
-        console.error("Error checking login status for bots:", error);
-      }
-    },
-    openSettingsModal() {
-      this.isSettingsOpen = true;
-    },
-    // Send the prompt when the user presses enter and prevent the default behavior
-    // But if the shift, ctrl, alt, or meta keys are pressed, do as default
-    filterEnterKey(event) {
-      if (
-        event.keyCode == 13 &&
-        !event.shiftKey &&
-        !event.ctrlKey &&
-        !event.altKey &&
-        !event.metaKey
-      ) {
-        event.preventDefault();
-        this.sendPromptToBots();
-      }
-    },
-    clearMessages() {
-      if (window.confirm(i18n.global.t("header.clearMessages"))) {
-        this.$store.dispatch("clearMessages");
-      }
-    },
-  },
-  computed: {
-    ...mapState(["columns"]),
-    ...mapState(["selectedBots"]),
-  },
-  created() {
-    this.checkAllBotsAvailability();
-    if (process.env.NODE_ENV !== "production") {
-      this.bots.push(DevBot.getInstance());
     }
-  },
-  mounted() {
-    !store.state.uuid && this.setUuid(uuidv4());
-    window._paq.push(["setUserId", store.state.uuid]);
-    window._paq.push(["trackPageView"]);
-  },
-};
+
+    const checkAvailabilityPromises = botsToCheck.map((bot) =>
+      bot
+        .checkAvailability()
+        .then(() => updateActiveBots())
+        .catch((error) => {
+          console.error(
+            `Error checking login status for ${bot.getFullname()}:`,
+            error,
+          );
+        }),
+    );
+    await Promise.allSettled(checkAvailabilityPromises);
+  } catch (error) {
+    console.error("Error checking login status for bots:", error);
+  }
+}
+
+function openSettingsModal() {
+  isSettingsOpen.value = true;
+}
+
+// Send the prompt when the user presses enter and prevent the default behavior
+// But if the shift, ctrl, alt, or meta keys are pressed, do as default
+function filterEnterKey(event) {
+  if (
+    event.keyCode == 13 &&
+    !event.shiftKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.metaKey
+  ) {
+    event.preventDefault();
+    sendPromptToBots();
+  }
+}
+
+async function clearMessages() {
+  const result = await confirmModal.value.showModal(
+    i18n.global.t("header.clearMessages"),
+  );
+  if (result) {
+    store.commit("clearMessages");
+  }
+}
+
+onMounted(() => {
+  !store.state.uuid && setUuid(uuidv4());
+  window._paq.push(["setUserId", store.state.uuid]);
+  window._paq.push(["trackPageView"]);
+
+  const ver = require("../package.json").version;
+  document.title = `ChatALL.ai v${ver}`;
+});
+
+onBeforeMount(() => {
+  checkAllBotsAvailability();
+});
+
 </script>
+
 
 <style>
 * {

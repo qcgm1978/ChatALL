@@ -1,10 +1,5 @@
 <template>
-  <v-dialog
-    :model-value="props.open"
-    fullscreen
-    :scrim="false"
-    transition="dialog-bottom-transition"
-  >
+  <v-dialog :model-value="props.open" fullscreen :scrim="false" transition="dialog-bottom-transition">
     <v-card>
       <v-toolbar dark color="primary">
         <v-toolbar-title>{{ $t("settings.title") }}</v-toolbar-title>
@@ -18,14 +13,16 @@
           <v-list-subheader>{{ $t("settings.general") }}</v-list-subheader>
           <v-list-item>
             <v-list-item-title>{{ $t("settings.language") }}</v-list-item-title>
-            <v-select
-              :items="languages"
-              item-title="name"
-              item-value="code"
-              hide-details
-              :model-value="lang"
+            <v-select :items="languages" item-title="name" item-value="code" hide-details :model-value="lang"
               @update:model-value="setCurrentLanguage($event)"
-            ></v-select>
+              ></v-select>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>{{ $t("settings.enableScroll") }}</v-list-item-title>
+            <v-checkbox v-model="enableScroll" color="primary" hideDetails="auto"
+              :label="$t('settings.enable')"
+              @update:model-value="setCurrentScroll($event)"
+              ></v-checkbox>
           </v-list-item>
         </div>
 
@@ -79,6 +76,7 @@ const languages = computed(() => [
   { name: $t("settings.auto"), code: "auto" },
   { name: "Deutsch", code: "de" },
   { name: "English", code: "en" },
+  { name: "Italiano", code: "it" },
   { name: "Русский", code: "ru" },
   { name: "简体中文", code: "zh" },
   { name: "Tiếng Việt", code: "vi" },
@@ -86,10 +84,15 @@ const languages = computed(() => [
 ]);
 
 const lang = computed(() => store.state.lang);
+const enableScroll = computed(() => store.state.enableScroll);
 
 const setCurrentLanguage = (lang) => {
   locale.value = lang;
   store.commit("setCurrentLanguage", lang);
+};
+const setCurrentScroll = (scroll) => {
+  locale.enableScroll = scroll;
+  store.commit("setCurrentScroll", scroll);
 };
 const closeDialog = () => {
   emit("update:open", false);

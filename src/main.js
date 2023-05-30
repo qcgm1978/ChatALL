@@ -14,6 +14,9 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
+// Init storage
+store.commit("init");
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -53,7 +56,7 @@ createApp(App)
   .use(vuetify)
   .use(VueMatomo, {
     // Configure your matomo server and site by providing
-    host: "https://chatall.matomo.cloud/",
+    host: "https://matomo.chatall.ai/",
     siteId: 1,
 
     // Changes the default .js and .php endpoint's filename

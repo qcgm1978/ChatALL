@@ -15,6 +15,9 @@ export default class ChatGPTBot extends Bot {
   static _className = "ChatGPTBot"; // Class name of the bot
   static _logoFilename = "chatgpt-logo.svg"; // Place it in assets/bots/
   static _loginUrl = "https://chat.openai.com/";
+  // Remove Electron from the user agent to avoid blank login screen of Google
+  static _userAgent =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) ChatALL/1.18.13 Chrome/112.0.5615.165 Safari/537.36";
   static _model = "";
   static _lock = new AsyncLock(); // All ChatGPT bots share the same lock
 
@@ -24,10 +27,6 @@ export default class ChatGPTBot extends Bot {
   };
 
   accessToken = "";
-  conversationContext = {
-    conversationId: "",
-    parentMessageId: "",
-  };
 
   constructor() {
     super();
@@ -52,6 +51,10 @@ export default class ChatGPTBot extends Bot {
     // Toggle periodic session refreshing based on login status
     this.toggleSessionRefreshing(this.isAvailable());
     return this.isAvailable();
+  }
+
+  async createChatContext() {
+    return { conversationId: undefined, parentMessageId: uuidv4() };
   }
 
   refreshSession() {
@@ -97,6 +100,7 @@ export default class ChatGPTBot extends Bot {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.accessToken}`,
     };
+    const context = await this.getChatContext();
     const payload = JSON.stringify({
       action: "next",
       messages: [
@@ -109,9 +113,10 @@ export default class ChatGPTBot extends Bot {
           },
         },
       ],
+      conversation_id: context.conversationId,
+      parent_message_id: context.parentMessageId,
       model: this.constructor._model,
-      conversation_id: this.conversationContext.conversationId || undefined,
-      parent_message_id: this.conversationContext.parentMessageId || uuidv4(),
+      history_and_training_disabled: false, // allow training
     });
 
     return new Promise((resolve, reject) => {
@@ -134,8 +139,10 @@ export default class ChatGPTBot extends Bot {
           } else
             try {
               const data = JSON.parse(event.data);
-              this.conversationContext.conversationId = data.conversation_id;
-              this.conversationContext.parentMessageId = data.message.id;
+              this.setChatContext({
+                conversationId: data.conversation_id,
+                parentMessageId: data.message.id,
+              });
               const content = data.message?.content;
               if (
                 content?.content_type === "code" ||
@@ -185,18 +192,12 @@ export default class ChatGPTBot extends Bot {
           let message = "";
           if (error.data) {
             const data = JSON.parse(error.data);
-            message = data.detail.message;
+            message = data.detail;
           } else {
             message = error.source.url;
           }
 
           reject(new Error(message));
-        });
-
-        source.addEventListener("done", () => {
-          source.close();
-          onUpdateResponse(callbackParam, { done: true });
-          resolve();
         });
 
         source.stream();

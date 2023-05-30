@@ -1,24 +1,14 @@
 <template>
-  <v-card
-    ref="root"
-    :class="[
-      'message',
-      message.type,
-      message.highlight ? 'highlight-border' : '',
-    ]"
-    :loading="message.done ? false : 'primary'"
-  >
+  <v-card ref="root" :class="[
+    'message',
+    message.type,
+    message.highlight ? 'highlight-border' : '',
+  ]" :loading="message.done ? false : 'primary'">
     <v-card-title v-if="message.type === 'response'" class="title">
-      <img :src="message.logo" alt="Bot Icon" />
-      {{ message.name }}
+      <img :src="botLogo" alt="Bot Icon" />
+      {{ botFullname }}
       <v-spacer></v-spacer>
-      <v-btn
-        flat
-        size="x-small"
-        icon
-        @click="toggleHighlight"
-        :color="message.highlight ? 'primary' : ''"
-      >
+      <v-btn flat size="x-small" icon @click="toggleHighlight" :color="message.highlight ? 'primary' : ''">
         <v-icon>mdi-lightbulb-on-outline</v-icon>
       </v-btn>
       <v-btn flat size="x-small" icon @click="copyToClipboard">
@@ -28,21 +18,20 @@
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-card-title>
-    <Markdown
-      class="markdown-body"
-      :breaks="true"
-      :html="true"
-      :source="message.content"
-      @click="handleClick"
-    />
+    <Markdown class="markdown-body" :breaks="true" :html="true" :source="message.content" @click="handleClick" />
+    <VueVega :source="message.content" />
   </v-card>
+  <ConfirmModal ref="confirmModal" />
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from "vue";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
-import { useMatomo } from '@/composables/matomo';
+import VueVega from "./VueVega";
+import { useMatomo } from "@/composables/matomo";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import bots from "@/bots";
 
 import "highlight.js/styles/github.css";
 import "github-markdown-css/github-markdown-light.css";
@@ -56,21 +45,35 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-})
+});
 
 const emits = defineEmits(["update-message"]);
 
 const matomo = useMatomo();
 
 const root = ref();
+const confirmModal = ref(null);
 
-watch(() => props.columns, () => {
-  root.value.$el.style.setProperty("--columns", props.columns);
-})
+const botLogo = computed(() => {
+  const bot = bots.getBotByClassName(props.message.className);
+  return bot ? bot.getLogo() : "";
+});
+
+const botFullname = computed(() => {
+  const bot = bots.getBotByClassName(props.message.className);
+  return bot ? bot.getFullname() : "";
+});
+
+watch(
+  () => props.columns,
+  () => {
+    root.value.$el.style.setProperty("--columns", props.columns);
+  },
+);
 
 onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
-}) 
+});
 
 function copyToClipboard() {
   navigator.clipboard.writeText(props.message.content);
@@ -89,8 +92,11 @@ function toggleHighlight() {
   );
 }
 
-function hide() {
-  if (window.confirm(i18n.global.t("modal.confirmHide"))) {
+async function hide() {
+  const result = await confirmModal.value.showModal(
+    i18n.global.t("modal.confirmHide"),
+  );
+  if (result) {
     emits("update-message", props.message.index, { hide: true });
     matomo.value.trackEvent("vote", "hide", props.message.className, 1);
   }
@@ -98,59 +104,62 @@ function hide() {
 
 function handleClick(event) {
   const target = event.target;
-  if (target.tagName !== "A" && target.tagName !== "SUP") {
+  if (target.tagName !== "A" && target.parentElement.tagName !== "A") {
+    return;
+  }
+  if (target.target === "innerWindow") {
+    // Open in Electron inner window
     return;
   }
   // Open in external browser
   event.preventDefault();
   const electron = window.require("electron");
-  const url =
-    target.tagName === "SUP" ? target.parentElement.href : target.href;
+  const url = target.href || target.parentElement.href;
   electron.shell.openExternal(url);
 }
 </script>
 
 <style scoped>
 .message {
-    border-radius: 8px;
-    padding: 16px;
-    word-wrap: break-word;
-    text-align: left;
+  border-radius: 8px;
+  padding: 16px;
+  word-wrap: break-word;
+  text-align: left;
 }
 
 .highlight-border {
-    box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 1);
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 1);
 }
 
 .prompt {
-    background-color: #95EC69;
-    width: fit-content;
-    grid-column: 1 / span var(--columns);
+  background-color: #95EC69;
+  width: fit-content;
+  grid-column: 1 / span var(--columns);
 }
 
 .response {
-    background-color: #FFF;
-    width: 100%;
-    grid-column: auto / span 1;
+  background-color: #FFF;
+  width: 100%;
+  grid-column: auto / span 1;
 }
 
 .title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    padding: 0;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  padding: 0;
+  margin-bottom: 8px;
 }
 
 .title img {
-    width: 20px;
-    height: 20px;
-    margin-right: 4px;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
 }
 
 .markdown-body {
-    background-color: inherit;
-    font-family: inherit;
+  background-color: inherit;
+  font-family: inherit;
 }
 </style>
