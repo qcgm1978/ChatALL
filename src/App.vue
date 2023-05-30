@@ -4,37 +4,15 @@
       <div class="header-content">
         <img class="logo" src="@/assets/logo-banner.png" alt="ChatALL" />
         <div class="column-icons">
-          <img
-            src="@/assets/column-1.svg"
-            @click="changeColumns(1)"
-            :class="{ selected: columns === 1 }"
-          />
-          <img
-            src="@/assets/column-2.svg"
-            @click="changeColumns(2)"
-            :class="{ selected: columns === 2 }"
-          />
-          <img
-            src="@/assets/column-3.svg"
-            @click="changeColumns(3)"
-            :class="{ selected: columns === 3 }"
-          />
+          <img src="@/assets/column-1.svg" @click="changeColumns(1)" :class="{ selected: columns === 1 }" />
+          <img src="@/assets/column-2.svg" @click="changeColumns(2)" :class="{ selected: columns === 2 }" />
+          <img src="@/assets/column-3.svg" @click="changeColumns(3)" :class="{ selected: columns === 3 }" />
         </div>
         <div>
-          <v-icon
-            class="cursor-pointer"
-            color="primary"
-            icon="mdi-broom"
-            size="x-large"
-            @click="clearMessages()"
-          ></v-icon>
-          <v-icon
-            class="cursor-pointer"
-            color="primary"
-            icon="mdi-cog"
-            size="x-large"
-            @click="openSettingsModal()"
-          ></v-icon>
+          <v-icon class="cursor-pointer" color="primary" icon="mdi-broom" size="x-large"
+            @click="clearMessages()"></v-icon>
+          <v-icon class="cursor-pointer" color="primary" icon="mdi-cog" size="x-large"
+            @click="openSettingsModal()"></v-icon>
         </div>
       </div>
     </header>
@@ -46,51 +24,42 @@
     </main>
 
     <footer>
-      <v-textarea
-        v-model="prompt"
-        auto-grow
-        max-rows="8.5"
-        rows="1"
-        density="comfortable"
-        hide-details
-        variant="solo"
-        :placeholder="$t('footer.promptPlaceholder')"
-        autofocus
-        @keydown="filterEnterKey"
-        style="min-width: 390px"
-      ></v-textarea>
-      <v-btn
-        color="primary"
-        elevation="2"
-        class="margin-bottom"
-        :disabled="
-          prompt.trim() === '' || Object.values(activeBots).every((bot) => !bot)
-        "
-        @click="sendPromptToBots"
-      >
+      <v-textarea v-model="prompt" auto-grow max-rows="8.5" rows="1" density="comfortable" hide-details variant="solo"
+        :placeholder="$t('footer.promptPlaceholder')" autofocus @keydown="filterEnterKey"
+        style="min-width: 390px"></v-textarea>
+      <v-btn color="primary" elevation="2" class="margin-bottom" :disabled="prompt.trim() === '' || Object.values(activeBots).every((bot) => !bot)
+        " @click="sendPromptToBots">
         {{ $t("footer.sendPrompt") }}
       </v-btn>
       <div class="bot-logos margin-bottom">
-        <img
-          v-for="(bot, index) in bots"
-          :class="{ selected: activeBots[bot.getClassname()] }"
-          :key="index"
-          :src="bot.getLogo()"
-          :alt="bot.getFullname()"
-          :title="bot.getFullname()"
-          @click="toggleSelected(bot)"
-        />
+        <!-- <img v-for="(bot, index) in bots" :class="{ selected: activeBots[bot.getClassname()] }" :key="index"
+          :src="bot.getLogo()" :alt="bot.getFullname()" :title="bot.getFullname()" @click="toggleSelected(bot)" /> -->
+          <v-select
+            :items="botsOptions"
+            item-text="name"
+            item-value="code"
+            v-model="activeBotsOptions"
+            @update:model-value="toggleSelected"
+          >
+            <template #item="{ item }">
+              <v-list-item-avatar tile>
+                <img :src="item.logo" :alt="item.name">
+              </v-list-item-avatar>
+          
+              <v-list-item-content>
+                <v-list-item-title :text="item.name"></v-list-item-title>
+              </v-list-item-content>
+            </template>
+          </v-select>
+          
+        <!-- <v-select :items="languages" item-title="name" item-value="code" hide-details v-model="selectedLanguages"
+          multiple></v-select> -->
+
       </div>
     </footer>
-    <MakeAvailableModal
-      v-model:open="isMakeAvailableOpen"
-      :bot="clickedBot"
-      @done="checkAllBotsAvailability(clickedBot)"
-    />
-    <SettingsModal
-      v-model:open="isSettingsOpen"
-      @done="checkAllBotsAvailability()"
-    />
+    <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot"
+      @done="checkAllBotsAvailability(clickedBot)" />
+    <SettingsModal v-model:open="isSettingsOpen" @done="checkAllBotsAvailability()" />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
@@ -121,7 +90,14 @@ const matomo = useMatomo();
 const confirmModal = ref(null);
 const prompt = ref("");
 const bots = ref(_bots.all);
+const botsOptions = ref(bots.value.map(d => ({
+  logo: d.getLogo(),
+  name: d.getFullname(),
+  code:d.getClassname()
+})))
 const activeBots = reactive({});
+const selected=Object.keys(store.state.selectedBots).filter(k=>store.state.selectedBots[k])
+const activeBotsOptions = botsOptions.value.filter(d=>selected.includes(d.code))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
@@ -252,36 +228,36 @@ onBeforeMount(() => {
 
 <style>
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: "Arial", sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 #app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-    padding: 16px;
-    z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  z-index: 999;
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .logo {
@@ -289,60 +265,60 @@ header {
 }
 
 .column-icons img {
-    opacity: 0.5;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin: 4px;
+  opacity: 0.5;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  margin: 4px;
 }
 
 .bot-logos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .bot-logos img {
-    opacity: 0.3;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
+  opacity: 0.3;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
 }
 
 img.selected {
-    opacity: 1;
+  opacity: 1;
 }
 
 .content {
-    flex: 1;
-    background-color: #f3f3f3;
-    padding: 16px;
+  flex: 1;
+  background-color: #f3f3f3;
+  padding: 16px;
 }
 
 footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: transparent;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    padding: 8px 16px;
-    gap: 8px;
-    box-sizing: border-box;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: transparent;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 8px 16px;
+  gap: 8px;
+  box-sizing: border-box;
 }
 
 .margin-bottom {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* Override default style of vuetify v-textarea */
-.v-textarea--auto-grow textarea{
-    overflow: auto !important;
+.v-textarea--auto-grow textarea {
+  overflow: auto !important;
 }
 </style>
