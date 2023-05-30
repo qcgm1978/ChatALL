@@ -180,7 +180,7 @@ export default createStore({
       commit("updateMessage", { indexes, message: values });
 
       // workaround for notifing the message window to scroll to bottom
-      commit("incrementUpdateCounter");
+      // commit("incrementUpdateCounter");
 
       const i =
         indexes.chatIndex == -1 ? state.currentChatIndex : indexes.chatIndex;

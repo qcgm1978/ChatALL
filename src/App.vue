@@ -146,7 +146,7 @@ function sendPromptToBots() {
     bots: toBots,
   });
 
-  matomo.value.trackEvent(
+  matomo.value && matomo.value.trackEvent(
     "prompt",
     "send",
     "Active bots count",
