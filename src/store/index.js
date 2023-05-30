@@ -22,6 +22,7 @@ export default createStore({
   state: {
     uuid: "",
     lang: "auto",
+    enableScroll: true,
     columns: 2,
     selectedBots: {
       // Active bots which no login required
@@ -74,6 +75,10 @@ export default createStore({
       state.lang = language;
       i18n.global.locale = language;
     },
+    setCurrentScroll(state, scroll) {
+      state.enableScroll = scroll;
+      i18n.global.locale = scroll;
+    },
     setChatgpt(state, refreshCycle) {
       state.chatgpt.refreshCycle = refreshCycle;
     },
@@ -83,7 +88,7 @@ export default createStore({
     setMoss(state, token) {
       state.moss.token = token;
     },
-    setClaudeInSlack(state, { slackUserToken , botUserId }) {
+    setClaudeInSlack(state, { slackUserToken, botUserId }) {
       state.claudeInSlack = { slackUserToken, botUserId };
     },
     setWenxinQianfan(state, values) {
@@ -180,7 +185,9 @@ export default createStore({
       commit("updateMessage", { indexes, message: values });
 
       // workaround for notifing the message window to scroll to bottom
-      // commit("incrementUpdateCounter");
+      if (state.enableScroll) {
+        commit("incrementUpdateCounter");
+      }
 
       const i =
         indexes.chatIndex == -1 ? state.currentChatIndex : indexes.chatIndex;

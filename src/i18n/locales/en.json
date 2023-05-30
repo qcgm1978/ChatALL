@@ -4,6 +4,7 @@
     "forExample": "E.g. { example }",
     "title": "Settings",
     "general": "General",
+    "enableScroll": "Automatic scrolling of chat window",
     "auto": "Automatic",
     "language": "Language",
     "languagePrompt": "Relaunch the app to apply the new language",
