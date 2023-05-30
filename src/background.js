@@ -4,6 +4,9 @@
 import { app, protocol, BrowserWindow, ipcMain, autoUpdater } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
+import { handle_IPC } from "./slack";
+import fs from 'fs'
+const { WebClient } = require("@slack/web-api");
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const DEFAULT_USER_AGENT = ""; // Empty string to use the Electron default
@@ -167,7 +170,7 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (BrowserWindow.getAllWindows().length === 0) {createWindow();}
 });
 
 // This method will be called when Electron has finished
@@ -204,3 +207,4 @@ if (isDevelopment) {
     });
   }
 }
+handle_IPC(WebClient);

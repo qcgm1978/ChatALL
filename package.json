@@ -19,8 +19,12 @@
     "start": "electron .",
     "release": "vue-cli-service electron:build -wml --x64 --arm64"
   },
+  "browser": {
+    "fs": false
+  },
   "dependencies": {
     "@mdi/font": "^7.2.96",
+    "@slack/web-api": "^6.8.1",
     "async-lock": "^1.4.0",
     "axios": "^1.4.0",
     "core-js": "^3.30.2",

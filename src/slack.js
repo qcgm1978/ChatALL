@@ -1,17 +1,15 @@
+/* eslint-disable no-unused-vars */
 import store from "@/store";
 const { ipcMain } = require("electron");
-const { WebClient } = require("@slack/web-api");
-const http = require('http');
-const server = http.createServer((req, res) => {
-  res.end('Hello World!');
-});
-server.listen(3000);
+// const http = require('http');
+// const server = http.createServer((req, res) => {
+//   res.end('Hello World!');
+// });
+// server.listen(7000);
 
 // your bot token
-const slackToken = "xoxb-<your-token>";
-const web = new WebClient(slackToken);
+const slackUserToken = "xoxb-<your-token>";
 
-const { slackUserToken, botUserId } = store.state.claudeInSlack;
 // main process event IPC channel
 const SLACK_EVENT_CHANNEL = "slack-event";
 const SLACK_CALL_CHANNEL = "slack-call";
@@ -19,8 +17,9 @@ export class SlackBot {
   constructor({
     topics,
     user_token = slackUserToken,
-    bot_user_id = botUserId,
+    bot_user_id = 'botUserId',
     prompt = `以下list每个元素字符串的情绪转为emoji unicode值(\\U开头)，一行输出emoji字符串python list，不要换行，字符串用双引号扩起来`,
+    WebClient=null
   }) {
     this.client = new WebClient(user_token);
     this.bot_user_id = bot_user_id;
@@ -150,8 +149,10 @@ export class SlackBot {
   }
 }
 
-export function handle_IPC() {
-  ipcMain.handle(
+export function handle_IPC(WebClient) {
+// const { slackUserToken, botUserId } = store.state.claudeInSlack;
+const web = new WebClient(slackUserToken);
+ipcMain.handle(
     SLACK_CALL_CHANNEL,
     async (event, channel, method, ...args) => {
       const payload = { channel };
