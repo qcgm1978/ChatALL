@@ -34,26 +34,31 @@
       <div class="bot-logos margin-bottom">
         <!-- <img v-for="(bot, index) in bots" :class="{ selected: activeBots[bot.getClassname()] }" :key="index"
           :src="bot.getLogo()" :alt="bot.getFullname()" :title="bot.getFullname()" @click="toggleSelected(bot)" /> -->
-          <v-select
-            :items="botsOptions"
-            item-text="name"
-            item-value="code"
-            v-model="activeBotsOptions"
-            @update:model-value="toggleSelected"
-          >
-            <template #item="{ item }">
-              <v-list-item-avatar tile>
-                <img :src="item.logo" :alt="item.name">
-              </v-list-item-avatar>
-          
-              <v-list-item-content>
-                <v-list-item-title :text="item.name"></v-list-item-title>
-              </v-list-item-content>
-            </template>
-          </v-select>
-          
-        <!-- <v-select :items="languages" item-title="name" item-value="code" hide-details v-model="selectedLanguages"
-          multiple></v-select> -->
+          <!-- label="Select bots" -->
+        <v-select v-model="selectedOptions" :items="botsOptions" multiple item-value="classname" 
+        >
+          <template #selection="{ item }">
+            <v-chip close @click:close="() => (item.isSelected = false)">
+              <img :src="item.logo" :alt="item.fullname" height="20" width="20" />
+              {{ item.fullname }}
+            </v-chip>
+          </template>
+          <template #item="{ item, tile }">
+            <v-list-item-avatar :tile="tile">
+              <img :src="item.logo" alt="item.fullname" width="24" height="24" />
+            </v-list-item-avatar>
+
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-bold text-decoration-none">
+                {{ item.fullname }}
+              </v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-text>
+              <v-checkbox :input-value="item.isSelected" @input="(value) => { item.isSelected = value }"> </v-checkbox>
+            </v-list-item-text>
+          </template>
+        </v-select>
+
 
       </div>
     </footer>
@@ -77,6 +82,7 @@ import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import { VListItemAvatar, VListItemContent,VListItemText } from 'vuetify/lib/components/VList'
 
 // Composables
 import { useMatomo } from '@/composables/matomo';
@@ -92,16 +98,16 @@ const prompt = ref("");
 const bots = ref(_bots.all);
 const botsOptions = ref(bots.value.map(d => ({
   logo: d.getLogo(),
-  name: d.getFullname(),
-  code:d.getClassname()
+  fullname: d.getFullname(),
+  classname: d.getClassname(),
+  isSelected:false
 })))
 const activeBots = reactive({});
-const selected=Object.keys(store.state.selectedBots).filter(k=>store.state.selectedBots[k])
-const activeBotsOptions = botsOptions.value.filter(d=>selected.includes(d.code))
+const selected = Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k])
+const selectedOptions = botsOptions.value.filter(d => selected.includes(d.code))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
-
 const columns = computed(() => store.state.columns);
 const selectedBots = computed(() => store.state.selectedBots);
 
@@ -211,6 +217,7 @@ async function clearMessages() {
 }
 
 onMounted(() => {
+  // Vue.component('VListItemAvatar', VListItemAvatar)
   !store.state.uuid && setUuid(uuidv4());
   window._paq.push(["setUserId", store.state.uuid]);
   window._paq.push(["trackPageView"]);

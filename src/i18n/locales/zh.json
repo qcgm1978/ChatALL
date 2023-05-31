@@ -1,6 +1,7 @@
 {
   "settings": {
     "enable": "启用",
+    "noDataText":"没有数据",
     "forExample": "例如：{ example }",
     "title": "设置",
     "general": "通用",
