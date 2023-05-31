@@ -52,6 +52,7 @@ import WenxinQianfanBotSettings from "@/components/BotSettings/WenxinQianfanBotS
 import GradioAppBotSettings from "@/components/BotSettings/GradioAppBotSettings.vue";
 import LMSYSBotSettings from "@/components/BotSettings/LMSYSBotSettings.vue";
 import HuggingChatBotSettings from "@/components/BotSettings/HuggingChatBotSettings.vue";
+import QianWenBotSettings from "@/components/BotSettings/QianWenBotSettings.vue";
 
 const { t: $t, locale } = useI18n();
 const store = useStore();
@@ -69,6 +70,7 @@ const settings = [
   HuggingChatBotSettings,
   LMSYSBotSettings,
   MOSSBotSettings,
+  QianWenBotSettings,
   SparkBotSettings,
 ];
 

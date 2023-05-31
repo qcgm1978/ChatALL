@@ -50,6 +50,9 @@ export default createStore({
     moss: {
       token: "",
     },
+    qianWen: {
+      xsrfToken: "",
+    },
     wenxinQianfan: {
       apiKey: "",
       secretKey: "",
@@ -89,7 +92,10 @@ export default createStore({
       state.moss.token = token;
     },
     setClaudeInSlack(state, { slackUserToken, botUserId }) {
-      state.claudeInSlack = { slackUserToken, botUserId };
+      state.claudeInSlack = { slackUserToken, botUserId }
+    },
+    setQianWenToken(state, token) {
+      state.qianWen.xsrfToken = token;
     },
     setWenxinQianfan(state, values) {
       state.wenxinQianfan = { ...state.wenxinQianfan, ...values };

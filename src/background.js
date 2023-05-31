@@ -81,14 +81,16 @@ async function createWindow() {
       const urlObj = new URL(url);
 
       // Only replace outbound access and electron origin
-      if (
-        ["http:", "https:"].includes(urlObj.protocol) &&
-        !["localhost", "127.0.0.1"].includes(urlObj.hostname) &&
-        requestHeaders["Referer"]
-      ) {
-        const refererObj = new URL(requestHeaders["Referer"]);
-        if (["localhost", "127.0.0.1"].includes(refererObj.hostname)) {
-          const referer = `${urlObj.protocol}//${urlObj.host}/`;
+      if (["http:", "https:"].includes(urlObj.protocol)) {
+        const referer = `${urlObj.protocol}//${urlObj.host}/`;
+        if (!requestHeaders["Referer"]) {
+          // Force add referer header. This is required for QianWen.
+          requestHeaders["Referer"] = referer;
+        } else if (
+          requestHeaders["Referer"].includes("127.0.0.1") ||
+          requestHeaders["Referer"].includes("localhost")
+        ) {
+          // Replace the referer header if it is the default one.
           requestHeaders["Referer"] = referer;
         }
       }
@@ -143,6 +145,22 @@ function createNewWindow(url, userAgent = "") {
           'localStorage.getItem("flutter.token");',
         );
         mainWindow.webContents.send("moss-secret", secret);
+      } catch (error) {
+        console.error(error);
+      }
+      newWin.destroy(); // Destroy the window manually
+    });
+  }
+
+  // Get QianWen bot's XSRF-TOKEN
+  if (url.includes("tongyi.aliyun.com")) {
+    newWin.on("close", async (e) => {
+      try {
+        e.preventDefault(); // Prevent the window from closing
+        const token = await newWin.webContents.executeJavaScript(
+          'document.cookie.split("; ").find((cookie) => cookie.startsWith("XSRF-TOKEN="))?.split("=")[1];',
+        );
+        mainWindow.webContents.send("QIANWEN-XSRF-TOKEN", token);
       } catch (error) {
         console.error(error);
       }
