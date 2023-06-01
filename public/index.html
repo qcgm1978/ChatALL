@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <!-- Vue devtools -->
-    <%= process.env.NODE_ENV === 'development' ? '<script src="http://localhost:8098"></script>' : '' %>
+    <%= process.env.NODE_ENV === 'development' && process.env.HAS_VUEJS3_DEVTOOLS ? '<script src="http://localhost:8098"></script>' : '' %>
     <title>ChatALL</title>
   </head>
   <body>
