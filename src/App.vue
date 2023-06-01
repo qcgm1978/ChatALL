@@ -160,14 +160,13 @@ function updateActiveBots() {
 
 async function checkAllBotsAvailability(specifiedBot = null) {
   try {
-    let botsToCheck = bots.value;
+    let botsToCheck = bots.value.filter((bot) => selectedBots.value[bot.getClassname()])
     if (specifiedBot) {
       // If a bot is specified, only check bots of the same brand
       botsToCheck = bots.value.filter(
         (bot) => bot.constructor._brandId === specifiedBot.constructor._brandId,
       );
     }
-
     const checkAvailabilityPromises = botsToCheck.map((bot) =>
       bot
         .checkAvailability()
