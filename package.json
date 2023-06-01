@@ -54,6 +54,7 @@
     "eslint-plugin-vue": "^9.14.1",
     "prettier-plugin-vue": "^1.1.6",
     "sse.js": "github:mpetazzoni/sse.js",
+    "vite-plugin-vue-markdown": "^0.23.5",
     "vsce": "^2.15.0",
     "vue-cli-plugin-electron-builder": "^2.1.1"
   },

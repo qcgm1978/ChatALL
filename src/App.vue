@@ -85,13 +85,13 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import { VListItemAvatar, VListItemContent,VListItemText } from 'vuetify/lib/components/VList'
 
 // Composables
-import { useMatomo } from "@/composables/matomo";
+// import { useMatomo } from "@/composables/matomo";
 
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
 
 const store = useStore();
-const matomo = useMatomo();
+// const matomo = useMatomo();
 
 const confirmModal = ref(null);
 const prompt = ref("");
@@ -126,12 +126,12 @@ function sendPromptToBots() {
     bots: toBots,
   });
 
-  matomo.value && matomo.value.trackEvent(
-    "prompt",
-    "send",
-    "Active bots count",
-    toBots.length,
-  );
+  // matomo.value && matomo.value.trackEvent(
+  //   "prompt",
+  //   "send",
+  //   "Active bots count",
+  //   toBots.length,
+  // );
   // Clear the textarea after sending the prompt
   prompt.value = "";
 }
