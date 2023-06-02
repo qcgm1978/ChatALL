@@ -34,33 +34,26 @@
       <div class="bot-logos margin-bottom">
         <!-- <img v-for="(bot, index) in bots" :class="{ selected: activeBots[bot.getClassname()] }" :key="index"
           :src="bot.getLogo()" :alt="bot.getFullname()" :title="bot.getFullname()" @click="toggleSelected(bot)" /> -->
-        <!-- label="Select bots" -->
-        <!-- <multiselect v-model="selectedBots" :options="bots" :multiple="true" :close-on-select="false"
-          :clear-on-select="false" :preserve-search="true" placeholder="Select bots"></multiselect> -->
-
-        <!-- <v-select v-model="selectedOptions" :items="botsOptions" multiple item-value="classname" 
-        >
-          <template #selection="{ item }">
-            <v-chip close @click:close="() => (item.isSelected = false)">
-              <img :src="item.logo" :alt="item.fullname" height="20" width="20" />
-              {{ item.fullname }}
-            </v-chip>
-          </template>
-          <template #item="{ item, tile }">
-            <v-list-item-avatar :tile="tile">
-              <img :src="item.logo" alt="item.fullname" width="24" height="24" />
-            </v-list-item-avatar>
-
-            <v-list-item-content>
-              <v-list-item-title class="font-weight-bold text-decoration-none">
-                {{ item.fullname }}
-              </v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-text>
-              <v-checkbox :input-value="item.isSelected" @input="(value) => { item.isSelected = value }"> </v-checkbox>
-            </v-list-item-text>
-          </template>
-        </v-select> -->
+          <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions" multiple
+          @update:model-value="toggleSelected($event)"
+          ></v-select>
+          <!-- <v-select v-model="selectedOptions" :items="botsOptions" item-text="name" item-value="id" label="Select" multiple>
+            <template v-slot:selection="{ item }">
+              <v-chip :key="item.id" class="ma-2" color="blue" text-color="white">
+                {{ item.name }}
+              </v-chip>
+            </template>
+            <template v-slot:item="{ item }">
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ item.name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.fullname }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </template>
+          </v-select> -->
 
 
       </div>
@@ -86,7 +79,7 @@ import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import { VListItemAvatar, VListItemContent, VListItemText } from 'vuetify/lib/components/VList'
-import Multiselect from 'vue-multiselect'
+// import Multiselect from 'vue-multiselect'
 
 // Composables
 // import { useMatomo } from "@/composables/matomo";
@@ -100,17 +93,18 @@ const store = useStore();
 const confirmModal = ref(null);
 const prompt = ref("");
 const bots = ref(_bots.all);
-const botsOptions = (bots.value.map(d => ({
-  logo: d.getLogo(),
-  fullname: d.getFullname(),
-  name: d.getFullname(),
-  classname: d.getClassname(),
-  id: d.getClassname(),
-  isSelected: false
-})))
+const bots_val = bots.value.map(d => ({
+logo: d.getLogo(),
+fullname: d.getFullname(),
+name: d.getFullname(),
+classname: d.getClassname(),
+id: d.getClassname(),
+isSelected: false
+}));
+const botsOptions = computed(_=>bots_val)
 const activeBots = reactive({});
 const selected = Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k])
-const selectedOptions = botsOptions.filter(d => selected.includes(d.classname))
+const selectedOptions = ref(bots_val.filter(d => selected.includes(d.classname)))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
@@ -137,19 +131,12 @@ function sendPromptToBots() {
 
 }
 
-function toggleSelected(bot) {
-  const botId = bot.getClassname();
-  var selected = false;
-  if (!bot.isAvailable()) {
-    clickedBot.value = bot;
-    // Open the bot's settings dialog
-    isMakeAvailableOpen.value = true;
-    selected = true;
-  } else {
-    selected = !selectedBots.value[botId];
-  }
-  setBotSelected({ botId, selected });
+function toggleSelected(botIds) {
+  Object.keys(store.state.selectedBots).map(botId => {
+    setBotSelected({ botId, selected:botIds.includes(botId) })
+  })
   updateActiveBots();
+  selectedOptions.value = bots_val.filter(d => botIds.includes(d.classname));
 }
 
 function updateActiveBots() {
