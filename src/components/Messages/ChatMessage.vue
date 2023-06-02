@@ -77,19 +77,12 @@ onMounted(() => {
 
 function copyToClipboard() {
   navigator.clipboard.writeText(props.message.content);
-  // matomo.value.trackEvent("vote", "copy", props.message.className, 1);
 }
 
 function toggleHighlight() {
   emits("update-message", props.message.index, {
     highlight: !props.message.highlight,
   });
-  // matomo.value.trackEvent(
-  //   "vote",
-  //   "highlight",
-  //   props.message.className,
-  //   props.message.highlight ? -1 : 1,
-  // );
 }
 
 async function hide() {
@@ -98,7 +91,6 @@ async function hide() {
   );
   if (result) {
     emits("update-message", props.message.index, { hide: true });
-    // matomo.value.trackEvent("vote", "hide", props.message.className, 1);
   }
 }
 
