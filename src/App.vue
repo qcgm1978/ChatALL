@@ -34,8 +34,11 @@
       <div class="bot-logos margin-bottom">
         <!-- <img v-for="(bot, index) in bots" :class="{ selected: activeBots[bot.getClassname()] }" :key="index"
           :src="bot.getLogo()" :alt="bot.getFullname()" :title="bot.getFullname()" @click="toggleSelected(bot)" /> -->
-          <!-- label="Select bots" -->
-        <v-select v-model="selectedOptions" :items="botsOptions" multiple item-value="classname" 
+        <!-- label="Select bots" -->
+        <!-- <multiselect v-model="selectedBots" :options="bots" :multiple="true" :close-on-select="false"
+          :clear-on-select="false" :preserve-search="true" placeholder="Select bots"></multiselect> -->
+
+        <!-- <v-select v-model="selectedOptions" :items="botsOptions" multiple item-value="classname" 
         >
           <template #selection="{ item }">
             <v-chip close @click:close="() => (item.isSelected = false)">
@@ -57,7 +60,7 @@
               <v-checkbox :input-value="item.isSelected" @input="(value) => { item.isSelected = value }"> </v-checkbox>
             </v-list-item-text>
           </template>
-        </v-select>
+        </v-select> -->
 
 
       </div>
@@ -82,7 +85,8 @@ import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import { VListItemAvatar, VListItemContent,VListItemText } from 'vuetify/lib/components/VList'
+import { VListItemAvatar, VListItemContent, VListItemText } from 'vuetify/lib/components/VList'
+import Multiselect from 'vue-multiselect'
 
 // Composables
 // import { useMatomo } from "@/composables/matomo";
@@ -100,7 +104,7 @@ const botsOptions = ref(bots.value.map(d => ({
   logo: d.getLogo(),
   fullname: d.getFullname(),
   classname: d.getClassname(),
-  isSelected:false
+  isSelected: false
 })))
 const activeBots = reactive({});
 const selected = Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k])
