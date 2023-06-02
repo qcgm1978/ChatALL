@@ -39,8 +39,12 @@ async function createWindow() {
   });
 
   mainWindow = win;
+  // 窗口加载完成后最大化
+  win.webContents.on('did-finish-load', () => {
+    win.maximize();
+  });
   // win.setFullScreen(true)
-  // win.setFullScreen(false)
+
   // Force the SameSite attribute to None for all cookies
   // This is required for the cross-origin request to work
   win.webContents.session.cookies.on(
