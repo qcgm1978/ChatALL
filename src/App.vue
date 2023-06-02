@@ -124,7 +124,7 @@ async function checkAllBotsAvailability(specifiedBot = null) {
     let botsToCheck = bots.value.filter((bot) => selectedBots.value[bot.getClassname()])
     if (specifiedBot) {
       // If a bot is specified, only check bots of the same brand
-      botsToCheck = bots.value.filter(
+      botsToCheck = botsToCheck.filter(
         (bot) => bot.constructor._brandId === specifiedBot.constructor._brandId,
       );
     }
