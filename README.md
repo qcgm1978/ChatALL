@@ -121,10 +121,8 @@ npm run electron:build -- -wml --x64 --arm64
 - ChatGPT, Bing Chat and Google provide many solutions (ranked in order)
 - Inspired by [ChatHub](https://github.com/chathub-dev/chathub). Respect!
 
-### Mine
+## Sponsor
 
-```
-sudo yarn install 
-# --registry=https://registry.npm.taobao.org 
---proxy http://127.0.0.1:1087
-```
+If you like this project, please consider:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F8KZJGJ)
