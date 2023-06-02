@@ -51,8 +51,8 @@ export default class BingChatBot extends Bot {
     return conversation;
   }
 
-  async checkAvailability() {
-    await axios
+  checkAvailability() {
+    return axios
       .get("https://www.bing.com/turing/conversation/chats")
       .then((response) => {
         this.constructor._isAvailable =
@@ -67,8 +67,10 @@ export default class BingChatBot extends Bot {
       .catch((error) => {
         this.constructor._isAvailable = false;
         console.error("Error checking Bing Chat login status:", error);
+      })
+      .finally((_) => {
+        return this.isAvailable();
       });
-    return this.isAvailable();
   }
 
   async makePromptRequest(prompt) {
