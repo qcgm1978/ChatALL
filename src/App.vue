@@ -100,15 +100,17 @@ const store = useStore();
 const confirmModal = ref(null);
 const prompt = ref("");
 const bots = ref(_bots.all);
-const botsOptions = ref(bots.value.map(d => ({
+const botsOptions = (bots.value.map(d => ({
   logo: d.getLogo(),
   fullname: d.getFullname(),
+  name: d.getFullname(),
   classname: d.getClassname(),
+  id: d.getClassname(),
   isSelected: false
 })))
 const activeBots = reactive({});
 const selected = Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k])
-const selectedOptions = botsOptions.value.filter(d => selected.includes(d.code))
+const selectedOptions = botsOptions.filter(d => selected.includes(d.classname))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
