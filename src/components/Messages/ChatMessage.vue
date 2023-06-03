@@ -19,7 +19,7 @@
       </v-btn>
     </v-card-title>
     <Markdown class="markdown-body" :breaks="true" :html="true" :source="message.content" @click="handleClick" />
-    <VueVega :source="message.content" />
+    <!-- <VueVega :source="message.content" /> -->
   </v-card>
   <ConfirmModal ref="confirmModal" />
 </template>
@@ -28,7 +28,7 @@
 import { onMounted, ref, watch, computed } from "vue";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
-import VueVega from "./VueVega";
+// import VueVega from "./VueVega";
 // import { useMatomo } from "@/composables/matomo";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
@@ -109,6 +109,7 @@ function handleClick(event) {
   const url = target.href || target.parentElement.href;
   electron.shell.openExternal(url);
 }
+
 </script>
 
 <style scoped>

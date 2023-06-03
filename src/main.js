@@ -38,7 +38,7 @@ const vuetify = createVuetify({
       },
     },
   },
-  defaultLocale: (key, value) => value !== undefined ? value : key // Only set defaults for untranslated keys
+  defaultLocale: (key, value) => (value !== undefined ? value : key), // Only set defaults for untranslated keys
   // defaultLocale: (key, value) => value || key // Set key as default value inside createVuetify
 
 });
