@@ -22,7 +22,10 @@
         <ChatMessages :columns="columns"></ChatMessages>
       </div>
     </main>
-
+    <div class="bot-logos margin-bottom">
+      <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions"
+        multiple @update:model-value="toggleSelected($event)"></v-select>
+    </div>
     <footer>
       <v-textarea v-model="prompt" auto-grow max-rows="8.5" rows="1" density="comfortable" hide-details variant="solo"
         :placeholder="$t('footer.promptPlaceholder')" autofocus @keydown="filterEnterKey"
@@ -31,32 +34,7 @@
         " @click="sendPromptToBots">
         {{ $t("footer.sendPrompt") }}
       </v-btn>
-      <div class="bot-logos margin-bottom">
-        <!-- <img v-for="(bot, index) in bots" :class="{ selected: activeBots[bot.getClassname()] }" :key="index"
-          :src="bot.getLogo()" :alt="bot.getFullname()" :title="bot.getFullname()" @click="toggleSelected(bot)" /> -->
-          <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions" multiple
-          @update:model-value="toggleSelected($event)"
-          ></v-select>
-          <!-- <v-select v-model="selectedOptions" :items="botsOptions" item-text="name" item-value="id" label="Select" multiple>
-            <template v-slot:selection="{ item }">
-              <v-chip :key="item.id" class="ma-2" color="blue" text-color="white">
-                {{ item.name }}
-              </v-chip>
-            </template>
-            <template v-slot:item="{ item }">
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ item.name }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.fullname }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-            </template>
-          </v-select> -->
 
-
-      </div>
     </footer>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot"
       @done="checkAllBotsAvailability(clickedBot)" />
@@ -94,14 +72,14 @@ const confirmModal = ref(null);
 const prompt = ref("");
 const bots = ref(_bots.all);
 const bots_val = bots.value.map(d => ({
-logo: d.getLogo(),
-fullname: d.getFullname(),
-name: d.getFullname(),
-classname: d.getClassname(),
-id: d.getClassname(),
-isSelected: false
+  logo: d.getLogo(),
+  fullname: d.getFullname(),
+  name: d.getFullname(),
+  classname: d.getClassname(),
+  id: d.getClassname(),
+  isSelected: false
 }));
-const botsOptions = computed(_=>bots_val)
+const botsOptions = computed(_ => bots_val)
 const activeBots = reactive({});
 const selected = Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k])
 const selectedOptions = ref(bots_val.filter(d => selected.includes(d.classname)))
@@ -130,12 +108,12 @@ function sendPromptToBots() {
   prompt.value = "";
 
 }
-
 function toggleSelected(botIds) {
   Object.keys(store.state.selectedBots).map(botId => {
-    setBotSelected({ botId, selected:botIds.includes(botId) })
+    setBotSelected({ botId, selected: botIds.includes(botId) })
   })
-  updateActiveBots();
+  // updateActiveBots();
+  checkAllBotsAvailability()
   selectedOptions.value = bots_val.filter(d => botIds.includes(d.classname));
 }
 
@@ -262,6 +240,8 @@ header {
 }
 
 .bot-logos {
+  position: relative;
+  top: -120px;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
