@@ -12,7 +12,9 @@ export default class ChatGPT4Bot extends ChatGPTBot {
 
   async checkAvailability() {
     const isAvailable = await super.checkAvailability();
-    if (isAvailable) {
+    if (this.getClassname() == 'ChatGPTBrowsingBot') {
+      this.constructor._isAvailable = isAvailable;
+    }else if (isAvailable) {
       try {
         const headers = {
           "Content-Type": "application/json",

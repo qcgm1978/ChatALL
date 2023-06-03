@@ -81,8 +81,7 @@ const bots_val = bots.value.map(d => ({
 }));
 const botsOptions = computed(_ => bots_val)
 const activeBots = reactive({});
-const selected = Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k])
-const selectedOptions = ref(bots_val.filter(d => selected.includes(d.classname)))
+const selectedOptions = computed(_=>bots_val.filter(d => Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k]).includes(d.classname)))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
@@ -109,12 +108,12 @@ function sendPromptToBots() {
 
 }
 function toggleSelected(botIds) {
-  Object.keys(store.state.selectedBots).map(botId => {
-    setBotSelected({ botId, selected: botIds.includes(botId) })
+  bots_val.map(({id}) => {
+    setBotSelected({ botId:id, selected: botIds.includes(id) })
   })
   // updateActiveBots();
   checkAllBotsAvailability()
-  selectedOptions.value = bots_val.filter(d => botIds.includes(d.classname));
+  // selectedOptions.value = bots_val.filter(d => botIds.includes(d.classname));
 }
 
 function updateActiveBots() {
@@ -126,7 +125,7 @@ function updateActiveBots() {
 
 async function checkAllBotsAvailability(specifiedBot = null) {
   try {
-    let botsToCheck = bots.value.filter((bot) => selectedBots.value[bot.getClassname()])
+    let botsToCheck = bots.value.filter((bot) => store.state.selectedBots[bot.getClassname()])
     if (specifiedBot) {
       // If a bot is specified, only check bots of the same brand
       botsToCheck = botsToCheck.filter(
@@ -138,6 +137,7 @@ async function checkAllBotsAvailability(specifiedBot = null) {
         .checkAvailability()
         .then(() => updateActiveBots())
         .catch((error) => {
+          isMakeAvailableOpen.value = true;
           console.error(
             `Error checking login status for ${bot.getFullname()}:`,
             error,
