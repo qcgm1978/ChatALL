@@ -48,7 +48,8 @@ export default class ClaudeInSlackBot extends Bot {
       // When everything is done, call resolve()
       // If there is an error, call reject(error)
       try {
-        fetch(`http://127.0.0.1:8010/ask_claude?prompt=${prompt}`)
+        const url = `http://127.0.0.1:8010/ask_claude?prompt=${encodeURIComponent(prompt)}`;
+        fetch(url)
           .then((res) => res.json())
           .then((answer) => {
             onUpdateResponse(callbackParam, {
