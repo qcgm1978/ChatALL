@@ -21,6 +21,14 @@
       <div id="content">
         <ChatMessages :columns="columns"></ChatMessages>
       </div>
+      <v-card class="filter-table">
+        <v-card-title>
+          Nutrition
+          <v-spacer></v-spacer>
+          <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
+        </v-card-title>
+        <v-data-table :headers="headers" :items="desserts" :search="search"></v-data-table>
+      </v-card>
     </main>
     <div class="bot-logos margin-bottom">
       <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions"
@@ -36,14 +44,6 @@
       </v-btn>
 
     </footer>
-    <v-card >
-      <v-card-title>
-        Nutrition
-        <v-spacer></v-spacer>
-        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
-      </v-card-title>
-      <v-data-table :headers="headers" :items="desserts" :search="search" ></v-data-table>
-    </v-card>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot"
       @done="checkAllBotsAvailability(clickedBot)" />
     <SettingsModal v-model:open="isSettingsOpen" @done="checkAllBotsAvailability()" />
@@ -363,5 +363,8 @@ footer {
 /* Override default style of vuetify v-textarea */
 .v-textarea--auto-grow textarea {
   overflow: auto !important;
+}
+.filter-table{
+  transform: translate(0px, -100px);
 }
 </style>
