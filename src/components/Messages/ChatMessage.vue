@@ -18,7 +18,9 @@
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-card-title>
-    <Markdown class="markdown-body" :breaks="true" :html="true" :source="message.content" @click="handleClick" />
+    <pre v-if="message.type === 'prompt'">{{ message.content }}</pre>
+    <Markdown v-else class="markdown-body" :breaks="true" :html="message.format === 'html'" :source="message.content"
+      @click="handleClick" />
     <!-- <VueVega :source="message.content" /> -->
   </v-card>
   <ConfirmModal ref="confirmModal" />
@@ -29,7 +31,6 @@ import { onMounted, ref, watch, computed } from "vue";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
 // import VueVega from "./VueVega";
-// import { useMatomo } from "@/composables/matomo";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
 
@@ -49,7 +50,6 @@ const props = defineProps({
 
 const emits = defineEmits(["update-message"]);
 
-// const matomo = useMatomo();
 
 const root = ref();
 const confirmModal = ref(null);
@@ -76,7 +76,11 @@ onMounted(() => {
 });
 
 function copyToClipboard() {
-  navigator.clipboard.writeText(props.message.content);
+  let content = props.message.content;
+  if (props.message.format === "html") {
+    content = content.replace(/<[^>]*>?/gm, "");
+  }
+  navigator.clipboard.writeText(content);
 }
 
 function toggleHighlight() {
@@ -128,6 +132,11 @@ function handleClick(event) {
   background-color: #95EC69;
   width: fit-content;
   grid-column: 1 / span var(--columns);
+}
+
+.prompt pre {
+  white-space: pre-wrap;
+  font-family: inherit;
 }
 
 .response {
