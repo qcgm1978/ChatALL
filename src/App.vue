@@ -97,7 +97,7 @@ function sendPromptToBots() {
 
   const toBots = bots.value.filter((bot) => activeBots[bot.getClassname()]);
 
-  const store_dispatch = store.dispatch("sendPrompt", {
+  store.dispatch("sendPrompt", {
     prompt: prompt.value,
     bots: toBots,
   }).then((that) => {
