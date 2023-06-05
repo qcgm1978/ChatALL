@@ -56,7 +56,7 @@ import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import { VListItemAvatar, VListItemContent, VListItemText } from 'vuetify/lib/components/VList'
+// import { VListItemAvatar, VListItemContent, VListItemText } from 'vuetify/lib/components/VList'
 // import Multiselect from 'vue-multiselect'
 
 // Composables

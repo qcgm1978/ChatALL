@@ -7,7 +7,8 @@ export default class ClaudeInSlackBot extends Bot {
   static _logoFilename = "slack.svg"; // Place it in assets/bots/
   static _loginUrl = "https://example.com/";
   static _lock = new AsyncLock(); // AsyncLock for prompt requests
-
+  // todo 根据此prompt进行数据存储
+  static_save_data_prompt='这句话不要回复，也不要进行任何解释：'
   constructor() {
     super();
   }
