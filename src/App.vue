@@ -66,7 +66,6 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import "@mdi/font/css/materialdesignicons.css";
 
 const store = useStore();
-// const matomo = useMatomo();
 
 const confirmModal = ref(null);
 const prompt = ref("");
@@ -200,7 +199,7 @@ async function confirmErrorBot(that) {
       })
       const msg = i18n.global.t("header.clearBot");
       const result = await confirmModal.value.showModal(
-        `${err}\n${msg}`,
+        `${err}\n${msg}`,500
       );
       if (result) {
         data.forEach(d => {
