@@ -17,11 +17,12 @@ import * as directives from "vuetify/directives";
 store.commit("init");
 
 const vuetify = createVuetify({
+  locale: {
+    adapter: process.env.NODE_ENV !== 'development' && createVueI18nAdapter({ i18n, useI18n }),
+  },
+  
   components,
   directives,
-  locale: {
-    adapter: createVueI18nAdapter({ i18n, useI18n }),
-  },
   theme: {
     defaultTheme: "light",
     themes: {
@@ -38,9 +39,6 @@ const vuetify = createVuetify({
       },
     },
   },
-  defaultLocale: (key, value) => (value !== undefined ? value : key), // Only set defaults for untranslated keys
-  // defaultLocale: (key, value) => value || key // Set key as default value inside createVuetify
-
 });
 
 // Inject geetest script for iFlytek Spark

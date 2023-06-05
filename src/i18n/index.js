@@ -33,7 +33,17 @@ const i18n = createI18n({
   legacy: false, // Vuetify does not support the legacy mode of vue-i18n
   locale: lang,
   fallbackLocale: "en",
+  // fallbackLocale: false, // 不使用备用语言环境
   messages,
+  defaultLocale: (key, locale) => {
+    if (!locale || !locale[key]) {
+      return key
+    }
+  },
 });
-
+// i18n.set((key, locale) => {
+//   if (key === 'hello') {
+//     return '您好'
+//   }
+// })
 export default i18n;

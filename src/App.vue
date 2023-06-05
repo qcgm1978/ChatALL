@@ -36,6 +36,14 @@
       </v-btn>
 
     </footer>
+    <v-card >
+      <v-card-title>
+        Nutrition
+        <v-spacer></v-spacer>
+        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
+      </v-card-title>
+      <v-data-table :headers="headers" :items="desserts" :search="search" ></v-data-table>
+    </v-card>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot"
       @done="checkAllBotsAvailability(clickedBot)" />
     <SettingsModal v-model:open="isSettingsOpen" @done="checkAllBotsAvailability()" />
@@ -64,7 +72,7 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
-
+import { VDataTable } from 'vuetify/labs/VDataTable'
 const store = useStore();
 
 const confirmModal = ref(null);
@@ -90,7 +98,40 @@ const selectedBots = computed(() => store.state.selectedBots);
 const changeColumns = (columns) => store.commit("changeColumns", columns);
 const setUuid = (uuid) => store.commit("setUuid", uuid);
 const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
+// filter table(https://vuetifyjs.com/en/components/data-tables/filtering/#data-table-filtering)
+const search = ref('')
+const headers = reactive([
+  {
+    align: 'start',
+    key: 'name',
+    sortable: false,
+    title: 'Dessert (100g serving)',
+  },
+  { key: 'calories', title: 'Calories' },
+  { key: 'fat', title: 'Fat (g)' },
+  { key: 'carbs', title: 'Carbs (g)' },
+  { key: 'protein', title: 'Protein (g)' },
+  { key: 'iron', title: 'Iron (%)' },
+])
+const desserts = reactive([
+  {
+    name: 'Frozen Yogurt',
+    calories: 159,
+    fat: 6.0,
+    carbs: 24,
+    protein: 4.0,
+    iron: 1,
+  },
+  {
+    name: 'Ice cream sandwich',
+    calories: 237,
+    fat: 9.0,
+    carbs: 37,
+    protein: 4.3,
+    iron: 1,
+  },
 
+])
 function sendPromptToBots() {
   if (prompt.value.trim() === "") return;
   if (Object.values(activeBots).every((bot) => !bot)) return;
@@ -199,7 +240,7 @@ async function confirmErrorBot(that) {
       })
       const msg = i18n.global.t("header.clearBot");
       const result = await confirmModal.value.showModal(
-        `${err}\n${msg}`,500
+        `${err}\n${msg}`, 500
       );
       if (result) {
         data.forEach(d => {
