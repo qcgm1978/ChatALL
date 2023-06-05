@@ -21,14 +21,14 @@
       <div id="content">
         <ChatMessages :columns="columns"></ChatMessages>
       </div>
-      <v-card class="filter-table">
+      <!-- <v-card class="filter-table">
         <v-card-title>
           Nutrition
           <v-spacer></v-spacer>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="headers" :items="desserts" :search="search"></v-data-table>
-      </v-card>
+      </v-card> -->
     </main>
     <div class="bot-logos margin-bottom">
       <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions"
@@ -99,39 +99,43 @@ const changeColumns = (columns) => store.commit("changeColumns", columns);
 const setUuid = (uuid) => store.commit("setUuid", uuid);
 const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
 // filter table(https://vuetifyjs.com/en/components/data-tables/filtering/#data-table-filtering)
-const search = ref('')
-const headers = reactive([
-  {
-    align: 'start',
-    key: 'name',
-    sortable: false,
-    title: 'Dessert (100g serving)',
-  },
-  { key: 'calories', title: 'Calories' },
-  { key: 'fat', title: 'Fat (g)' },
-  { key: 'carbs', title: 'Carbs (g)' },
-  { key: 'protein', title: 'Protein (g)' },
-  { key: 'iron', title: 'Iron (%)' },
-])
-const desserts = reactive([
-  {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    iron: 1,
-  },
-  {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    iron: 1,
-  },
+// const { search, headers, desserts } = set_filter_table();
+function set_filter_table() {
+  const search = ref('');
+  const headers = reactive([
+    {
+      align: 'start',
+      key: 'name',
+      sortable: false,
+      title: 'Dessert (100g serving)',
+    },
+    { key: 'calories', title: 'Calories' },
+    { key: 'fat', title: 'Fat (g)' },
+    { key: 'carbs', title: 'Carbs (g)' },
+    { key: 'protein', title: 'Protein (g)' },
+    { key: 'iron', title: 'Iron (%)' },
+  ]);
+  const desserts = reactive([
+    {
+      name: 'Frozen Yogurt',
+      calories: 159,
+      fat: 6.0,
+      carbs: 24,
+      protein: 4.0,
+      iron: 1,
+    },
+    {
+      name: 'Ice cream sandwich',
+      calories: 237,
+      fat: 9.0,
+      carbs: 37,
+      protein: 4.3,
+      iron: 1,
+    },
+  ]);
+  return { search, headers, desserts };
+}
 
-])
 function sendPromptToBots() {
   if (prompt.value.trim() === "") return;
   if (Object.values(activeBots).every((bot) => !bot)) return;
@@ -364,7 +368,8 @@ footer {
 .v-textarea--auto-grow textarea {
   overflow: auto !important;
 }
-.filter-table{
+
+.filter-table {
   transform: translate(0px, -100px);
 }
 </style>
