@@ -154,17 +154,25 @@ function sendPromptToBots() {
 
 }
 function toggleSelected(botIds) {
-  bots_val.map(({ id }) => {
+  bots_val.forEach(({ id }) => {
     setBotSelected({ botId: id, selected: botIds.includes(id) })
   })
   checkAllBotsAvailability()
 }
 
+function adaptColumns(ps) {
+  const num = ps.map(d => d.status == 'fulfilled').length
+  changeColumns(num >= 3 ? 3 : num);
+}
+
 function updateActiveBots() {
+  let i = 0
   for (const bot of bots.value) {
-    activeBots[bot.getClassname()] =
-      bot.isAvailable() && selectedBots.value[bot.getClassname()];
+    const val = bot.isAvailable() && selectedBots.value[bot.getClassname()];
+    activeBots[bot.getClassname()] = val;
+    val && i++
   }
+  return i
 }
 
 async function checkAllBotsAvailability(specifiedBot = null) {
@@ -187,8 +195,8 @@ async function checkAllBotsAvailability(specifiedBot = null) {
             error,
           );
         }),
-    );
-    await Promise.allSettled(checkAvailabilityPromises);
+    )
+    await Promise.allSettled(checkAvailabilityPromises).then(adaptColumns)
   } catch (error) {
     console.error("Error checking login status for bots:", error);
   }
