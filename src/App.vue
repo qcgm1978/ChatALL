@@ -81,7 +81,7 @@ const bots_val = bots.value.map(d => ({
 }));
 const botsOptions = computed(_ => bots_val)
 const activeBots = reactive({});
-const selectedOptions = computed(_=>bots_val.filter(d => Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k]).includes(d.classname)))
+const selectedOptions = computed(_ => bots_val.filter(d => Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k]).includes(d.classname)))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
@@ -98,22 +98,22 @@ function sendPromptToBots() {
 
   const toBots = bots.value.filter((bot) => activeBots[bot.getClassname()]);
 
-  store.dispatch("sendPrompt", {
+  const store_dispatch = store.dispatch("sendPrompt", {
     prompt: prompt.value,
     bots: toBots,
-  });
+  }).then((that) => {
+    confirmErrorBot(that)
+  })
 
   // Clear the textarea after sending the prompt
   prompt.value = "";
 
 }
 function toggleSelected(botIds) {
-  bots_val.map(({id}) => {
-    setBotSelected({ botId:id, selected: botIds.includes(id) })
+  bots_val.map(({ id }) => {
+    setBotSelected({ botId: id, selected: botIds.includes(id) })
   })
-  // updateActiveBots();
   checkAllBotsAvailability()
-  // selectedOptions.value = bots_val.filter(d => botIds.includes(d.classname));
 }
 
 function updateActiveBots() {
@@ -176,6 +176,40 @@ async function clearMessages() {
   if (result) {
     store.commit("clearMessages");
   }
+}
+async function confirmErrorBot(that) {
+  let failed = []
+  Promise.allSettled(that).then(results => {
+    for (let result of results) {
+      if (result.status === 'fulfilled') {
+        // 处理resolve的Promise
+      } else {
+        // 处理reject的Promise 
+        const bot = result.reason
+        const fullName = bot.getFullname()
+        const classname = bot.getClassname()
+        failed.push({ fullName, classname })
+      }
+    }
+    return failed
+  }).then(async data => {
+    if (data.length) {
+      const names = data.map(d => d.fullName).join(',')
+      const err = i18n.global.t("error.failedConnectUrl", {
+        url: names,
+      })
+      const msg = i18n.global.t("header.clearBot");
+      const result = await confirmModal.value.showModal(
+        `${err}\n${msg}`,
+      );
+      if (result) {
+        data.forEach(d => {
+          setBotSelected({ botId: d.classname, selected: false })
+        })
+        updateActiveBots()
+      }
+    }
+  })
 }
 
 onMounted(() => {

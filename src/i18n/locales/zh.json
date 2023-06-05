@@ -16,6 +16,7 @@
   },
   "header": {
     "clearMessages": "清空所有消息？",
+    "clearBot": "不再询问该机器人？",
     "yes": "是",
     "no": "否",
     "singleColumn": "单列",

@@ -45,7 +45,7 @@ export default class ChatGPTBot extends Bot {
         this.constructor._isAvailable = false;
       }
     } catch (error) {
-      console.error("Error checking ChatGPT login status:", error);
+      console.warn("Error checking ChatGPT login status:", error);
       this.constructor._isAvailable = false;
     }
     // Toggle periodic session refreshing based on login status

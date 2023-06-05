@@ -15,6 +15,7 @@
   },
   "header": {
     "clearMessages": "Clear all messages?",
+    "clearBot": "Clear selected failed bot?",
     "yes": "Yes",
     "no": "No",
     "singleColumn": "Single Column",

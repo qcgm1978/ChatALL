@@ -154,7 +154,7 @@ export default createStore({
         done: true,
         hide: false,
       });
-
+      const ret=[]
       for (const bot of bots) {
         const message = {
           type: "response",
@@ -171,13 +171,13 @@ export default createStore({
         const currentChat = state.chats[state.currentChatIndex];
         message.index = currentChat.messages.push(message) - 1;
 
-        bot.sendPrompt(
+        const bot_sendPrompt=bot.sendPrompt(
           prompt,
           (indexes, values) =>
             dispatch("updateMessage", { indexes, message: values }),
           { chatIndex: state.currentChatIndex, messageIndex: message.index },
         );
-
+        ret.push(bot_sendPrompt)
         getMatomo().trackEvent(
           "prompt",
           "sendTo",
@@ -185,6 +185,7 @@ export default createStore({
           prompt.length,
         );
       }
+      return ret
     },
     updateMessage({ commit, state }, { indexes, message: values }) {
       commit("updateMessage", { indexes, message: values });
