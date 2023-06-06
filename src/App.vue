@@ -30,7 +30,7 @@
         <v-data-table :headers="headers" :items="desserts" :search="search"></v-data-table>
       </v-card> -->
     </main>
-    <div class="bot-logos margin-bottom">
+    <!-- <div class="bot-logos margin-bottom">
       <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions"
         multiple @update:model-value="toggleSelected($event)"></v-select>
     </div>
@@ -46,33 +46,34 @@
     </footer>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot"
       @done="checkAllBotsAvailability(clickedBot)" />
-    <SettingsModal v-model:open="isSettingsOpen" @done="checkAllBotsAvailability()" />
+    <SettingsModal v-model:open="isSettingsOpen" @done="checkAllBotsAvailability()" /> -->
+
+    <FooterBar></FooterBar>
+    <SettingsModal
+      v-model:open="isSettingsOpen"
+      @done="checkAllBotsAvailability()"
+    />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeMount, reactive } from "vue";
+import { ref, computed, onMounted,reactive } from "vue";
 import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 
 import i18n from "./i18n";
-import _bots from "./bots";
 
 // Components
-import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-// import { VListItemAvatar, VListItemContent, VListItemText } from 'vuetify/lib/components/VList'
-// import Multiselect from 'vue-multiselect'
-
-// Composables
-// import { useMatomo } from "@/composables/matomo";
+import FooterBar from "@/components/Footer/FooterBar.vue";
 
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
-import { VDataTable } from 'vuetify/labs/VDataTable'
+// import { VDataTable } from 'vuetify/labs/VDataTable'
+import _bots from "@/bots";
 const store = useStore();
 
 const confirmModal = ref(null);
@@ -88,12 +89,12 @@ const bots_val = bots.value.map(d => ({
 }));
 const botsOptions = computed(_ => bots_val)
 const activeBots = reactive({});
+const selectedBots = computed(() => store.state.selectedBots);
 const selectedOptions = computed(_ => bots_val.filter(d => Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k]).includes(d.classname)))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
 const columns = computed(() => store.state.columns);
-const selectedBots = computed(() => store.state.selectedBots);
 
 const changeColumns = (columns) => store.commit("changeColumns", columns);
 const setUuid = (uuid) => store.commit("setUuid", uuid);
@@ -206,21 +207,6 @@ function openSettingsModal() {
   isSettingsOpen.value = true;
 }
 
-// Send the prompt when the user presses enter and prevent the default behavior
-// But if the shift, ctrl, alt, or meta keys are pressed, do as default
-function filterEnterKey(event) {
-  if (
-    event.keyCode == 13 &&
-    !event.shiftKey &&
-    !event.ctrlKey &&
-    !event.altKey &&
-    !event.metaKey
-  ) {
-    event.preventDefault();
-    sendPromptToBots();
-  }
-}
-
 async function clearMessages() {
   const result = await confirmModal.value.showModal(
     i18n.global.t("header.clearMessages"),
@@ -273,10 +259,6 @@ onMounted(() => {
   const ver = require("../package.json").version;
   document.title = `ChatALL.ai - v${ver}`;
 });
-
-onBeforeMount(() => {
-  checkAllBotsAvailability();
-});
 </script>
 
 <style>
@@ -325,56 +307,14 @@ header {
   margin: 4px;
 }
 
-.bot-logos {
-  position: relative;
-  top: -120px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.bot-logos img {
-  opacity: 0.3;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-}
-
-img.selected {
-  opacity: 1;
-}
-
 .content {
   flex: 1;
   background-color: #f3f3f3;
   padding: 16px;
 }
 
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: transparent;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 8px 16px;
-  gap: 8px;
-  box-sizing: border-box;
-}
-
-.margin-bottom {
-  margin-bottom: 5px;
-}
-
 .cursor-pointer {
   cursor: pointer;
-}
-
-/* Override default style of vuetify v-textarea */
-.v-textarea--auto-grow textarea {
-  overflow: auto !important;
 }
 
 .filter-table {

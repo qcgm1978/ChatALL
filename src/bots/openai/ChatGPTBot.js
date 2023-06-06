@@ -193,18 +193,20 @@ export default class ChatGPTBot extends Bot {
           if (error.data) {
             try {
               const data = JSON.parse(error.data);
-              message = data.detail;
+              message = data.detail?.message;
             } catch (e) {
-              // 创建一个虚拟的 HTML 元素
-              const div = document.createElement("div");
-
-              // 将文档字符串赋值给虚拟元素的 innerHTML 属性
-              div.innerHTML = error.data;
-
-              // 使用 DOM 操作获取目标标签的文本内容
-              const p = div.querySelector("p").textContent;
-              const span=div.querySelector("span").textContent
-              message = `${p}. ${span}`;
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(error.data, "text/html");
+              const msg = doc.querySelector(".message p");
+              message = msg ? msg.textContent + ". " : "";
+              const explanation = doc.querySelector(".explanation");
+              if (msg || explanation) {
+                message += explanation ? explanation.textContent : "";
+              } else {
+                const p = doc.querySelector("p").textContent;
+                const span = doc.querySelector("span").textContent;
+                message = `${p}. ${span}`;
+              }
             }
           } else {
             message = error.source.url;
