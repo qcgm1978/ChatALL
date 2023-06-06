@@ -3,9 +3,6 @@ import VuexPersist from "vuex-persist";
 import i18n from "@/i18n";
 import messagesPersist from "./messagesPersist";
 
-const getMatomo = function () {
-  return window.Piwik.getAsyncTracker();
-};
 
 // 初始化 VuexPersist 实例
 const vuexPersist = new VuexPersist({
@@ -178,12 +175,6 @@ export default createStore({
           { chatIndex: state.currentChatIndex, messageIndex: message.index },
         );
         ret.push(bot_sendPrompt)
-        getMatomo().trackEvent(
-          "prompt",
-          "sendTo",
-          bot.getClassname(),
-          prompt.length,
-        );
       }
       return ret
     },
@@ -199,14 +190,6 @@ export default createStore({
         indexes.chatIndex == -1 ? state.currentChatIndex : indexes.chatIndex;
       const chat = state.chats[i];
       const message = { ...chat.messages[indexes.messageIndex], ...values };
-      if (values.done) {
-        getMatomo().trackEvent(
-          "prompt",
-          "received",
-          message.className,
-          message.content.length,
-        );
-      }
     },
   },
   getters: {

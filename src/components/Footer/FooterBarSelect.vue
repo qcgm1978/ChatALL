@@ -113,8 +113,8 @@ async function checkAllBotsAvailability(specifiedBot = null) {
     console.error("Error checking login status for bots:", error);
   }
 }
-function adaptColumns(ps) {
-  const num = ps.map((d) => d.status == "fulfilled").length;
+function adaptColumns(promises) {
+  const num = promises.map((d) => d.status == "fulfilled").length;
   props.changeColumns(num >= 3 ? 3 : num);
 }
 

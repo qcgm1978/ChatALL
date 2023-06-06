@@ -47,14 +47,12 @@ import { useStore } from "vuex";
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 
 // Composables
-import { useMatomo } from "@/composables/matomo";
 
 import _bots from "@/bots";
 
 const { ipcRenderer } = window.require("electron");
 
 const store = useStore();
-const matomo = useMatomo();
 
 const activeBots = reactive({});
 const bots = ref(_bots.all);
@@ -100,12 +98,6 @@ function sendPromptToBots() {
   // Clear the textarea after sending the prompt
   prompt.value = "";
 
-  matomo.value?.trackEvent(
-    "prompt",
-    "send",
-    "Active bots count",
-    toBots.length,
-  );
 }
 
 async function toggleSelected(bot) {

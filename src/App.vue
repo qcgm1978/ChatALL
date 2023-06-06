@@ -163,8 +163,6 @@ async function clearMessages() {
 onMounted(() => {
   // Vue.component('VListItemAvatar', VListItemAvatar)
   !store.state.uuid && setUuid(uuidv4());
-  window._paq.push(["setUserId", store.state.uuid]);
-  // window._paq.push(["trackPageView"]);
 
   const ver = require("../package.json").version;
   document.title = `ChatALL.ai - v${ver}`;
