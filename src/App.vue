@@ -4,15 +4,37 @@
       <div class="header-content">
         <img class="logo" src="@/assets/logo-banner.png" alt="ChatALL" />
         <div class="column-icons">
-          <img src="@/assets/column-1.svg" @click="changeColumns(1)" :class="{ selected: columns === 1 }" />
-          <img src="@/assets/column-2.svg" @click="changeColumns(2)" :class="{ selected: columns === 2 }" />
-          <img src="@/assets/column-3.svg" @click="changeColumns(3)" :class="{ selected: columns === 3 }" />
+          <img
+            src="@/assets/column-1.svg"
+            @click="changeColumns(1)"
+            :class="{ selected: columns === 1 }"
+          />
+          <img
+            src="@/assets/column-2.svg"
+            @click="changeColumns(2)"
+            :class="{ selected: columns === 2 }"
+          />
+          <img
+            src="@/assets/column-3.svg"
+            @click="changeColumns(3)"
+            :class="{ selected: columns === 3 }"
+          />
         </div>
         <div>
-          <v-icon class="cursor-pointer" color="primary" icon="mdi-broom" size="x-large"
-            @click="clearMessages()"></v-icon>
-          <v-icon class="cursor-pointer" color="primary" icon="mdi-cog" size="x-large"
-            @click="openSettingsModal()"></v-icon>
+          <v-icon
+            class="cursor-pointer"
+            color="primary"
+            icon="mdi-broom"
+            size="x-large"
+            @click="clearMessages()"
+          ></v-icon>
+          <v-icon
+            class="cursor-pointer"
+            color="primary"
+            icon="mdi-cog"
+            size="x-large"
+            @click="openSettingsModal()"
+          ></v-icon>
         </div>
       </div>
     </header>
@@ -30,35 +52,18 @@
         <v-data-table :headers="headers" :items="desserts" :search="search"></v-data-table>
       </v-card> -->
     </main>
-    <!-- <div class="bot-logos margin-bottom">
-      <v-select :items="botsOptions" item-title="name" item-value="id" hide-details :model-value="selectedOptions"
-        multiple @update:model-value="toggleSelected($event)"></v-select>
-    </div>
-    <footer>
-      <v-textarea v-model="prompt" auto-grow max-rows="8.5" rows="1" density="comfortable" hide-details variant="solo"
-        :placeholder="$t('footer.promptPlaceholder')" autofocus @keydown="filterEnterKey"
-        style="min-width: 390px"></v-textarea>
-      <v-btn color="primary" elevation="2" class="margin-bottom" :disabled="prompt.trim() === '' || Object.values(activeBots).every((bot) => !bot)
-        " @click="sendPromptToBots">
-        {{ $t("footer.sendPrompt") }}
-      </v-btn>
 
-    </footer>
-    <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot"
-      @done="checkAllBotsAvailability(clickedBot)" />
-    <SettingsModal v-model:open="isSettingsOpen" @done="checkAllBotsAvailability()" /> -->
-
-    <FooterBar></FooterBar>
+    <FooterBarSelect v-if="NODE_ENV === 'development'" :changeColumns="changeColumns" />
+    <FooterBar v-else></FooterBar>
     <SettingsModal
       v-model:open="isSettingsOpen"
-      @done="checkAllBotsAvailability()"
     />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted,reactive } from "vue";
+import { ref, computed, onMounted, reactive } from "vue";
 import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 
@@ -68,6 +73,7 @@ import i18n from "./i18n";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import FooterBarSelect from "@/components/Footer/FooterBarSelect.vue";
 import FooterBar from "@/components/Footer/FooterBar.vue";
 
 // Styles
@@ -75,22 +81,13 @@ import "@mdi/font/css/materialdesignicons.css";
 // import { VDataTable } from 'vuetify/labs/VDataTable'
 import _bots from "@/bots";
 const store = useStore();
-
+const NODE_ENV=process.env.NODE_ENV
 const confirmModal = ref(null);
 const prompt = ref("");
 const bots = ref(_bots.all);
-const bots_val = bots.value.map(d => ({
-  logo: d.getLogo(),
-  fullname: d.getFullname(),
-  name: d.getFullname(),
-  classname: d.getClassname(),
-  id: d.getClassname(),
-  isSelected: false
-}));
-const botsOptions = computed(_ => bots_val)
+
 const activeBots = reactive({});
 const selectedBots = computed(() => store.state.selectedBots);
-const selectedOptions = computed(_ => bots_val.filter(d => Object.keys(store.state.selectedBots).filter(k => store.state.selectedBots[k]).includes(d.classname)))
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
@@ -102,23 +99,23 @@ const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
 // filter table(https://vuetifyjs.com/en/components/data-tables/filtering/#data-table-filtering)
 // const { search, headers, desserts } = set_filter_table();
 function set_filter_table() {
-  const search = ref('');
+  const search = ref("");
   const headers = reactive([
     {
-      align: 'start',
-      key: 'name',
+      align: "start",
+      key: "name",
       sortable: false,
-      title: 'Dessert (100g serving)',
+      title: "Dessert (100g serving)",
     },
-    { key: 'calories', title: 'Calories' },
-    { key: 'fat', title: 'Fat (g)' },
-    { key: 'carbs', title: 'Carbs (g)' },
-    { key: 'protein', title: 'Protein (g)' },
-    { key: 'iron', title: 'Iron (%)' },
+    { key: "calories", title: "Calories" },
+    { key: "fat", title: "Fat (g)" },
+    { key: "carbs", title: "Carbs (g)" },
+    { key: "protein", title: "Protein (g)" },
+    { key: "iron", title: "Iron (%)" },
   ]);
   const desserts = reactive([
     {
-      name: 'Frozen Yogurt',
+      name: "Frozen Yogurt",
       calories: 159,
       fat: 6.0,
       carbs: 24,
@@ -126,7 +123,7 @@ function set_filter_table() {
       iron: 1,
     },
     {
-      name: 'Ice cream sandwich',
+      name: "Ice cream sandwich",
       calories: 237,
       fat: 9.0,
       carbs: 37,
@@ -137,71 +134,18 @@ function set_filter_table() {
   return { search, headers, desserts };
 }
 
-function sendPromptToBots() {
-  if (prompt.value.trim() === "") return;
-  if (Object.values(activeBots).every((bot) => !bot)) return;
 
-  const toBots = bots.value.filter((bot) => activeBots[bot.getClassname()]);
-
-  store.dispatch("sendPrompt", {
-    prompt: prompt.value,
-    bots: toBots,
-  }).then((that) => {
-    confirmErrorBot(that)
-  })
-
-  // Clear the textarea after sending the prompt
-  prompt.value = "";
-
-}
-function toggleSelected(botIds) {
-  bots_val.forEach(({ id }) => {
-    setBotSelected({ botId: id, selected: botIds.includes(id) })
-  })
-  checkAllBotsAvailability()
-}
-
-function adaptColumns(ps) {
-  const num = ps.map(d => d.status == 'fulfilled').length
-  changeColumns(num >= 3 ? 3 : num);
-}
 
 function updateActiveBots() {
-  let i = 0
+  let i = 0;
   for (const bot of bots.value) {
     const val = bot.isAvailable() && selectedBots.value[bot.getClassname()];
     activeBots[bot.getClassname()] = val;
-    val && i++
+    val && i++;
   }
-  return i
+  return i;
 }
 
-async function checkAllBotsAvailability(specifiedBot = null) {
-  try {
-    let botsToCheck = bots.value.filter((bot) => store.state.selectedBots[bot.getClassname()])
-    if (specifiedBot) {
-      // If a bot is specified, only check bots of the same brand
-      botsToCheck = botsToCheck.filter(
-        (bot) => bot.constructor._brandId === specifiedBot.constructor._brandId,
-      );
-    }
-    const checkAvailabilityPromises = botsToCheck.map((bot) =>
-      bot
-        .checkAvailability()
-        .then(() => updateActiveBots())
-        .catch((error) => {
-          isMakeAvailableOpen.value = true;
-          console.error(
-            `Error checking login status for ${bot.getFullname()}:`,
-            error,
-          );
-        }),
-    )
-    await Promise.allSettled(checkAvailabilityPromises).then(adaptColumns)
-  } catch (error) {
-    console.error("Error checking login status for bots:", error);
-  }
-}
 
 function openSettingsModal() {
   isSettingsOpen.value = true;
@@ -214,40 +158,6 @@ async function clearMessages() {
   if (result) {
     store.commit("clearMessages");
   }
-}
-async function confirmErrorBot(that) {
-  let failed = []
-  Promise.allSettled(that).then(results => {
-    for (let result of results) {
-      if (result.status === 'fulfilled') {
-        // 处理resolve的Promise
-      } else {
-        // 处理reject的Promise 
-        const bot = result.reason
-        const fullName = bot.getFullname()
-        const classname = bot.getClassname()
-        failed.push({ fullName, classname })
-      }
-    }
-    return failed
-  }).then(async data => {
-    if (data.length) {
-      const names = data.map(d => d.fullName).join(',')
-      const err = i18n.global.t("error.failedConnectUrl", {
-        url: names,
-      })
-      const msg = i18n.global.t("header.clearBot");
-      const result = await confirmModal.value.showModal(
-        `${err}\n${msg}`, 500
-      );
-      if (result) {
-        data.forEach(d => {
-          setBotSelected({ botId: d.classname, selected: false })
-        })
-        updateActiveBots()
-      }
-    }
-  })
 }
 
 onMounted(() => {
