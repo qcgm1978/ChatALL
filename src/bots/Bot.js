@@ -171,6 +171,8 @@ export default class Bot {
     }
 
     const executeSendPrompt = async () => {
+      // Begin thinking...
+      onUpdateResponse(callbackParam, { content: "...", done: false });
       await this._sendPrompt(prompt, onUpdateResponse, callbackParam);
     };
 
@@ -188,8 +190,9 @@ export default class Bot {
         });
       }
     } catch (err) {
-      console.error(`Error send prompt to ${this.getFullname()}:`, err);
+      console.warn(`Error send prompt to ${this.getFullname()}:`, err);
       onUpdateResponse(callbackParam, { content: err.toString(), done: true }); // Make sure stop loading
+      throw this
     }
   }
 

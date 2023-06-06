@@ -11,7 +11,8 @@ export default class ClaudeInSlackBot extends Bot {
   static _logoFilename = "slack.svg"; // Place it in assets/bots/
   static _loginUrl = "https://example.com/";
   static _lock = new AsyncLock(); // AsyncLock for prompt requests
-
+  // todo 根据此prompt进行数据存储
+  static_save_data_prompt='这句话不要回复，也不要进行任何解释：'
   constructor() {
     super();
   }
@@ -65,7 +66,8 @@ export default class ClaudeInSlackBot extends Bot {
       // When everything is done, call resolve()
       // If there is an error, call reject(error)
       try {
-        fetch(`http://127.0.0.1:8010/ask_claude?prompt=${prompt}`)
+        const url = `http://127.0.0.1:8010/ask_claude?prompt=${encodeURIComponent(prompt)}`;
+        fetch(url)
           .then((res) => res.json())
           .then((answer) => {
             onUpdateResponse(callbackParam, {

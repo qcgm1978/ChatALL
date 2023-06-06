@@ -43,186 +43,112 @@
       <div id="content">
         <ChatMessages :columns="columns"></ChatMessages>
       </div>
+      <!-- <v-card class="filter-table">
+        <v-card-title>
+          Nutrition
+          <v-spacer></v-spacer>
+          <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
+        </v-card-title>
+        <v-data-table :headers="headers" :items="desserts" :search="search"></v-data-table>
+      </v-card> -->
     </main>
 
-    <footer>
-      <v-textarea
-        v-model="prompt"
-        auto-grow
-        max-rows="8.5"
-        rows="1"
-        density="comfortable"
-        hide-details
-        variant="solo"
-        :placeholder="$t('footer.promptPlaceholder')"
-        autofocus
-        @keydown="filterEnterKey"
-        style="min-width: 390px"
-      ></v-textarea>
-      <v-btn
-        color="primary"
-        elevation="2"
-        class="margin-bottom"
-        :disabled="
-          prompt.trim() === '' || Object.values(activeBots).every((bot) => !bot)
-        "
-        @click="sendPromptToBots"
-      >
-        {{ $t("footer.sendPrompt") }}
-      </v-btn>
-      <div class="bot-logos margin-bottom">
-        <img
-          v-for="(bot, index) in bots"
-          :class="{ selected: activeBots[bot.getClassname()] }"
-          :key="index"
-          :src="bot.getLogo()"
-          :alt="bot.getFullname()"
-          :title="bot.getFullname()"
-          @click="toggleSelected(bot)"
-        />
-      </div>
-    </footer>
-    <MakeAvailableModal
-      v-model:open="isMakeAvailableOpen"
-      :bot="clickedBot"
-      @done="checkAllBotsAvailability(clickedBot)"
-    />
+    <FooterBarSelect v-if="NODE_ENV === 'development'" :changeColumns="changeColumns" />
+    <FooterBar v-else></FooterBar>
     <SettingsModal
       v-model:open="isSettingsOpen"
-      @done="checkAllBotsAvailability()"
     />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeMount, reactive } from 'vue';
+import { ref, computed, onMounted, reactive } from "vue";
 import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 
 import i18n from "./i18n";
-import _bots from "./bots";
 
 // Components
-import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-
-// Composables
-import { useMatomo } from '@/composables/matomo';
+import FooterBarSelect from "@/components/Footer/FooterBarSelect.vue";
+import FooterBar from "@/components/Footer/FooterBar.vue";
 
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
-
+// import { VDataTable } from 'vuetify/labs/VDataTable'
+import _bots from "@/bots";
 const store = useStore();
-const matomo = useMatomo();
-
+const NODE_ENV=process.env.NODE_ENV
 const confirmModal = ref(null);
 const prompt = ref("");
 const bots = ref(_bots.all);
+
 const activeBots = reactive({});
+const selectedBots = computed(() => store.state.selectedBots);
 const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
 const isMakeAvailableOpen = ref(false);
-
 const columns = computed(() => store.state.columns);
-const selectedBots = computed(() => store.state.selectedBots);
 
 const changeColumns = (columns) => store.commit("changeColumns", columns);
 const setUuid = (uuid) => store.commit("setUuid", uuid);
 const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
-
-function sendPromptToBots() {
-  if (prompt.value.trim() === "") return;
-  if (Object.values(activeBots).every((bot) => !bot)) return;
-
-  const toBots = bots.value.filter(
-    (bot) => activeBots[bot.getClassname()],
-  );
-
-  store.dispatch("sendPrompt", {
-    prompt: prompt.value,
-    bots: toBots,
-  });
-
-  matomo.value && matomo.value.trackEvent(
-    "prompt",
-    "send",
-    "Active bots count",
-    toBots.length,
-  );
-  // Clear the textarea after sending the prompt
-  prompt.value = "";
+// filter table(https://vuetifyjs.com/en/components/data-tables/filtering/#data-table-filtering)
+// const { search, headers, desserts } = set_filter_table();
+function set_filter_table() {
+  const search = ref("");
+  const headers = reactive([
+    {
+      align: "start",
+      key: "name",
+      sortable: false,
+      title: "Dessert (100g serving)",
+    },
+    { key: "calories", title: "Calories" },
+    { key: "fat", title: "Fat (g)" },
+    { key: "carbs", title: "Carbs (g)" },
+    { key: "protein", title: "Protein (g)" },
+    { key: "iron", title: "Iron (%)" },
+  ]);
+  const desserts = reactive([
+    {
+      name: "Frozen Yogurt",
+      calories: 159,
+      fat: 6.0,
+      carbs: 24,
+      protein: 4.0,
+      iron: 1,
+    },
+    {
+      name: "Ice cream sandwich",
+      calories: 237,
+      fat: 9.0,
+      carbs: 37,
+      protein: 4.3,
+      iron: 1,
+    },
+  ]);
+  return { search, headers, desserts };
 }
 
-function toggleSelected(bot) {
-  const botId = bot.getClassname();
-  var selected = false;
-  if (!bot.isAvailable()) {
-    clickedBot.value = bot;
-    // Open the bot's settings dialog
-    isMakeAvailableOpen.value = true;
-    selected = true;
-  } else {
-    selected = !selectedBots.value[botId];
-  }
-  setBotSelected({ botId, selected });
-  updateActiveBots();
-}
+
 
 function updateActiveBots() {
+  let i = 0;
   for (const bot of bots.value) {
-    activeBots[bot.getClassname()] =
-      bot.isAvailable() && selectedBots.value[bot.getClassname()];
+    const val = bot.isAvailable() && selectedBots.value[bot.getClassname()];
+    activeBots[bot.getClassname()] = val;
+    val && i++;
   }
+  return i;
 }
 
-async function checkAllBotsAvailability(specifiedBot = null) {
-  try {
-    let botsToCheck = bots.value;
-    if (specifiedBot) {
-      // If a bot is specified, only check bots of the same brand
-      botsToCheck = bots.value.filter(
-        (bot) =>
-          bot.constructor._brandId === specifiedBot.constructor._brandId,
-      );
-    }
-
-    const checkAvailabilityPromises = botsToCheck.map((bot) =>
-      bot
-        .checkAvailability()
-        .then(() => updateActiveBots())
-        .catch((error) => {
-          console.error(
-            `Error checking login status for ${bot.getFullname()}:`,
-            error,
-          );
-        }),
-    );
-    await Promise.allSettled(checkAvailabilityPromises);
-  } catch (error) {
-    console.error("Error checking login status for bots:", error);
-  }
-}
 
 function openSettingsModal() {
   isSettingsOpen.value = true;
-}
-
-// Send the prompt when the user presses enter and prevent the default behavior
-// But if the shift, ctrl, alt, or meta keys are pressed, do as default
-function filterEnterKey(event) {
-  if (
-    event.keyCode == 13 &&
-    !event.shiftKey &&
-    !event.ctrlKey &&
-    !event.altKey &&
-    !event.metaKey
-  ) {
-    event.preventDefault();
-    sendPromptToBots();
-  }
 }
 
 async function clearMessages() {
@@ -235,53 +161,46 @@ async function clearMessages() {
 }
 
 onMounted(() => {
+  // Vue.component('VListItemAvatar', VListItemAvatar)
   !store.state.uuid && setUuid(uuidv4());
-  window._paq.push(["setUserId", store.state.uuid]);
-  window._paq.push(["trackPageView"]);
 
   const ver = require("../package.json").version;
-  document.title = `ChatALL.ai v${ver}`;
+  document.title = `ChatALL.ai - v${ver}`;
 });
-
-onBeforeMount(() => {
-  checkAllBotsAvailability();
-});
-
 </script>
-
 
 <style>
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: "Arial", sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 #app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-    padding: 16px;
-    z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  z-index: 999;
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .logo {
@@ -289,60 +208,28 @@ header {
 }
 
 .column-icons img {
-    opacity: 0.5;
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin: 4px;
-}
-
-.bot-logos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-
-.bot-logos img {
-    opacity: 0.3;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
+  opacity: 0.5;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  margin: 4px;
 }
 
 img.selected {
-    opacity: 1;
+  opacity: 1;
 }
 
 .content {
-    flex: 1;
-    background-color: #f3f3f3;
-    padding: 16px;
-}
-
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: transparent;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    padding: 8px 16px;
-    gap: 8px;
-    box-sizing: border-box;
-}
-
-.margin-bottom {
-    margin-bottom: 5px;
+  flex: 1;
+  background-color: #f3f3f3;
+  padding: 16px;
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-/* Override default style of vuetify v-textarea */
-.v-textarea--auto-grow textarea{
-    overflow: auto !important;
+.filter-table {
+  transform: translate(0px, -100px);
 }
 </style>

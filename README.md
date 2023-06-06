@@ -2,7 +2,7 @@
   <img src="src/assets/logo-cover.png" width=256></img>
   <p><strong>Chat with ALL AI Bots Concurrently, Discover the Best</strong></p>
 
-[Deutsch](README_DE-DE.md) | English | [简体中文](README_ZH-CN.md) | [日本語](README_JA-JP.md) | [Tiếng Việt](README_VI-VN.md) | [Français](README_FR-FR.md)
+[Deutsch](README_DE-DE.md) | English | [Français](README_FR-FR.md) | [日本語](README_JA-JP.md) | [한국어](README_KO-KR.md) | [Tiếng Việt](README_VI-VN.md) | [简体中文](README_ZH-CN.md)
 
 </div>
 
@@ -22,10 +22,10 @@ Large Language Models (LLMs) based AI bots are amazing. However, their behavior 
 | [ChatGPT](https://chat.openai.com)                           | Yes         | Yes         | Web Browsing included                       |
 | [Bing Chat](https://www.bing.com/new)                        | Yes         | No API      | No login required                           |
 | [Baidu ERNIE](https://yiyan.baidu.com/)                      | No          | Yes         |                                             |
-| [Bard](https://bard.google.com/)                             | Yes         | No API      |                                             |
+| [Bard](https://bard.google.com/)                             | Yes         | Coming soon |                                             |
 | [Poe](https://poe.com/)                                      | Coming soon | Coming soon |                                             |
 | [MOSS](https://moss.fastnlp.top/)                            | Yes         | No API      |                                             |
-| [Tongyi Qianwen](http://tongyi.aliyun.com/)                  | Coming soon | Coming soon |                                             |
+| [Tongyi Qianwen](http://tongyi.aliyun.com/)                  | Yes         | Coming soon |                                             |
 | [Dedao Learning Assistant](https://ai.dedao.cn/)             | Coming soon | No API      |                                             |
 | [iFLYTEK SPARK](http://xinghuo.xfyun.cn/)                    | Yes         | Coming soon |                                             |
 | [Alpaca](https://crfm.stanford.edu/2023/03/13/alpaca.html)   | Yes         | No API      | No Login required                           |
@@ -35,7 +35,7 @@ Large Language Models (LLMs) based AI bots are amazing. However, their behavior 
 | [Gradio](https://gradio.app/)                                | Yes         | No API      | For Hugging Face space/self-deployed models |
 | [HuggingChat](https://huggingface.co/chat/)                  | Yes         | No API      |                                             |
 
-And more...
+More is coming. Upvote your favorite bots in [these issues](https://github.com/sunner/ChatALL/labels/more%20LLMs).
 
 ### Other features
 
@@ -45,8 +45,18 @@ And more...
 - Automatically keep ChatGPT session alive
 - Enable/disable any bots at any time
 - Switch between one, two, or three-column view
-- Supports multiple languages (Chinese, English, German, French, Russian, Vietnamese)
-- [TODO] Best recommendations
+- Supports multiple languages (Chinese, English, German, French, Russian, Vietnamese, Korean)
+- Supports Windows, macOS and Linux
+
+Planned features:
+
+You are welcome to contribute to these features.
+
+- [ ] Dark mode
+- [ ] Multi-chats
+- [ ] Select bots in popup menu
+- [ ] Deploy front-end to GitHub Pages
+- [ ] LangChain integration
 
 ## Prerequisites
 
@@ -121,10 +131,8 @@ npm run electron:build -- -wml --x64 --arm64
 - ChatGPT, Bing Chat and Google provide many solutions (ranked in order)
 - Inspired by [ChatHub](https://github.com/chathub-dev/chathub). Respect!
 
-### Mine
+## Sponsor
 
-```
-sudo yarn install 
-# --registry=https://registry.npm.taobao.org 
---proxy http://127.0.0.1:1087
-```
+If you like this project, please consider:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F8KZJGJ)

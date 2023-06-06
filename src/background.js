@@ -33,10 +33,20 @@ async function createWindow() {
       webSecurity: false,
       preload: "./preload.js",
     },
+    frame: false,
+    maximizable: true
+  })
+  // 窗口加载完成后最大化
+  win.webContents.on('did-finish-load', () => {
+    win.maximize();
   });
 
   mainWindow = win;
-  win.setFullScreen(true)
+  // 窗口加载完成后最大化
+  win.webContents.on('did-finish-load', () => {
+    win.maximize();
+  });
+  // win.setFullScreen(true)
 
   // Force the SameSite attribute to None for all cookies
   // This is required for the cross-origin request to work
@@ -84,14 +94,16 @@ async function createWindow() {
       const urlObj = new URL(url);
 
       // Only replace outbound access and electron origin
-      if (
-        ["http:", "https:"].includes(urlObj.protocol) &&
-        !["localhost", "127.0.0.1"].includes(urlObj.hostname) &&
-        requestHeaders["Referer"]
-      ) {
-        const refererObj = new URL(requestHeaders["Referer"]);
-        if (["localhost", "127.0.0.1"].includes(refererObj.hostname)) {
-          const referer = `${urlObj.protocol}//${urlObj.host}/`;
+      if (["http:", "https:"].includes(urlObj.protocol)) {
+        const referer = `${urlObj.protocol}//${urlObj.host}/`;
+        if (!requestHeaders["Referer"]) {
+          // Force add referer header. This is required for QianWen.
+          requestHeaders["Referer"] = referer;
+        } else if (
+          requestHeaders["Referer"].includes("127.0.0.1") ||
+          requestHeaders["Referer"].includes("localhost")
+        ) {
+          // Replace the referer header if it is the default one.
           requestHeaders["Referer"] = referer;
         }
       }
@@ -137,21 +149,28 @@ function createNewWindow(url, userAgent = "") {
   }
   newWin.loadURL(url);
 
-  // Get the secret of MOSS
-  if (url.includes("moss.fastnlp.top")) {
-    newWin.on("close", async (e) => {
-      try {
-        e.preventDefault(); // Prevent the window from closing
-        const secret = await newWin.webContents.executeJavaScript(
-          'localStorage.getItem("flutter.token");',
-        );
-        mainWindow.webContents.send("moss-secret", secret);
-      } catch (error) {
-        console.error(error);
-      }
+  newWin.on("close", async (e) => {
+    if (url.startsWith("https://moss.fastnlp.top/")) {
+      // Get the secret of MOSS
+      e.preventDefault(); // Prevent the window from closing
+      const secret = await newWin.webContents.executeJavaScript(
+        'localStorage.getItem("flutter.token");',
+      );
+      mainWindow.webContents.send("moss-secret", secret);
       newWin.destroy(); // Destroy the window manually
-    });
-  }
+    } else if (url.startsWith("https://qianwen.aliyun.com/")) {
+      // Get QianWen bot's XSRF-TOKEN
+      e.preventDefault(); // Prevent the window from closing
+      const token = await newWin.webContents.executeJavaScript(
+        'document.cookie.split("; ").find((cookie) => cookie.startsWith("XSRF-TOKEN="))?.split("=")[1];',
+      );
+      mainWindow.webContents.send("QIANWEN-XSRF-TOKEN", token);
+      newWin.destroy(); // Destroy the window manually
+    }
+
+    // Tell renderer process to check aviability
+    mainWindow.webContents.send("CHECK-AVAILABILITY", url);
+  });
 }
 
 ipcMain.handle("create-new-window", (event, url, userAgent) => {
@@ -180,9 +199,11 @@ app.on("ready", async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
+      // console.log(VUEJS3_DEVTOOLS)
       await installExtension(VUEJS3_DEVTOOLS);
+      process.env.HAS_VUEJS3_DEVTOOLS=true
     } catch (e) {
-      console.error("Vue Devtools failed to install:", e.toString());
+      console.log("Vue Devtools failed to install:", e.toString());
     }
   }
 

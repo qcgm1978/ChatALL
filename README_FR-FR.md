@@ -2,7 +2,7 @@
   <img src="src/assets/logo-cover.png" width=256></img>
   <p><strong>Discutez avec tous les bots IA simultanément pour sélectionner la meilleure réponse</strong></p>
 
-[Deutsch](README_DE-DE.md) | [English](README.md) | [简体中文](README_ZH-CN.md) | [日本語](README_JA-JP.md) | [Tiếng Việt](README_VI-VN.md) | Français
+[Deutsch](README_DE-DE.md) | [English](README.md) | Français | [日本語](README_JA-JP.md) | [한국어](README_KO-KR.md) | [Tiếng Việt](README_VI-VN.md) | [简体中文](README_ZH-CN.md)
 
 </div>
 
@@ -18,14 +18,14 @@ Les robots d'intelligence artificielle basés sur les grands modèles de langage
 ### Bots pris en charge
 
 | AI Bots                                                      | Accès web     | API           | Notes                                             |
-| ------------------------------------------------------------ | -----------   | -----------   | --------------------------------------------------|
+| ------------------------------------------------------------ | ------------- | ------------- | ------------------------------------------------- |
 | [ChatGPT](https://chat.openai.com)                           | Oui           | Oui           | Navigation web incluse                            |
 | [Bing Chat](https://www.bing.com/new)                        | Oui           | Non           |                                                   |
 | [Baidu ERNIE](https://yiyan.baidu.com/)                      | Non           | Oui           |                                                   |
 | [Bard](https://bard.google.com/)                             | Oui           | Non           |                                                   |
 | [Poe](https://poe.com/)                                      | Prochainement | Prochainement |                                                   |
 | [MOSS](https://moss.fastnlp.top/)                            | Oui           | Non           |                                                   |
-| [Tongyi Qianwen](http://tongyi.aliyun.com/)                  | Prochainement | Prochainement |                                                   |
+| [Tongyi Qianwen](http://tongyi.aliyun.com/)                  | Oui           | Prochainement |                                                   |
 | [Dedao Learning Assistant](https://ai.dedao.cn/)             | Prochainement | Non           |                                                   |
 | [iFLYTEK SPARK](http://xinghuo.xfyun.cn/)                    | Oui           | Prochainement |                                                   |
 | [Alpaca](https://crfm.stanford.edu/2023/03/13/alpaca.html)   | Oui           | Non           | Pas besoin de compte ou de clé API                |
@@ -118,3 +118,9 @@ npm run electron:build -- -wml --x64 --arm64
 - GPT-4 a contribué à une grande partie du code
 - ChatGPT, Bing Chat et Google fournissent de nombreuses solutions (classées par ordre).
 - Inspiré par [ChatHub] (https://github.com/chathub-dev/chathub). Respect !
+
+## Sponsor
+
+Si vous aimez ce projet, veuillez envisager:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F8KZJGJ)

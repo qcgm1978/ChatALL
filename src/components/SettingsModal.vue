@@ -52,6 +52,7 @@ import WenxinQianfanBotSettings from "@/components/BotSettings/WenxinQianfanBotS
 import GradioAppBotSettings from "@/components/BotSettings/GradioAppBotSettings.vue";
 import LMSYSBotSettings from "@/components/BotSettings/LMSYSBotSettings.vue";
 import HuggingChatBotSettings from "@/components/BotSettings/HuggingChatBotSettings.vue";
+import QianWenBotSettings from "@/components/BotSettings/QianWenBotSettings.vue";
 
 const { t: $t, locale } = useI18n();
 const store = useStore();
@@ -69,6 +70,7 @@ const settings = [
   HuggingChatBotSettings,
   LMSYSBotSettings,
   MOSSBotSettings,
+  QianWenBotSettings,
   SparkBotSettings,
 ];
 
@@ -76,11 +78,12 @@ const languages = computed(() => [
   { name: $t("settings.auto"), code: "auto" },
   { name: "Deutsch", code: "de" },
   { name: "English", code: "en" },
+  { name: "Français", code: "fr" },
+  { name: "한국어", code: "ko" },
   { name: "Italiano", code: "it" },
   { name: "Русский", code: "ru" },
-  { name: "简体中文", code: "zh" },
   { name: "Tiếng Việt", code: "vi" },
-  { name: "Français", code: "fr" },
+  { name: "简体中文", code: "zh" },
 ]);
 
 const lang = computed(() => store.state.lang);

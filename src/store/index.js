@@ -3,9 +3,6 @@ import VuexPersist from "vuex-persist";
 import i18n from "@/i18n";
 import messagesPersist from "./messagesPersist";
 
-const getMatomo = function () {
-  return window.Piwik.getAsyncTracker();
-};
 
 // 初始化 VuexPersist 实例
 const vuexPersist = new VuexPersist({
@@ -51,6 +48,9 @@ export default createStore({
     moss: {
       token: "",
     },
+    qianWen: {
+      xsrfToken: "",
+    },
     wenxinQianfan: {
       apiKey: "",
       secretKey: "",
@@ -94,7 +94,10 @@ export default createStore({
       state.moss.token = token;
     },
     setClaudeInSlack(state, { slackUserToken, botUserId }) {
-      state.claudeInSlack = { slackUserToken, botUserId };
+      state.claudeInSlack = { slackUserToken, botUserId }
+    },
+    setQianWenToken(state, token) {
+      state.qianWen.xsrfToken = token;
     },
     setWenxinQianfan(state, values) {
       state.wenxinQianfan = { ...state.wenxinQianfan, ...values };
@@ -153,8 +156,7 @@ export default createStore({
         done: true,
         hide: false,
       });
-
-      const $matomo = getMatomo();
+      const ret=[]
       for (const bot of bots) {
         const message = {
           type: "response",
@@ -171,20 +173,15 @@ export default createStore({
         const currentChat = state.chats[state.currentChatIndex];
         message.index = currentChat.messages.push(message) - 1;
 
-        bot.sendPrompt(
+        const bot_sendPrompt=bot.sendPrompt(
           prompt,
           (indexes, values) =>
             dispatch("updateMessage", { indexes, message: values }),
           { chatIndex: state.currentChatIndex, messageIndex: message.index },
         );
-
-        $matomo.trackEvent(
-          "prompt",
-          "sendTo",
-          bot.getClassname(),
-          prompt.length,
-        );
+        ret.push(bot_sendPrompt)
       }
+      return ret
     },
     updateMessage({ commit, state }, { indexes, message: values }) {
       commit("updateMessage", { indexes, message: values });
@@ -198,14 +195,6 @@ export default createStore({
         indexes.chatIndex == -1 ? state.currentChatIndex : indexes.chatIndex;
       const chat = state.chats[i];
       const message = { ...chat.messages[indexes.messageIndex], ...values };
-      if (values.done) {
-        getMatomo().trackEvent(
-          "prompt",
-          "received",
-          message.className,
-          message.content.length,
-        );
-      }
     },
   },
   getters: {

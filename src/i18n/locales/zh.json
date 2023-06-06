@@ -1,6 +1,7 @@
 {
   "settings": {
     "enable": "启用",
+    "noDataText":"没有数据",
     "forExample": "例如：{ example }",
     "title": "设置",
     "general": "通用",
@@ -15,6 +16,7 @@
   },
   "header": {
     "clearMessages": "清空所有消息？",
+    "clearBot": "不再询问该机器人？",
     "yes": "是",
     "no": "否",
     "singleColumn": "单列",
@@ -52,6 +54,7 @@
   "bingChat": {
     "name": "Bing Chat",
     "loginToContinue": "请求被限制。请<a { attributes }>登录</a>再继续。",
+    "solveCaptcha": "你需要<a { attributes }>通过真人验证</a>才能继续。",
     "h3imaginative": "创造力",
     "galileo": "平衡",
     "h3precise": "精确"
@@ -101,6 +104,9 @@
     "temperature0": "更具确定性",
     "temperature2": "更具随机性",
     "apiKey": "API 密钥"
+  },
+  "qianWen": {
+    "name": "通义千问"
   },
   "spark": {
     "name": "讯飞星火"

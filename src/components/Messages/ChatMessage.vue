@@ -18,8 +18,10 @@
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-card-title>
-    <Markdown class="markdown-body" :breaks="true" :html="true" :source="message.content" @click="handleClick" />
-    <VueVega :source="message.content" />
+    <pre v-if="message.type === 'prompt'">{{ message.content }}</pre>
+    <Markdown v-else class="markdown-body" :breaks="true" :html="message.format === 'html'" :source="message.content"
+      @click="handleClick" />
+    <!-- <VueVega :source="message.content" /> -->
   </v-card>
   <ConfirmModal ref="confirmModal" />
 </template>
@@ -28,8 +30,7 @@
 import { onMounted, ref, watch, computed } from "vue";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
-import VueVega from "./VueVega";
-import { useMatomo } from "@/composables/matomo";
+// import VueVega from "./VueVega";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
 
@@ -49,7 +50,6 @@ const props = defineProps({
 
 const emits = defineEmits(["update-message"]);
 
-const matomo = useMatomo();
 
 const root = ref();
 const confirmModal = ref(null);
@@ -76,20 +76,17 @@ onMounted(() => {
 });
 
 function copyToClipboard() {
-  navigator.clipboard.writeText(props.message.content);
-  matomo.value.trackEvent("vote", "copy", props.message.className, 1);
+  let content = props.message.content;
+  if (props.message.format === "html") {
+    content = content.replace(/<[^>]*>?/gm, "");
+  }
+  navigator.clipboard.writeText(content);
 }
 
 function toggleHighlight() {
   emits("update-message", props.message.index, {
     highlight: !props.message.highlight,
   });
-  matomo.value.trackEvent(
-    "vote",
-    "highlight",
-    props.message.className,
-    props.message.highlight ? -1 : 1,
-  );
 }
 
 async function hide() {
@@ -98,7 +95,6 @@ async function hide() {
   );
   if (result) {
     emits("update-message", props.message.index, { hide: true });
-    matomo.value.trackEvent("vote", "hide", props.message.className, 1);
   }
 }
 
@@ -117,6 +113,7 @@ function handleClick(event) {
   const url = target.href || target.parentElement.href;
   electron.shell.openExternal(url);
 }
+
 </script>
 
 <style scoped>
@@ -135,6 +132,11 @@ function handleClick(event) {
   background-color: #95EC69;
   width: fit-content;
   grid-column: 1 / span var(--columns);
+}
+
+.prompt pre {
+  white-space: pre-wrap;
+  font-family: inherit;
 }
 
 .response {

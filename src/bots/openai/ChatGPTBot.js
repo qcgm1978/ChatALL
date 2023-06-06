@@ -45,7 +45,7 @@ export default class ChatGPTBot extends Bot {
         this.constructor._isAvailable = false;
       }
     } catch (error) {
-      console.error("Error checking ChatGPT login status:", error);
+      console.warn("Error checking ChatGPT login status:", error);
       this.constructor._isAvailable = false;
     }
     // Toggle periodic session refreshing based on login status
@@ -191,8 +191,23 @@ export default class ChatGPTBot extends Bot {
 
           let message = "";
           if (error.data) {
-            const data = JSON.parse(error.data);
-            message = data.detail;
+            try {
+              const data = JSON.parse(error.data);
+              message = data.detail?.message;
+            } catch (e) {
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(error.data, "text/html");
+              const msg = doc.querySelector(".message p");
+              message = msg ? msg.textContent + ". " : "";
+              const explanation = doc.querySelector(".explanation");
+              if (msg || explanation) {
+                message += explanation ? explanation.textContent : "";
+              } else {
+                const p = doc.querySelector("p").textContent;
+                const span = doc.querySelector("span").textContent;
+                message = `${p}. ${span}`;
+              }
+            }
           } else {
             message = error.source.url;
           }
