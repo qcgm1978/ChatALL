@@ -1,10 +1,10 @@
 /* eslint-disable no-constant-condition */
 import AsyncLock from "async-lock";
-const { ipcRenderer } = require('electron')
+// const { ipcRenderer } = require('electron')
 import Bot from "@/bots/Bot";
-// main process event IPC channel 
+// main process event IPC channel
 // const SLACK_EVENT_CHANNEL = 'slack-event'
-const SLACK_CALL_CHANNEL = 'slack-call'
+const SLACK_CALL_CHANNEL = "slack-call";
 export default class ClaudeInSlackBot extends Bot {
   static _brandId = "ClaudeInSlack"; // Brand id of the bot, should be unique. Used in i18n.
   static _className = "ClaudeInSlackBot"; // Class name of the bot
@@ -12,7 +12,7 @@ export default class ClaudeInSlackBot extends Bot {
   static _loginUrl = "https://example.com/";
   static _lock = new AsyncLock(); // AsyncLock for prompt requests
   // todo 根据此prompt进行数据存储
-  static_save_data_prompt='这句话不要回复，也不要进行任何解释：'
+  static_save_data_prompt = "这句话不要回复，也不要进行任何解释：";
   constructor() {
     super();
   }
@@ -30,24 +30,52 @@ export default class ClaudeInSlackBot extends Bot {
     //   this.constructor._isAvailable = true;
     // else:
     //   this.constructor._isAvailable = false;
-    
-    
-    
-    // example call method of Slack in renderer 
-    await this.slackSendMessage()
-    
-    
+
+    // example call method of Slack in renderer
+    try {
+      await this.slackSendMessage();
+    } catch (e) {
+      print(e);
+    }
+
     this.constructor._isAvailable = true; // For simplicity, default to true
     return this.isAvailable(); // Always return like this
   }
-  async slackSendMessage (messageObject) {
+  async slackSendMessage(messageObject) {
     try {
-        await ipcRenderer.invoke(SLACK_CALL_CHANNEL, 'send-message', messageObject)
-        console.log('Slack message sent successfully!')
+      // await ipcRenderer.invoke(SLACK_CALL_CHANNEL, 'send-message', messageObject)
+      // const webhook = require('webhook-discord')
+
+      // const hook = new webhook.Webhook({
+      //   'url': 'https://hooks.slack.com/services/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',
+      //   socket_mode:true
+      // })
+
+      // const SlackWebhook = require("@slack/webhook");
+
+      // const webhook = new SlackWebhook.WebhookClient({
+      //   url: IncomingWebhookUrl,
+      //   socketMode: true, // Enable Socket Mode
+      // });
+      const ipcRenderer = require("electron").ipcRenderer;
+      const SlackWebhook = require("@slack/webhook");
+
+      ipcRenderer.on("webhook", (event, webhookUrl) => {
+        const webhook = new SlackWebhook.WebhookClient({ url: webhookUrl });
+        webhook.send({ text: "Hello from renderer process!" });
+      });
+
+      ipcRenderer.send("get-webhook"); // 请求Webhook URL
+      // Listen for events
+      // webhook.on("message", (info) => {
+      //   console.log(`Received a message event: ${info.text}`);
+      // });
+
+      console.log("Slack message sent successfully!");
     } catch (error) {
-        console.error('Error while sending message to Slack:', error)
+      console.error("Error while sending message to Slack:", error);
     }
-}
+  }
   /**
    * Send a prompt to the bot and call onResponse(response, callbackParam)
    * when the response is ready.
@@ -66,7 +94,9 @@ export default class ClaudeInSlackBot extends Bot {
       // When everything is done, call resolve()
       // If there is an error, call reject(error)
       try {
-        const url = `http://127.0.0.1:8010/ask_claude?prompt=${encodeURIComponent(prompt)}`;
+        const url = `http://127.0.0.1:8010/ask_claude?prompt=${encodeURIComponent(
+          prompt,
+        )}`;
         fetch(url)
           .then((res) => res.json())
           .then((answer) => {
@@ -92,4 +122,3 @@ export default class ClaudeInSlackBot extends Bot {
     return null;
   }
 }
-

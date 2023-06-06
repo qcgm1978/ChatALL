@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import store from "@/store";
-const { ipcMain } = require("electron");
-// const http = require('http');
-// const server = http.createServer((req, res) => {
-//   res.end('Hello World!');
-// });
-// server.listen(7000);
+// import store from "@/store";
+import { ipcMain } from "electron"
+import { App } from "@slack/bolt"
+const SLACK_USER_TOKEN = "xoxp-5192708081924-5190227275250-5175689156935-c05d4e702c5dd246ab5f05a8740f01af"
+const BOT_USER_ID = "U055L36GMFV"
+
+
 
 // your bot token
 const slackUserToken = "xoxb-<your-token>";
@@ -17,9 +17,9 @@ export class SlackBot {
   constructor({
     topics,
     user_token = slackUserToken,
-    bot_user_id = 'botUserId',
+    bot_user_id = "botUserId",
     prompt = `以下list每个元素字符串的情绪转为emoji unicode值(\\U开头)，一行输出emoji字符串python list，不要换行，字符串用双引号扩起来`,
-    WebClient=null
+    WebClient = null,
   }) {
     this.client = new WebClient(user_token);
     this.bot_user_id = bot_user_id;
@@ -149,29 +149,42 @@ export class SlackBot {
   }
 }
 
-export function handle_IPC(WebClient) {
-// const { slackUserToken, botUserId } = store.state.claudeInSlack;
-const web = new WebClient(slackUserToken);
-ipcMain.handle(
-    SLACK_CALL_CHANNEL,
-    async (event, channel, method, ...args) => {
-      const payload = { channel };
-      payload[method] = args[0];
-      if (
-        args.length >= 2 &&
-        typeof args[1] === "object" &&
-        !Array.isArray(args[1])
-      ) {
-        Object.assign(payload, args[1]);
-      }
-      try {
-        // Call slack API and send response to renderer process
-        const response = await web.conversations.sendMessage(payload);
-        event.sender.send(SLACK_EVENT_CHANNEL, null, response);
-      } catch (error) {
-        // Send rejected promise error message back that can be handled in the calling code
-        event.sender.send(SLACK_EVENT_CHANNEL, error.message, null);
-      }
-    },
-  );
+export function handle_IPC() {
+  // const { slackUserToken, botUserId } = store.state.claudeInSlack;
+  const app = new App({
+    // signingSecret: SLACK_SIGNING_SECRET,
+    // token: SLACK_BOT_TOKEN,
+    signingSecret: SLACK_USER_TOKEN,
+    token: BOT_USER_ID,
+  });
+  // /* Add functionality here */
+
+  // (async () => {
+  //   // Start the app
+  //   await app.start(process.env.PORT || 3000);
+
+  //   console.log("⚡️ Bolt app is running!");
+  // })();
+  // ipcMain.handle(
+  //   SLACK_CALL_CHANNEL,
+  //   async (event, channel, method, ...args) => {
+  //     const payload = { channel };
+  //     payload[method] = args[0];
+  //     if (
+  //       args.length >= 2 &&
+  //       typeof args[1] === "object" &&
+  //       !Array.isArray(args[1])
+  //     ) {
+  //       Object.assign(payload, args[1]);
+  //     }
+  //     try {
+  //       // Call slack API and send response to renderer process
+  //       const response = await web.conversations.sendMessage(payload);
+  //       event.sender.send(SLACK_EVENT_CHANNEL, null, response);
+  //     } catch (error) {
+  //       // Send rejected promise error message back that can be handled in the calling code
+  //       event.sender.send(SLACK_EVENT_CHANNEL, error.message, null);
+  //     }
+  //   },
+  // );
 }

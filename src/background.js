@@ -5,8 +5,7 @@ import { app, protocol, BrowserWindow, ipcMain, autoUpdater } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
 import { handle_IPC } from "./slack";
-import fs from 'fs'
-const { WebClient } = require("@slack/web-api");
+handle_IPC();
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const DEFAULT_USER_AGENT = ""; // Empty string to use the Electron default
@@ -34,16 +33,16 @@ async function createWindow() {
       preload: "./preload.js",
     },
     frame: false,
-    maximizable: true
-  })
+    maximizable: true,
+  });
   // 窗口加载完成后最大化
-  win.webContents.on('did-finish-load', () => {
+  win.webContents.on("did-finish-load", () => {
     win.maximize();
   });
 
   mainWindow = win;
   // 窗口加载完成后最大化
-  win.webContents.on('did-finish-load', () => {
+  win.webContents.on("did-finish-load", () => {
     win.maximize();
   });
   // win.setFullScreen(true)
@@ -176,7 +175,12 @@ function createNewWindow(url, userAgent = "") {
 ipcMain.handle("create-new-window", (event, url, userAgent) => {
   createNewWindow(url, userAgent);
 });
-
+const os = require("electron-is").os;
+const webhookUrl =
+  "https://hooks.slack.com/services/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";
+ipcMain.on("get-webhook", (event) => {
+  event.sender.send("webhook", webhookUrl);
+});
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -189,7 +193,9 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {createWindow();}
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
 
 // This method will be called when Electron has finished
@@ -201,7 +207,7 @@ app.on("ready", async () => {
     try {
       // console.log(VUEJS3_DEVTOOLS)
       await installExtension(VUEJS3_DEVTOOLS);
-      process.env.HAS_VUEJS3_DEVTOOLS=true
+      process.env.HAS_VUEJS3_DEVTOOLS = true;
     } catch (e) {
       console.log("Vue Devtools failed to install:", e.toString());
     }
@@ -228,4 +234,3 @@ if (isDevelopment) {
     });
   }
 }
-handle_IPC(WebClient);
