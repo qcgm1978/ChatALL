@@ -53,11 +53,13 @@
       </v-card> -->
     </main>
 
-    <FooterBarSelect v-if="NODE_ENV === 'development'" :changeColumns="changeColumns" />
-    <FooterBar v-else></FooterBar>
-    <SettingsModal
-      v-model:open="isSettingsOpen"
+    <FooterBarSelect
+      v-if="NODE_ENV === 'development'"
+      :changeColumns="changeColumns"
+      :confirmModal="confirmModal"
     />
+    <FooterBar v-else></FooterBar>
+    <SettingsModal v-model:open="isSettingsOpen" />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
@@ -81,16 +83,9 @@ import "@mdi/font/css/materialdesignicons.css";
 // import { VDataTable } from 'vuetify/labs/VDataTable'
 import _bots from "@/bots";
 const store = useStore();
-const NODE_ENV=process.env.NODE_ENV
+const NODE_ENV = process.env.NODE_ENV;
 const confirmModal = ref(null);
-const prompt = ref("");
-const bots = ref(_bots.all);
-
-const activeBots = reactive({});
-const selectedBots = computed(() => store.state.selectedBots);
-const clickedBot = ref(null);
 const isSettingsOpen = ref(false);
-const isMakeAvailableOpen = ref(false);
 const columns = computed(() => store.state.columns);
 
 const changeColumns = (columns) => store.commit("changeColumns", columns);
@@ -133,19 +128,6 @@ function set_filter_table() {
   ]);
   return { search, headers, desserts };
 }
-
-
-
-function updateActiveBots() {
-  let i = 0;
-  for (const bot of bots.value) {
-    const val = bot.isAvailable() && selectedBots.value[bot.getClassname()];
-    activeBots[bot.getClassname()] = val;
-    val && i++;
-  }
-  return i;
-}
-
 
 function openSettingsModal() {
   isSettingsOpen.value = true;

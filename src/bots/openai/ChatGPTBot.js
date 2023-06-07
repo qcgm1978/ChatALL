@@ -57,13 +57,16 @@ export default class ChatGPTBot extends Bot {
     return { conversationId: undefined, parentMessageId: uuidv4() };
   }
 
-  refreshSession() {
-    axios.get(REFRESH_SESSION_URL).catch((error) => {
+  refreshSession(resolve,reject) {
+    return axios.get(REFRESH_SESSION_URL).then(_=>resolve).catch((error) => {
       // the REFRESH_SESSION_URL always returns a 404 error
       // if 403, then the session has expired
       if (error.response && error.response.status === 403) {
         this.constructor._isAvailable = false;
         this.toggleSessionRefreshing(false);
+        reject()
+      } else {
+        resolve()
       }
     });
   }
@@ -74,7 +77,7 @@ export default class ChatGPTBot extends Bot {
   setRefreshCycle(cycle) {
     const sr = this.constructor._sessionRefreshing;
     sr.interval = cycle * 1000;
-    this.toggleSessionRefreshing(sr.interval > 0);
+    return this.toggleSessionRefreshing(sr.interval > 0);
   }
 
   toggleSessionRefreshing(shouldRefresh) {
@@ -84,11 +87,15 @@ export default class ChatGPTBot extends Bot {
       clearInterval(sr.id);
       sr.id = null;
     }
-
-    if (shouldRefresh && sr.interval > 0) {
-      this.refreshSession();
-      sr.id = setInterval(this.refreshSession.bind(this), sr.interval);
-    }
+    return new Promise((resolve, reject) => {
+      
+      if (shouldRefresh && sr.interval > 0) {
+        this.refreshSession();
+        sr.id = setInterval(this.refreshSession.bind(this,resolve,reject), sr.interval);
+      } else {
+        resolve()
+      }
+    })
   }
 
   async _sendPrompt(prompt, onUpdateResponse, callbackParam) {
