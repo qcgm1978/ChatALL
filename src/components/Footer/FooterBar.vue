@@ -25,15 +25,13 @@
       {{ $t("footer.sendPrompt") }}
     </v-btn>
     <div class="bot-logos margin-bottom">
-      <img
+      <BotLogo
         v-for="(bot, index) in bots"
-        :class="{ selected: activeBots[bot.getClassname()] }"
         :key="index"
-        :src="bot.getLogo()"
-        :alt="bot.getFullname()"
-        :title="bot.getFullname()"
+        :bot="bot"
+        :active="activeBots[bot.getClassname()]"
         @click="toggleSelected(bot)"
-      />
+      ></BotLogo>
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
   </div>
@@ -45,6 +43,7 @@ import { useStore } from "vuex";
 
 // Components
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
+import BotLogo from "./BotLogo.vue";
 
 // Composables
 
@@ -54,18 +53,29 @@ const { ipcRenderer } = window.require("electron");
 
 const store = useStore();
 
-const activeBots = reactive({});
 const bots = ref(_bots.all);
+const activeBots = reactive({});
+const favBots = computed(() => {
+  const _favBots = [];
+  store.getters.currentChat.favBots.forEach((favBot) => {
+    _favBots.push({
+      ...favBot,
+      instance: _bots.getBotByClassName(favBot.classname),
+    });
+  });
+  return _favBots;
+});
+
 const prompt = ref("");
-const selectedBots = computed(() => store.state.selectedBots);
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
-const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
+
+const setBotSelected = (param) => store.commit("SET_BOT_SELECTED", param);
 
 function updateActiveBots() {
-  for (const bot of bots.value) {
-    activeBots[bot.getClassname()] =
-      bot.isAvailable() && selectedBots.value[bot.getClassname()];
+  for (const favBot of favBots.value) {
+    activeBots[favBot.classname] =
+      favBot.instance.isAvailable() && favBot.selected;
   }
 }
 
@@ -101,9 +111,9 @@ function sendPromptToBots() {
 }
 
 async function toggleSelected(bot) {
-  const botId = bot.getClassname();
+  const botClassname = bot.getClassname();
   let selected = false;
-  if (activeBots[botId]) {
+  if (activeBots[botClassname]) {
     selected = false;
   } else {
     selected = true;
@@ -116,23 +126,23 @@ async function toggleSelected(bot) {
       }
     }
   }
-  setBotSelected({ botId, selected });
+  setBotSelected({ botClassname, selected });
   updateActiveBots();
 }
 
 onBeforeMount(async () => {
-  bots.value.forEach(async (bot) => {
-    await bot.checkAvailability();
+  favBots.value.forEach(async (favBot) => {
+    await favBot.instance.checkAvailability();
     updateActiveBots();
   });
 
   // Listen message trigged by main process
   ipcRenderer.on("CHECK-AVAILABILITY", async (event, url) => {
-    const bot = bots.value.find((bot) => bot.getLoginUrl() === url);
-    if (bot) {
+    const botsToCheck = bots.value.filter((bot) => bot.getLoginUrl() === url);
+    botsToCheck.forEach(async (bot) => {
       await bot.checkAvailability();
       updateActiveBots();
-    }
+    });
   });
 });
 </script>
@@ -143,7 +153,7 @@ onBeforeMount(async () => {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: transparent;
+  background-color: rgba(243, 243, 243, 0.7);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -156,19 +166,6 @@ onBeforeMount(async () => {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-}
-
-.bot-logos img {
-  opacity: 0.5;
-  filter: grayscale(100%);
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-}
-
-img.selected {
-  opacity: 1;
-  filter: grayscale(0%);
 }
 
 .margin-bottom {
