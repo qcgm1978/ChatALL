@@ -53,7 +53,7 @@
       </v-card> -->
     </main>
 
-    <FooterBarSelect v-if="NODE_ENV === 'development'" :changeColumns="changeColumns" />
+    <FooterBarSelect v-if="NODE_ENV !== 'development'" :changeColumns="changeColumns" />
     <FooterBar v-else></FooterBar>
     <SettingsModal
       v-model:open="isSettingsOpen"
