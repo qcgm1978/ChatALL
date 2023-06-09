@@ -58,8 +58,6 @@
     <SettingsModal
       v-model:open="isSettingsOpen"
     />
-    <FooterBar v-else></FooterBar>
-    <SettingsModal v-model:open="isSettingsOpen" />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
