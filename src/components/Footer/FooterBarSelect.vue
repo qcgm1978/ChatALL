@@ -201,7 +201,7 @@ onBeforeMount(() => {
 });
 </script>
 
-<style>
+<style scoped>
 footer {
     position: fixed;
     bottom: 0;
