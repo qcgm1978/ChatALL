@@ -21,17 +21,6 @@ export default createStore({
     lang: "auto",
     enableScroll: true,
     columns: 2,
-    selectedBots: {
-      // Active bots which no login required
-      BingChatCreativeBot: true,
-      BingChatBalancedBot: true,
-      BingChatPreciseBot: true,
-      ChatGLMBot: true,
-      VicunaBot: true,
-      AlpacaBot: true,
-      ClaudeBot: true,
-      ClaudeInSlackBot: true,
-    },
     openaiApi: {
       apiKey: "",
       temperature: 1,
@@ -60,10 +49,31 @@ export default createStore({
       slackUserToken:'',
       botUserId:''
     },
-    messages: [],
-    chats: [{ title: "New Chat", contexts: {}, messages: [] }],
+    chats: [
+      {
+        title: "New Chat",
+        favBots: [
+          // default bots
+          { classname: "ChatGPT35Bot", selected: true },
+          { classname: "ChatGPT4Bot", selected: true },
+          { classname: "ChatGPTBrowsingBot", selected: true },
+          { classname: "BingChatCreativeBot", selected: true },
+          { classname: "BingChatBalancedBot", selected: true },
+          { classname: "BingChatPreciseBot", selected: true },
+          { classname: "ChatGLMBot", selected: true },
+          { classname: "VicunaBot", selected: true },
+          { classname: "AlpacaBot", selected: true },
+          { classname: "ClaudeBot", selected: true },
+        ],
+        contexts: {},
+        messages: [],
+      },
+    ],
     currentChatIndex: 0,
     updateCounter: 0,
+    // TODO: delete following fields
+    selectedBots: {},
+    messages: [],
   },
   mutations: {
     changeColumns(state, n) {
@@ -72,9 +82,13 @@ export default createStore({
     setUuid(state, uuid) {
       state.uuid = uuid;
     },
-    SET_BOT_SELECTED(state, payload) {
-      const { botId, selected } = payload;
-      state.selectedBots[botId] = selected;
+    SET_BOT_SELECTED(state, { botClassname, selected }) {
+      const currentChat = state.chats[state.currentChatIndex];
+      const bot = currentChat.favBots.find(
+        (bot) => bot.classname === botClassname,
+      );
+      if (bot) bot.selected = selected;
+      else currentChat.favBots.push({ classname: botClassname, selected });
     },
     setCurrentLanguage(state, language) {
       state.lang = language;
@@ -145,6 +159,16 @@ export default createStore({
         };
         state.chats[0] = chat;
         state.messages = [];
+      }
+      // Migrate to favorited bots
+      if (state.selectedBots) {
+        const bots = Object.keys(state.selectedBots);
+        state.chats[0].favBots = [];
+        for (const bot of bots) {
+          if (state.selectedBots[bot])
+            state.chats[0].favBots.push({ classname: bot, selected: true });
+        }
+        state.selectedBots = null;
       }
     },
   },

@@ -52,7 +52,7 @@ import i18n from "../../i18n";
 import _bots from "@/bots";
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 
-const props = defineProps(["changeColumns", ]);
+const props = defineProps(["changeColumns",'confirmModal' ]);
 const store = useStore();
 const bots = ref(_bots.all);
 const bots_val = bots.value.map((d) => ({
@@ -76,7 +76,6 @@ const prompt = ref("");
 const selectedBots = computed(() => store.state.selectedBots);
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
-const confirmModal = ref(null);
 const setBotSelected = (uuid) => store.commit("SET_BOT_SELECTED", uuid);
 function toggleSelected(botIds) {
   bots_val.forEach(({ id }) => {
@@ -182,7 +181,7 @@ async function confirmErrorBot(that) {
           url: names,
         });
         const msg = i18n.global.t("header.clearBot");
-        const result = await confirmModal.value.showModal(
+        const result = await props.confirmModal.value.showModal(
           `${err}\n${msg}`,
           500,
         );
@@ -202,7 +201,7 @@ onBeforeMount(() => {
 });
 </script>
 
-<style>
+<style scoped>
 footer {
     position: fixed;
     bottom: 0;
