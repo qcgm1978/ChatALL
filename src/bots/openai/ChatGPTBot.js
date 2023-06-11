@@ -57,7 +57,7 @@ export default class ChatGPTBot extends Bot {
     return { conversationId: undefined, parentMessageId: uuidv4() };
   }
 
-  refreshSession(resolve,reject) {
+  refreshSession(resolve=_=>_,reject=_=>_) {
     return axios.get(REFRESH_SESSION_URL).then(_=>resolve).catch((error) => {
       // the REFRESH_SESSION_URL always returns a 404 error
       // if 403, then the session has expired

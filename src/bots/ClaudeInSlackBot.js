@@ -1,6 +1,6 @@
-/* eslint-disable no-constant-condition */
 import AsyncLock from "async-lock";
 // const { ipcRenderer } = require('electron')
+const { ipcRenderer } = window.require("electron");
 import Bot from "@/bots/Bot";
 // main process event IPC channel
 // const SLACK_EVENT_CHANNEL = 'slack-event'
@@ -43,35 +43,8 @@ export default class ClaudeInSlackBot extends Bot {
   }
   async slackSendMessage(messageObject) {
     try {
-      // await ipcRenderer.invoke(SLACK_CALL_CHANNEL, 'send-message', messageObject)
-      // const webhook = require('webhook-discord')
-
-      // const hook = new webhook.Webhook({
-      //   'url': 'https://hooks.slack.com/services/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',
-      //   socket_mode:true
-      // })
-
-      // const SlackWebhook = require("@slack/webhook");
-
-      // const webhook = new SlackWebhook.WebhookClient({
-      //   url: IncomingWebhookUrl,
-      //   socketMode: true, // Enable Socket Mode
-      // });
-      const ipcRenderer = require("electron").ipcRenderer;
-      const SlackWebhook = require("@slack/webhook");
-
-      ipcRenderer.on("webhook", (event, webhookUrl) => {
-        const webhook = new SlackWebhook.WebhookClient({ url: webhookUrl });
-        webhook.send({ text: "Hello from renderer process!" });
-      });
-
-      ipcRenderer.send("get-webhook"); // 请求Webhook URL
-      // Listen for events
-      // webhook.on("message", (info) => {
-      //   console.log(`Received a message event: ${info.text}`);
-      // });
-
-      console.log("Slack message sent successfully!");
+      // ipcRenderer.invoke("get-webhook", 'hello1');
+      // console.log("Slack message sent successfully!");
     } catch (error) {
       console.error("Error while sending message to Slack:", error);
     }

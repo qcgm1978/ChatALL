@@ -159,12 +159,12 @@ export function handle_IPC() {
   });
   // /* Add functionality here */
 
-  // (async () => {
-  //   // Start the app
-  //   await app.start(process.env.PORT || 3000);
+  (async () => {
+    // Start the app
+    await app.start(3188);
 
-  //   console.log("⚡️ Bolt app is running!");
-  // })();
+    console.log("⚡️ Bolt app is running!");
+  })();
   // ipcMain.handle(
   //   SLACK_CALL_CHANNEL,
   //   async (event, channel, method, ...args) => {

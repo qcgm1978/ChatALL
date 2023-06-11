@@ -5,7 +5,38 @@ import { app, protocol, BrowserWindow, ipcMain, autoUpdater } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
 import { handle_IPC } from "./slack";
-handle_IPC();
+const { IncomingWebhook } = require('@slack/webhook');
+// 创建 IncomingWebhook 实例，提供您的 Slack Webhook URL
+const url = 'https://hooks.slack.com/services/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';
+// const webhook = new IncomingWebhook(url);
+
+// 创建 RTMClient 实例，提供您的 Slack 应用的令牌
+const token = 'YOUR_SLACK_TOKEN';
+const SLACK_USER_TOKEN = "xoxb-5192708081924-5183649584310-WNsF5MB1rnW6D2aQrxgsW2FH"
+const { App } = require('@slack/bolt');
+
+const app_slack = new App({
+  signingSecret: 'xoxp-5192708081924-5190227275250-5175689156935-c05d4e702c5dd246ab5f05a8740f01af',
+  token: 'xoxb-5192708081924-5183649584310-WNsF5MB1rnW6D2aQrxgsW2FH',
+});
+
+/* Add functionality here */
+
+(async () => {
+  // Start the app
+  await app_slack.start(3188);
+
+  console.log('⚡️ Bolt app is running!');
+  // Reverse all messages the app can hear
+  app_slack.message(async ({ message, say }) => {
+  // Filter out message events with subtypes (see https://api.slack.com/events/message)
+  if (message.subtype === undefined || message.subtype === 'bot_message') {
+    const reversedText = [...message.text].reverse().join("");
+    await say(reversedText);
+  }
+});
+})();
+// handle_IPC();
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const DEFAULT_USER_AGENT = ""; // Empty string to use the Electron default
@@ -175,11 +206,16 @@ function createNewWindow(url, userAgent = "") {
 ipcMain.handle("create-new-window", (event, url, userAgent) => {
   createNewWindow(url, userAgent);
 });
-const os = require("electron-is").os;
-const webhookUrl =
-  "https://hooks.slack.com/services/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";
-ipcMain.on("get-webhook", (event) => {
-  event.sender.send("webhook", webhookUrl);
+ipcMain.handle("get-webhook", (event,message) => {
+  webhook.send({
+    text: message
+  })
+    .then(() => {
+      console.log('Message sent to Slack');
+    })
+    .catch((error) => {
+      console.error('Error sending message to Slack:', error);
+    });
 });
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
