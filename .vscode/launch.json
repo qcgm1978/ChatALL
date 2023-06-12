@@ -5,22 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Electron: Background",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "electron:serve"],
-    //   "windows": {
-    //     "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
-    //   },
-      "outputCapture": "std",
-      "skipFiles": ["<node_internals>/**"],
-      "env": {
-        "ELECTRON_ENABLE_LOGGING": "true",
-        "ELECTRON_ENABLE_STACK_DUMPING": "true"
-      }
-    },
+      "name": "Electron: Main",
+      // "preLaunchTask": "webpack",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "program": "${workspaceFolder}/src/main.js",
+      "runtimeArgs": [
+          ".",
+          "--enable-logging",
+          "--remote-debugging-port=9223",
+      ]
+  },
     {
       "name": "Vue CLI: Electron Serve",
       "type": "node",
