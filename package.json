@@ -1,7 +1,7 @@
 {
   "name": "chatall",
-  "version": "1.19.25",
-  "main": "src/background.js",
+  "version": "1.25.27",
+  "main": "background.js",
   "description": "Chat with multiple AI bots and discover the best.",
   "author": "Sunner",
   "repository": {
@@ -63,6 +63,7 @@
     "electron-devtools-installer": "^3.2.0",
     "eslint": "^8.41.0",
     "eslint-plugin-vue": "^9.14.1",
+    "md5": "^2.3.0",
     "prettier-plugin-vue": "^1.1.6",
     "sse.js": "github:mpetazzoni/sse.js",
     "vite-plugin-vue-markdown": "^0.23.5",

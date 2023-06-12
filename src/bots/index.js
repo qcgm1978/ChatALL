@@ -5,6 +5,7 @@ import ChatGPTBrowsingBot from "@/bots/openai/ChatGPTBrowsingBot";
 import BingChatPreciseBot from "@/bots/microsoft/BingChatPreciseBot";
 import BingChatBalancedBot from "@/bots/microsoft/BingChatBalancedBot";
 import BingChatCreativeBot from "@/bots/microsoft/BingChatCreativeBot";
+import SageBot from "@/bots/poe/SageBot";
 import SparkBot from "@/bots/SparkBot";
 import BardBot from "@/bots/BardBot";
 import OpenAIAPI35Bot from "@/bots/openai/OpenAIAPI35Bot";
@@ -20,28 +21,39 @@ import DevBot from "@/bots/DevBot";
 import GradioAppBot from "@/bots/huggingface/GradioAppBot";
 import HuggingChatBot from "@/bots/huggingface/HuggingChatBot";
 import QianWenBot from "./QianWenBot";
+import ChatGPT35PoeBot from "./poe/ChatGPT35PoeBot";
+import ChatGPT4PoeBot from "./poe/ChatGPT4PoeBot";
+import ClaudeInstantPoeBot from "./poe/ClaudeInstantPoeBot";
+import ClaudeInstant100kPoeBot from "./poe/ClaudeInstant100kPoeBot";
+import ClaudePlusPoeBot from "./poe/ClaudePlusPoeBot";
 
 const all = [
-  ChatGPT35Bot.getInstance(),
-  ChatGPT4Bot.getInstance(),
-  ChatGPTBrowsingBot.getInstance(),
-  OpenAIAPI35Bot.getInstance(),
-  OpenAIAPI4Bot.getInstance(),
+  AlpacaBot.getInstance(),
+  BardBot.getInstance(),
   BingChatCreativeBot.getInstance(),
   BingChatBalancedBot.getInstance(),
   BingChatPreciseBot.getInstance(),
-  ClaudeBot.getInstance(),
-  ClaudeInSlackBot.getInstance(), 
-  BardBot.getInstance(),
-  WenxinQianfanBot.getInstance(),
-  QianWenBot.getInstance(),
-  SparkBot.getInstance(),
-  HuggingChatBot.getInstance(),
-  VicunaBot.getInstance(),
-  AlpacaBot.getInstance(),
   ChatGLMBot.getInstance(),
-  MOSSBot.getInstance(),
+  ChatGPT35Bot.getInstance(),
+  ChatGPT35PoeBot.getInstance(),
+  ChatGPT4Bot.getInstance(),
+  ChatGPTBrowsingBot.getInstance(),
+  ChatGPT4PoeBot.getInstance(),
+  ClaudeBot.getInstance(),
+  ClaudeInstantPoeBot.getInstance(),
+  ClaudeInstant100kPoeBot.getInstance(),
+  ClaudePlusPoeBot.getInstance(),
   GradioAppBot.getInstance(),
+  HuggingChatBot.getInstance(),
+  MOSSBot.getInstance(),
+  OpenAIAPI35Bot.getInstance(),
+  OpenAIAPI4Bot.getInstance(),
+  ClaudeInSlackBot.getInstance(), 
+  QianWenBot.getInstance(),
+  SageBot.getInstance(),
+  SparkBot.getInstance(),
+  VicunaBot.getInstance(),
+  WenxinQianfanBot.getInstance(),
 ];
 
 if (process.env.NODE_ENV !== "production") {

@@ -24,6 +24,7 @@
     "tripleColumn": "三列"
   },
   "footer": {
+    "chooseFavorite": "选择你喜欢的 AI",
     "sendPrompt": "发送到:",
     "promptPlaceholder": "输入消息。（Shift+Enter 换行）"
   },
@@ -104,6 +105,15 @@
     "temperature0": "更具确定性",
     "temperature2": "更具随机性",
     "apiKey": "API 密钥"
+  },
+  "poe": {
+    "name": "Poe",
+    "a2": "Claude-instant",
+    "a2_100k": "Claude-instant-100k",
+    "a2_2": "Claude+",
+    "beaver": "GPT-4",
+    "capybara": "Sage",
+    "chinchilla": "ChatGPT 3.5"
   },
   "qianWen": {
     "name": "通义千问"

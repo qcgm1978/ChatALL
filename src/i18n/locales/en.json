@@ -23,6 +23,7 @@
     "tripleColumn": "Triple Column"
   },
   "footer": {
+    "chooseFavorite": "Choose your favorite AI bots",
     "sendPrompt": "Send to:",
     "promptPlaceholder": "Type a message. (Shift+Enter to add a new line)"
   },
@@ -103,6 +104,15 @@
     "temperature0": "More deterministic",
     "temperature2": "More random",
     "apiKey": "API Key"
+  },
+  "poe": {
+    "name": "Poe",
+    "a2": "Claude-instant",
+    "a2_100k": "Claude-instant-100k",
+    "a2_2": "Claude+",
+    "beaver": "GPT-4",
+    "capybara": "Sage",
+    "chinchilla": "ChatGPT 3.5"
   },
   "qianWen": {
     "name": "QianWen"

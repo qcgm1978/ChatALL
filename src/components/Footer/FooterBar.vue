@@ -18,7 +18,8 @@
       elevation="2"
       class="margin-bottom"
       :disabled="
-        prompt.trim() === '' || Object.values(activeBots).every((bot) => !bot)
+        prompt.trim() === '' ||
+        favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
       "
       @click="sendPromptToBots"
     >
@@ -26,24 +27,27 @@
     </v-btn>
     <div class="bot-logos margin-bottom">
       <BotLogo
-        v-for="(bot, index) in bots"
+        v-for="(bot, index) in favBots"
         :key="index"
-        :bot="bot"
-        :active="activeBots[bot.getClassname()]"
-        @click="toggleSelected(bot)"
-      ></BotLogo>
+        :bot="bot.instance"
+        :active="activeBots[bot.classname]"
+        size="36"
+        @click="toggleSelected(bot.instance)"
+      />
+      <BotsMenu :favBots="favBots" />
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount, reactive } from "vue";
+import { ref, computed, onBeforeMount, reactive, watch } from "vue";
 import { useStore } from "vuex";
 
 // Components
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import BotLogo from "./BotLogo.vue";
+import BotsMenu from "./BotsMenu.vue";
 
 // Composables
 
@@ -70,7 +74,19 @@ const prompt = ref("");
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 
-const setBotSelected = (param) => store.commit("SET_BOT_SELECTED", param);
+watch(favBots, async (newValue, oldValue) => {
+  const botsToCheck = newValue.filter((newBot) => {
+    return !oldValue.some((oldBot) => oldBot.classname === newBot.classname);
+  });
+  await botsToCheck.forEach(async (favBot) => {
+    const bot = favBot.instance;
+    if (!bot.isAvailable()) {
+      await bot.checkAvailability();
+      updateActiveBots();
+    }
+  });
+  updateActiveBots();
+});
 
 function updateActiveBots() {
   for (const favBot of favBots.value) {
@@ -96,9 +112,12 @@ function filterEnterKey(event) {
 
 function sendPromptToBots() {
   if (prompt.value.trim() === "") return;
-  if (Object.values(activeBots).every((bot) => !bot)) return;
 
-  const toBots = bots.value.filter((bot) => activeBots[bot.getClassname()]);
+  const toBots = favBots.value
+    .filter((favBot) => activeBots[favBot.classname])
+    .map((favBot) => favBot.instance);
+
+  if (toBots.length === 0) return;
 
   store.dispatch("sendPrompt", {
     prompt: prompt.value,
@@ -126,8 +145,7 @@ async function toggleSelected(bot) {
       }
     }
   }
-  setBotSelected({ botClassname, selected });
-  updateActiveBots();
+  store.commit("setBotSelected", { botClassname, selected });
 }
 
 onBeforeMount(async () => {
