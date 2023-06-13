@@ -12,15 +12,16 @@ const app = new App({
 });
 
 const app_id = 'U055L36GMFV';
+const user_id = 'U055L6P837C';
+const public_user_id = 'C02S9S07UKV';
 // app.client.users.list().then(data => {
 //   console.log(data)
 // })
 // 向Claude app发送私密消息
-app.client.chat.postEphemeral({
+app.client.chat.postMessage({
   token: SLACK_BOT_TOKEN,
-  channel: app_id,
-  text: 'Hello, Claude app!',
-  user: 'U055L6P837C'
+  channel: public_user_id,
+  text: 'Hello, Claude app!'
 }).then((result) => {
   console.log('Message sent:', result);
 }).catch((error) => {

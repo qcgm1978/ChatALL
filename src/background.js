@@ -4,7 +4,8 @@
 import { app, protocol, BrowserWindow, ipcMain, autoUpdater } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
-import { handle_IPC } from "./slack";
+// import { handle_IPC } from "./slack";
+import './slack-lib'
 // handle_IPC();
 const isDevelopment = process.env.NODE_ENV !== "production";
 
