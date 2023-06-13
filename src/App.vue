@@ -54,7 +54,7 @@
     </main>
 
     <FooterBarSelect v-if="NODE_ENV !== 'development'" :changeColumns="changeColumns" />
-    <FooterBar v-else></FooterBar>
+    <FooterBar v-else :changeColumns="changeColumns"></FooterBar>
     <SettingsModal
       v-model:open="isSettingsOpen"
     />

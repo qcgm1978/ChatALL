@@ -53,6 +53,9 @@ import BotsMenu from "./BotsMenu.vue";
 
 import _bots from "@/bots";
 
+const props = defineProps(["changeColumns",
+  // 'confirmModal'
+]);
 const { ipcRenderer } = window.require("electron");
 
 const store = useStore();
@@ -109,6 +112,9 @@ function filterEnterKey(event) {
     sendPromptToBots();
   }
 }
+function adaptColumns(num) {
+  props.changeColumns(num >= 3 ? 3 : num);
+}
 
 function sendPromptToBots() {
   if (prompt.value.trim() === "") return;
@@ -118,15 +124,18 @@ function sendPromptToBots() {
     .map((favBot) => favBot.instance);
 
   if (toBots.length === 0) return;
-
-  store.dispatch("sendPrompt", {
-    prompt: prompt.value,
-    bots: toBots,
-  });
+  adaptColumns(toBots.length)
+  store
+    .dispatch("sendPrompt", {
+      prompt: prompt.value,
+      bots: toBots,
+    })
+    .catch((error) => {
+      isMakeAvailableOpen.value = true;
+    });
 
   // Clear the textarea after sending the prompt
   prompt.value = "";
-
 }
 
 async function toggleSelected(bot) {
