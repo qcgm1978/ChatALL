@@ -151,6 +151,8 @@ async function toggleSelected(bot) {
         clickedBot.value = bot;
         // Open the bot's settings dialog
         isMakeAvailableOpen.value = true;
+      } else {
+        updateActiveBots();
       }
     }
   }
