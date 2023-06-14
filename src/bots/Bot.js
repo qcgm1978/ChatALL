@@ -157,11 +157,12 @@ export default class Bot {
       await this._sendPrompt(prompt, onUpdateResponse, callbackParam);
     };
 
+    let ret
     try {
       if (!this.constructor._lock) {
-        await executeSendPrompt();
+        ret=await executeSendPrompt();
       } else {
-        await this.acquireLock("sendPrompt", executeSendPrompt, () => {
+        ret=await this.acquireLock("sendPrompt", executeSendPrompt, () => {
           onUpdateResponse(callbackParam, {
             content: i18n.global.t("bot.waiting", {
               botName: this.getBrandName(),
@@ -173,8 +174,8 @@ export default class Bot {
     } catch (err) {
       console.warn(`Error send prompt to ${this.getFullname()}:`, err);
       onUpdateResponse(callbackParam, { content: err.toString(), done: true }); // Make sure stop loading
-      throw this
     }
+    return ret
   }
 
   /**
