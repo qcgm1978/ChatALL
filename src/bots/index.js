@@ -39,8 +39,6 @@ const all = [
   ChatGLMBot.getInstance(),
   ChatGPT35Bot.getInstance(),
   ChatGPT35PoeBot.getInstance(),
-  ChatGPT4Bot.getInstance(),
-  ChatGPTBrowsingBot.getInstance(),
   ChatGPT4MobileBot.getInstance(),
   ChatGPT4PoeBot.getInstance(),
   ClaudeBot.getInstance(),
@@ -62,6 +60,8 @@ const all = [
   WenxinQianfanBot.getInstance(),
 ];
 
+const disabled = [ChatGPT4Bot.getInstance(), ChatGPTBrowsingBot.getInstance()];
+
 if (process.env.NODE_ENV !== "production") {
   all.push(DevBot.getInstance());
 }
@@ -69,7 +69,12 @@ if (process.env.NODE_ENV !== "production") {
 const bots = {
   all,
   getBotByClassName(className) {
-    return all.find((bot) => bot.getClassname() === className);
+    const bot = disabled.find((bot) => bot.getClassname() === className);
+    if (bot) {
+      return bot;
+    } else {
+      return all.find((bot) => bot.getClassname() === className);
+    }
   },
 };
 

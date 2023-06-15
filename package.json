@@ -1,6 +1,6 @@
 {
   "name": "chatall",
-  "version": "1.28.28",
+  "version": "1.28.30",
   "main": "background.js",
   "description": "Chat with multiple AI bots and discover the best.",
   "author": "Sunner",
@@ -30,6 +30,7 @@
     "@slack/webhook": "^6.1.0",
     "async-lock": "^1.4.0",
     "axios": "^1.4.0",
+    "compare-versions": "^6.0.0-rc.1",
     "core-js": "^3.30.2",
     "electron-builder": "^23.6.0",
     "electron-is": "^3.0.0",
