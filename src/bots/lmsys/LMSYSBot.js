@@ -33,7 +33,8 @@ export default class LMSYSBot extends GradioBot {
       if(data[1].length){
         r = data[1][data[1].length - 1][1];
       } else {
-        r='You may need to open the page switch to other models in the lmsys settings'
+        // r='You may need to open the page switch to other models in the lmsys settings'
+        r=data[2]
       }
     }
     return r;
