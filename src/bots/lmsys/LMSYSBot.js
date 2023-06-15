@@ -29,7 +29,11 @@ export default class LMSYSBot extends GradioBot {
   parseData(fn_index, data) {
     let r = "";
     if (fn_index === this.constructor._fnIndexes[1]) {
-      r = data[1][data[1].length - 1][1];
+      if(data[1].length){
+        r = data[1][data[1].length - 1][1];
+      } else {
+        r='You may need to open the page switch to other models in the lmsys settings'
+      }
     }
     return r;
   }
