@@ -7,6 +7,10 @@ import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
 // import { handle_IPC } from "./slack";
 // import './slack-lib'
 // handle_IPC();
+// process.env.ELECTRON_IS_DEV = 0
+// app.isPackaged = true;
+
+// import './update-info'
 import updateApp from './update';
 const isDevelopment = process.env.NODE_ENV !== "production";
 
