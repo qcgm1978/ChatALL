@@ -61,7 +61,7 @@ export default class ChatGPTBot extends Bot {
     return axios.get(REFRESH_SESSION_URL).then(_=>resolve).catch((error) => {
       // the REFRESH_SESSION_URL always returns a 404 error
       // if 403, then the session has expired
-      if (error.response && error.response.status === 403) {
+      if (error.response && [403,].includes(error.response.status)) {
         this.constructor._isAvailable = false;
         this.toggleSessionRefreshing(false);
         reject()
