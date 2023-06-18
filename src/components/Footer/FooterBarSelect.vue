@@ -183,6 +183,7 @@ async function confirmErrorBot(that) {
         const msg = i18n.global.t("header.clearBot");
         const result = await props.confirmModal.value.showModal(
           `${err}\n${msg}`,
+          "",
           500,
         );
         if (result) {

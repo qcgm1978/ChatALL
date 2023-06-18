@@ -230,7 +230,7 @@ export default class ChatGPTBot extends Bot {
                 message += explanation ? explanation.textContent : "";
               } else {
                 const p = doc.querySelector("p").textContent;
-                const span = doc.querySelector("span").textContent;
+                const span = doc.querySelector("span")?.textContent||''
                 message = `${p}. ${span}`;
               }
             }
