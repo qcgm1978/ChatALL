@@ -29,6 +29,7 @@ export default createStore({
     },
     chatgpt: {
       refreshCycle: 0,
+      riskConfirmed: false,
     },
     gradio: {
       url: "",

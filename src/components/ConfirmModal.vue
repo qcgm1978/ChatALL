@@ -1,7 +1,14 @@
 <template>
-  <v-dialog v-model="dialog" :max-width="max_width" @click:outside="close(false)">
-    <v-card>
-      <v-card-title>{{ title }}</v-card-title>
+  <v-dialog
+    v-model="dialog"
+    width="auto"
+    max-width="80%"
+    @click:outside="close(false)"
+  >
+    <v-card :title="_title">
+      <v-card-text>
+        <div v-html="_text"></div>
+      </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="primary darken-1" @click="close(false)">{{
@@ -19,14 +26,15 @@
 import { ref } from "vue";
 
 let dialog = ref(false);
-let title = ref("");
+let _title = ref("");
+let _text = ref("");
 let num=290
 let max_width = ref(num);
-
 let close;
 
-const showModal = (message,width=null) => {
-  title.value = message;
+const showModal = (title, text = "",width=null) => {
+  _title.value = title;
+  _text.value = text.replace(/\n/g, "<br />");
   if (width) {
     max_width.value=width
   }
