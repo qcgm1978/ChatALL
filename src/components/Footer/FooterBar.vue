@@ -55,7 +55,8 @@ import BotsMenu from "./BotsMenu.vue";
 
 import _bots from "@/bots";
 
-const props = defineProps(["changeColumns",
+const props = defineProps([
+  "changeColumns",
   // 'confirmModal'
 ]);
 const { ipcRenderer } = window.require("electron");
@@ -140,14 +141,20 @@ function sendPromptToBots() {
     .map((favBot) => favBot.instance);
 
   if (toBots.length === 0) return;
-  adaptColumns(toBots.length)
   store
     .dispatch("sendPrompt", {
       prompt: prompt.value,
       bots: toBots,
     })
-    .catch((error) => {
-      isMakeAvailableOpen.value = true;
+    .then((checkAvailabilityPromises) => {
+      Promise.allSettled(checkAvailabilityPromises).then((promises) => {
+        adaptColumns(toBots.length);
+        const rejected = promises.filter((d) => d.status == "rejected");
+        rejected.forEach((bot) => {
+          clickedBot.value = bot.reason.bot;
+          isMakeAvailableOpen.value = true;
+        });
+      });
     });
 
   // Clear the textarea after sending the prompt

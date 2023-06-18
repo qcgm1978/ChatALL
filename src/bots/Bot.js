@@ -185,6 +185,7 @@ export default class Bot {
     } catch (err) {
       console.warn(`Error send prompt to ${this.getFullname()}:`, err);
       onUpdateResponse(callbackParam, { content: err.toString(), done: true }); // Make sure stop loading
+      return new Promise((r,reject)=>reject({err,bot:this}))
     }
     return ret
   }
