@@ -44,6 +44,7 @@
 <script setup>
 import { ref, computed, onBeforeMount, reactive, watch } from "vue";
 import { useStore } from "vuex";
+const axios = require("axios");
 
 // Components
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
@@ -54,7 +55,16 @@ import BotsMenu from "./BotsMenu.vue";
 // Composables
 
 import _bots from "@/bots";
-
+axios.interceptors.response.use(
+  (response) => {
+    // Do something with response data
+    return response;
+  },
+  (error) => {
+    // Do something with response error
+    return Promise.reject(error);
+  },
+);
 const props = defineProps([
   "changeColumns",
   // 'confirmModal'
@@ -110,9 +120,10 @@ async function updateActiveBots() {
         });
       }
     }
-    activeBots[favBot.classname] =
-      favBot.instance.isAvailable() && favBot.selected;
+    const val = favBot.instance.isAvailable() && favBot.selected;
+    activeBots[favBot.classname] = val;
   }
+  // store.commit("updateCurrentChatFavBots", activeBots);
 }
 
 // Send the prompt when the user presses enter and prevent the default behavior
@@ -184,8 +195,11 @@ async function toggleSelected(bot) {
 
 onBeforeMount(async () => {
   favBots.value.forEach(async (favBot) => {
-    await favBot.instance.checkAvailability();
-    updateActiveBots();
+    if (favBot.selected) {
+      const result = await favBot.instance.checkAvailability();
+      favBot.selected = result;
+      updateActiveBots();
+    }
   });
 
   // Listen message trigged by main process

@@ -40,9 +40,6 @@ async function createWindow() {
     maximizable: true,
   });
   // 窗口加载完成后最大化
-  win.webContents.on("did-finish-load", () => {
-    win.maximize();
-  });
 
   mainWindow = win;
   // 窗口加载完成后最大化
@@ -187,17 +184,7 @@ function createNewWindow(url, userAgent = "") {
 ipcMain.handle("create-new-window", (event, url, userAgent) => {
   createNewWindow(url, userAgent);
 });
-ipcMain.handle("get-webhook", (event,message) => {
-  webhook.send({
-    text: message
-  })
-    .then(() => {
-      console.log('Message sent to Slack');
-    })
-    .catch((error) => {
-      console.error('Error sending message to Slack:', error);
-    });
-});
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
@@ -223,8 +210,8 @@ app.on("ready", async () => {
     // Install Vue Devtools
     try {
       // console.log(VUEJS3_DEVTOOLS)
-      await installExtension(VUEJS3_DEVTOOLS);
-      process.env.HAS_VUEJS3_DEVTOOLS = true;
+      // await installExtension(VUEJS3_DEVTOOLS);
+      // process.env.HAS_VUEJS3_DEVTOOLS = true;
     } catch (e) {
       console.log("Vue Devtools failed to install:", e.toString());
     }

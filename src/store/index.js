@@ -95,6 +95,9 @@ export default createStore({
       if (bot) bot.selected = selected;
       else currentChat.favBots.push({ classname: botClassname, selected });
     },
+    updateCurrentChatFavBots (state, favBots)  {
+      this.getters.currentChat.favBots = favBots;
+    },
     addFavoriteBot(state, botClassname) {
       const currentChat = state.chats[state.currentChatIndex];
       const favBots = currentChat.favBots;

@@ -26,3 +26,14 @@ bot.on('start', function() {
     // // define private group instead of 'private_group', where bot exist
     // bot.postMessageToGroup('private_group', 'meow!', params); 
 });
+ipcMain.handle("get-webhook", (event,message) => {
+    webhook.send({
+      text: message
+    })
+      .then(() => {
+        console.log('Message sent to Slack');
+      })
+      .catch((error) => {
+        console.error('Error sending message to Slack:', error);
+      });
+  });
