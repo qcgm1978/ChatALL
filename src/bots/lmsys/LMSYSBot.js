@@ -31,7 +31,7 @@ export default class LMSYSBot extends GradioBot {
     let r = ``;
     if (fn_index === this.constructor._fnIndexes[1]) {
       if(data[1].length){
-        r = data[1][data[1].length - 1][1];
+        r = data[1][data[1].length - 1][0];
       } else if(data[2] instanceof String) {
         // r='You may need to open the page switch to other models in the lmsys settings'
         r=data[2]
