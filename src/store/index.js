@@ -3,7 +3,6 @@ import VuexPersist from "vuex-persist";
 import i18n from "@/i18n";
 import messagesPersist from "./messagesPersist";
 
-
 // 初始化 VuexPersist 实例
 const vuexPersist = new VuexPersist({
   key: "chatall-app", // 用于存储的键名，可以根据你的应用更改
@@ -51,8 +50,8 @@ export default createStore({
       pastRounds: 5,
     },
     claudeInSlack: {
-      slackUserToken:'',
-      botUserId:''
+      slackUserToken: "",
+      botUserId: "",
     },
     chats: [
       {
@@ -92,10 +91,15 @@ export default createStore({
       const bot = currentChat.favBots.find(
         (bot) => bot.classname === botClassname,
       );
-      if (bot) bot.selected = selected;
-      else currentChat.favBots.push({ classname: botClassname, selected });
+      if (bot) {
+        bot.selected = selected;
+      } else {
+        currentChat.favBots.push({ classname: botClassname, selected });
+      }
+      // this.commit('updateCurrentChatFavBots',currentChat.favBots)
+      // this.getters.currentChat = state.chats[state.currentChatIndex];
     },
-    updateCurrentChatFavBots (state, favBots)  {
+    updateCurrentChatFavBots(state,favBots) {
       this.getters.currentChat.favBots = favBots;
     },
     addFavoriteBot(state, botClassname) {
@@ -128,7 +132,7 @@ export default createStore({
       state.moss.token = token;
     },
     setClaudeInSlack(state, { slackUserToken, botUserId }) {
-      state.claudeInSlack = { slackUserToken, botUserId }
+      state.claudeInSlack = { slackUserToken, botUserId };
     },
     setQianWenToken(state, token) {
       state.qianWen.xsrfToken = token;
@@ -203,7 +207,7 @@ export default createStore({
         done: true,
         hide: false,
       });
-      const ret=[]
+      const ret = [];
       for (const bot of bots) {
         const message = {
           type: "response",
@@ -220,15 +224,15 @@ export default createStore({
         const currentChat = state.chats[state.currentChatIndex];
         message.index = currentChat.messages.push(message) - 1;
 
-        const bot_sendPrompt=bot.sendPrompt(
+        const bot_sendPrompt = bot.sendPrompt(
           prompt,
           (indexes, values) =>
             dispatch("updateMessage", { indexes, message: values }),
           { chatIndex: state.currentChatIndex, messageIndex: message.index },
         );
-        ret.push(bot_sendPrompt)
+        ret.push(bot_sendPrompt);
       }
-      return ret
+      return ret;
     },
     updateMessage({ commit, state }, { indexes, message: values }) {
       commit("updateMessage", { indexes, message: values });

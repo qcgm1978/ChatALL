@@ -107,18 +107,20 @@ watch(favBots, async (newValue, oldValue) => {
 });
 
 async function updateActiveBots() {
-  for (const favBot of favBots.value) {
+  for (const bot of store.getters.currentChat.favBots) {
     // Unselect the bot if user has not confirmed to use it
+    const favBot = favBots.value.find(d => d.classname == bot.classname)
+    favBot.selected=bot.selected
     if (favBot.selected) {
       const confirmed = await favBot.instance.confirmBeforeUsing(
         confirmModal.value,
       );
-      if (!confirmed) {
+      // if (!confirmed) {
         store.commit("setBotSelected", {
           botClassname: favBot.classname,
-          selected: false,
+          selected: confirmed,
         });
-      }
+      // }
     }
     const val = favBot.instance.isAvailable() && favBot.selected;
     activeBots[favBot.classname] = val;
@@ -178,19 +180,22 @@ async function toggleSelected(bot) {
   if (activeBots[botClassname]) {
     selected = false;
   } else {
-    selected = true;
-    if (!bot.isAvailable()) {
+    if (bot.isAvailable()) {
+      selected = true;
+    } else {
       const availability = await bot.checkAvailability();
       if (!availability) {
+        selected = false;
         clickedBot.value = bot;
         // Open the bot's settings dialog
         isMakeAvailableOpen.value = true;
       } else {
-        updateActiveBots();
+        selected = true;
       }
     }
   }
   store.commit("setBotSelected", { botClassname, selected });
+  updateActiveBots();
 }
 
 onBeforeMount(async () => {
