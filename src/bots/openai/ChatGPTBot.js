@@ -45,7 +45,9 @@ export default class ChatGPTBot extends Bot {
         this.constructor._isAvailable = false;
       }
     } catch (error) {
-      console.warn("Error checking ChatGPT login status:", error);
+      const html=error.response.data
+      const message = this.get_message(html, );
+      console.warn("Error checking ChatGPT login status:", error,message);
       this.constructor._isAvailable = false;
     }
     // Toggle periodic session refreshing based on login status
@@ -221,18 +223,8 @@ export default class ChatGPTBot extends Bot {
               const data = JSON.parse(error.data);
               message = data.detail?.message || data.detail;
             } catch (e) {
-              const parser = new DOMParser();
-              const doc = parser.parseFromString(error.data, "text/html");
-              const msg = doc.querySelector(".message p");
-              message = msg ? msg.textContent + ". " : "";
-              const explanation = doc.querySelector(".explanation");
-              if (msg || explanation) {
-                message += explanation ? explanation.textContent : "";
-              } else {
-                const p = doc.querySelector("p").textContent;
-                const span = doc.querySelector("span")?.textContent||''
-                message = `${p}. ${span}`;
-              }
+              const html = error.data;
+              message = this.get_message(html, );
             }
           } else {
             message = error.source.url;
@@ -246,5 +238,21 @@ export default class ChatGPTBot extends Bot {
         reject(error);
       }
     });
+  }
+
+  get_message(html, ) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const msg = doc.querySelector(".message p");
+    let message = msg ? msg.textContent + ". " : "";
+    const explanation = doc.querySelector(".explanation");
+    if (msg || explanation) {
+      message += explanation ? explanation.textContent : "";
+    } else {
+      const p = doc.querySelector("p").textContent;
+      const span = doc.querySelector("span")?.textContent || '';
+      message = `${p}. ${span}`;
+    }
+    return message;
   }
 }
