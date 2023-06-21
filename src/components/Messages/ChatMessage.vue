@@ -1,14 +1,24 @@
 <template>
-  <v-card ref="root" :class="[
-    'message',
-    message.type,
-    message.highlight ? 'highlight-border' : '',
-  ]" :loading="message.done ? false : 'primary'">
+  <v-card
+    ref="root"
+    :class="[
+      'message',
+      message.type,
+      message.highlight ? 'highlight-border' : '',
+    ]"
+    :loading="message.done ? false : 'primary'"
+  >
     <v-card-title v-if="message.type === 'response'" class="title">
       <img :src="botLogo" alt="Bot Icon" />
       {{ botFullname }}
       <v-spacer></v-spacer>
-      <v-btn flat size="x-small" icon @click="toggleHighlight" :color="message.highlight ? 'primary' : ''">
+      <v-btn
+        flat
+        size="x-small"
+        icon
+        @click="toggleHighlight"
+        :color="message.highlight ? 'primary' : ''"
+      >
         <v-icon>mdi-lightbulb-on-outline</v-icon>
       </v-btn>
       <v-btn flat size="x-small" icon @click="copyToClipboard">
@@ -18,9 +28,20 @@
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-card-title>
-    <pre v-if="message.type === 'prompt'">{{ message.content }}</pre>
-    <Markdown v-else class="markdown-body" :breaks="true" :html="message.format === 'html'" :source="message.content"
-      @click="handleClick" />
+    <div v-if="message.type === 'prompt'" class="prompt-div">
+      <span>{{ message.content }} </span>
+      <v-btn flat size="x-small" icon @click="copyToClipboard">
+        <v-icon>mdi-content-copy</v-icon>
+      </v-btn>
+    </div>
+    <Markdown
+      v-else
+      class="markdown-body"
+      :breaks="true"
+      :html="message.format === 'html'"
+      :source="message.content"
+      @click="handleClick"
+    />
     <!-- <VueVega :source="message.content" /> -->
   </v-card>
   <ConfirmModal ref="confirmModal" />
@@ -49,7 +70,6 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["update-message"]);
-
 
 const root = ref();
 const confirmModal = ref(null);
@@ -113,7 +133,6 @@ function handleClick(event) {
   const url = target.href || target.parentElement.href;
   electron.shell.openExternal(url);
 }
-
 </script>
 
 <style scoped>
@@ -162,5 +181,10 @@ function handleClick(event) {
 .markdown-body {
   background-color: inherit;
   font-family: inherit;
+}
+.prompt-div{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 </style>
