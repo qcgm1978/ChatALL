@@ -1,18 +1,20 @@
 <template>
   <div class="footer">
-    <v-textarea
+    <v-autocomplete
       v-model="prompt"
+      :items="autocompleteItems"
       auto-grow
       max-rows="8.5"
       rows="1"
       density="comfortable"
       hide-details
       variant="solo"
-      :placeholder="$t('footer.promptPlaceholder')"
+      :label="$t('footer.promptPlaceholder')"
       autofocus
       @keydown="filterEnterKey"
+      @input="changePrompt"
       style="min-width: 390px"
-    ></v-textarea>
+    ></v-autocomplete>
     <v-btn
       color="primary"
       elevation="2"
@@ -55,16 +57,16 @@ import BotsMenu from "./BotsMenu.vue";
 // Composables
 
 import _bots from "@/bots";
-axios.interceptors.response.use(
-  (response) => {
-    // Do something with response data
-    return response;
-  },
-  (error) => {
-    // Do something with response error
-    return Promise.reject(error);
-  },
-);
+const autocompleteItems = computed(() => {
+  const messages = store.getters.currentChat.messages.filter(
+    (message) => !message.hide,
+  );
+  const items = messages
+    .filter((d) => d.type == "prompt")
+    .map((d) => d.content);
+  const set = new Set(items);
+  return Array.from(set);
+});
 const props = defineProps([
   "changeColumns",
   // 'confirmModal'
@@ -109,17 +111,17 @@ watch(favBots, async (newValue, oldValue) => {
 async function updateActiveBots() {
   for (const bot of store.getters.currentChat.favBots) {
     // Unselect the bot if user has not confirmed to use it
-    const favBot = favBots.value.find(d => d.classname == bot.classname)
-    favBot.selected=bot.selected
+    const favBot = favBots.value.find((d) => d.classname == bot.classname);
+    favBot.selected = bot.selected;
     if (favBot.selected) {
       const confirmed = await favBot.instance.confirmBeforeUsing(
         confirmModal.value,
       );
       // if (!confirmed) {
-        store.commit("setBotSelected", {
-          botClassname: favBot.classname,
-          selected: confirmed,
-        });
+      store.commit("setBotSelected", {
+        botClassname: favBot.classname,
+        selected: confirmed,
+      });
       // }
     }
     const val = favBot.instance.isAvailable() && favBot.selected;
@@ -140,6 +142,13 @@ function filterEnterKey(event) {
   ) {
     event.preventDefault();
     sendPromptToBots();
+  }
+}
+function changePrompt(evt) {
+  const value = evt.data;
+  if (value && !autocompleteItems.value.includes(value)) {
+    // autocompleteItems.value.push(prompt.value);
+    prompt.value = value;
   }
 }
 function adaptColumns(num) {
