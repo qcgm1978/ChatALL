@@ -3,6 +3,7 @@
     <v-autocomplete
       v-model="prompt"
       :items="autocompleteItems"
+      :menu-props="{ closeOnContentClick: true }"
       auto-grow
       max-rows="8.5"
       rows="1"
@@ -13,16 +14,14 @@
       autofocus
       @keydown="filterEnterKey"
       @input="changePrompt"
+      @blur="clearPrompt"
       style="min-width: 390px"
     ></v-autocomplete>
     <v-btn
       color="primary"
       elevation="2"
       class="margin-bottom"
-      :disabled="
-        prompt.trim() === '' ||
-        favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
-      "
+      :disabled="disabled"
       @click="sendPromptToBots"
     >
       {{ $t("footer.sendPrompt") }}
@@ -57,6 +56,9 @@ import BotsMenu from "./BotsMenu.vue";
 // Composables
 
 import _bots from "@/bots";
+const clearPrompt = (evt) => {
+  prompt.value = evt.target.value;
+};
 const autocompleteItems = computed(() => {
   const messages = store.getters.currentChat.messages.filter(
     (message) => !message.hide,
@@ -93,6 +95,7 @@ const favBots = computed(() => {
 const prompt = ref("");
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
+const disabled = ref(true);
 
 watch(favBots, async (newValue, oldValue) => {
   const botsToCheck = newValue.filter((newBot) => {
@@ -107,7 +110,13 @@ watch(favBots, async (newValue, oldValue) => {
   });
   updateActiveBots();
 });
-
+watch(prompt, (newValue, oldValue) => {
+  const dis =
+    !newValue ||
+    newValue.trim() === "" ||
+    favBots.value.filter((favBot) => activeBots[favBot.classname]).length === 0;
+  disabled.value = dis;
+});
 async function updateActiveBots() {
   for (const bot of store.getters.currentChat.favBots) {
     // Unselect the bot if user has not confirmed to use it
@@ -147,7 +156,7 @@ function filterEnterKey(event) {
 function changePrompt(evt) {
   const value = evt.data;
   if (value && !autocompleteItems.value.includes(value)) {
-    // autocompleteItems.value.push(prompt.value);
+    autocompleteItems.value.push(value);
     prompt.value = value;
   }
 }
@@ -180,7 +189,7 @@ function sendPromptToBots() {
     });
 
   // Clear the textarea after sending the prompt
-  prompt.value = "";
+  // prompt.value = "";
 }
 
 async function toggleSelected(bot) {
