@@ -17,7 +17,8 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "start": "electron .",
-    "release": "vue-cli-service electron:build -wml --x64 --arm64"
+    "release": "vue-cli-service electron:build -wml --x64 --arm64",
+    "ins": "sudo chmod -R 777 ./ && nvm use 16 && npm set proxy http://127.0.0.1:1087 && sudo npm i && node_modules/vue-cli-plugin-electron-builder/node_modules/webpack/lib/util/createHash.js:130 algorithm='debug'"
   },
   "build": {
     "publish": {
@@ -53,7 +54,6 @@
     "vue-i18n": "^9.2.2",
     "vue-matomo": "^4.2.0",
     "vue-multiselect": "^2.1.7",
-    "vue-vega": "^1.0.0-alpha.13",
     "vue3-markdown-it": "^1.0.10",
     "vuetify": "^3.2.3",
     "vuex": "^4.1.0",
@@ -75,7 +75,7 @@
     "eslint-plugin-vue": "^9.14.1",
     "md5": "^2.3.0",
     "prettier-plugin-vue": "^1.1.6",
-    "sse.js": "github:mpetazzoni/sse.js",
+    "sse.js": "*",
     "vite-plugin-vue-markdown": "^0.23.5",
     "vsce": "^2.15.0",
     "vue-cli-plugin-electron-builder": "^2.1.1"

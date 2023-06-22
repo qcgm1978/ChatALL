@@ -1,8 +1,14 @@
 <template>
   <div class="footer">
+    <!-- :custom-filter="filterItems"
+    :item-text="itemText"
+    :label="$t('footer.promptPlaceholder')"
+  -->
     <v-autocomplete
       v-model="prompt"
       :items="autocompleteItems"
+      item-title="name"
+      item-value="ind"
       :menu-props="{ closeOnContentClick: true }"
       auto-grow
       max-rows="8.5"
@@ -10,11 +16,9 @@
       density="comfortable"
       hide-details
       variant="solo"
-      :label="$t('footer.promptPlaceholder')"
       autofocus
       @keydown="filterEnterKey"
       @input="changePrompt"
-      @blur="clearPrompt"
       style="min-width: 390px"
     ></v-autocomplete>
     <v-btn
@@ -56,19 +60,24 @@ import BotsMenu from "./BotsMenu.vue";
 // Composables
 
 import _bots from "@/bots";
-const clearPrompt = (evt) => {
-  prompt.value = evt.target.value;
-};
 const autocompleteItems = computed(() => {
   const messages = store.getters.currentChat.messages.filter(
     (message) => !message.hide,
   );
   const items = messages
     .filter((d) => d.type == "prompt")
-    .map((d) => d.content);
+    .map((d, i) => ({ name: d.content, ind: d.content }));
   const set = new Set(items);
-  return Array.from(set);
+  const its = Array.from(set);
+  return its;
 });
+const itemText = () => {
+  return "text"; // 指定选项的文本属性名
+};
+const filterItems = (item, queryText, itemText) => {
+  const is_filter = item.toLowerCase().indexOf(queryText.toLowerCase()) > -1;
+  return is_filter; // 过滤选项
+};
 const props = defineProps([
   "changeColumns",
   // 'confirmModal'
@@ -112,9 +121,10 @@ watch(favBots, async (newValue, oldValue) => {
 });
 watch(prompt, (newValue, oldValue) => {
   const dis =
-    !newValue ||
-    newValue.trim() === "" ||
-    favBots.value.filter((favBot) => activeBots[favBot.classname]).length === 0;
+    newValue &&
+    (newValue.trim() === "" ||
+      favBots.value.filter((favBot) => activeBots[favBot.classname]).length ===
+        0);
   disabled.value = dis;
 });
 async function updateActiveBots() {
@@ -154,9 +164,12 @@ function filterEnterKey(event) {
   }
 }
 function changePrompt(evt) {
-  const value = evt.data;
-  if (value && !autocompleteItems.value.includes(value)) {
-    autocompleteItems.value.push(value);
+  const value = evt.target.value;
+  if (
+    value
+    // && !autocompleteItems.value.includes(value)
+  ) {
+    // autocompleteItems.value.push(value);
     prompt.value = value;
   }
 }
@@ -181,15 +194,17 @@ function sendPromptToBots() {
       Promise.allSettled(checkAvailabilityPromises).then((promises) => {
         adaptColumns(toBots.length);
         const rejected = promises.filter((d) => d.status == "rejected");
-        rejected.forEach((bot) => {
-          clickedBot.value = bot.reason.bot;
-          isMakeAvailableOpen.value = true;
-        });
+        if (rejected.length) {
+          rejected.forEach((bot) => {
+            clickedBot.value = bot.reason.bot;
+            isMakeAvailableOpen.value = true;
+          });
+          // Clear the textarea after sending the prompt
+        } else {
+          prompt.value = "";
+        }
       });
     });
-
-  // Clear the textarea after sending the prompt
-  // prompt.value = "";
 }
 
 async function toggleSelected(bot) {
