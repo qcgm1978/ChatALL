@@ -120,3 +120,5 @@ dist
 
 #Electron-builder output
 /dist_electron
+
+sse.js
