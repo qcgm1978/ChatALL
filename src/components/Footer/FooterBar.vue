@@ -93,6 +93,7 @@ const activeBots = reactive({});
 const favBots = computed(() => {
   const _favBots = [];
   store.getters.currentChat.favBots.forEach((favBot) => {
+    if (_bots.isBotDisabled(favBot.classname)) return;
     _favBots.push({
       ...favBot,
       instance: _bots.getBotByClassName(favBot.classname),
@@ -257,7 +258,6 @@ onBeforeMount(async () => {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: rgba(243, 243, 243, 0.7);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;

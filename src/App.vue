@@ -2,22 +2,36 @@
   <div id="app">
     <header>
       <div class="header-content">
-        <img class="logo" src="@/assets/logo-banner.png" alt="ChatALL" />
+        <img
+          :class="{ 'dark-png': store.state.theme === Theme.DARK }"
+          class="logo"
+          src="@/assets/logo-banner.png"
+          alt="ChatALL"
+        />
         <div class="column-icons">
           <img
             src="@/assets/column-1.svg"
             @click="changeColumns(1)"
-            :class="{ selected: columns === 1 }"
+            :class="{
+              selected: columns === 1,
+              'dark-png': store.state.theme === Theme.DARK,
+            }"
           />
           <img
             src="@/assets/column-2.svg"
             @click="changeColumns(2)"
-            :class="{ selected: columns === 2 }"
+            :class="{
+              selected: columns === 2,
+              'dark-png': store.state.theme === Theme.DARK,
+            }"
           />
           <img
             src="@/assets/column-3.svg"
             @click="changeColumns(3)"
-            :class="{ selected: columns === 3 }"
+            :class="{
+              selected: columns === 3,
+              'dark-png': store.state.theme === Theme.DARK,
+            }"
           />
         </div>
         <div>
@@ -65,8 +79,10 @@
 
 <script setup>
 import { ref, computed, onMounted, reactive } from "vue";
+import { useTheme } from "vuetify";
 import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
+import { applyTheme, resolveTheme, Theme } from "./theme";
 
 import i18n from "./i18n";
 
@@ -81,9 +97,20 @@ import UpdateNotification from "@/components/Notification/UpdateNotificationModa
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
 // import { VDataTable } from 'vuetify/labs/VDataTable'
-import _bots from "@/bots";
-const store = useStore();
 const NODE_ENV = process.env.NODE_ENV;
+
+const { ipcRenderer } = window.require("electron");
+
+const store = useStore();
+const vuetifyTheme = useTheme();
+const onUpdatedSystemTheme = async () => {
+  const resolvedTheme = await resolveTheme(store.state.mode, ipcRenderer);
+  store.commit("setTheme", resolvedTheme);
+  applyTheme(resolvedTheme, vuetifyTheme);
+};
+
+ipcRenderer.on("on-updated-system-theme", onUpdatedSystemTheme);
+
 const confirmModal = ref(null);
 const isSettingsOpen = ref(false);
 const columns = computed(() => store.state.columns);
@@ -169,14 +196,14 @@ body {
 }
 
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  padding: 16px;
-  z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgb(var(--v-theme-header));
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    padding: 16px;
+    z-index: 999;
 }
 
 .header-content {
@@ -202,9 +229,9 @@ img.selected {
 }
 
 .content {
-  flex: 1;
-  background-color: #f3f3f3;
-  padding: 16px;
+    flex: 1;
+    background-color: rgb(var(--v-theme-background));
+    padding: 16px;
 }
 
 .cursor-pointer {
@@ -213,5 +240,9 @@ img.selected {
 
 .filter-table {
   transform: translate(0px, -100px);
+}
+
+.dark-png {
+  filter: grayscale(1) brightness(5);
 }
 </style>

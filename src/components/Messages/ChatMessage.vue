@@ -55,9 +55,6 @@ import Markdown from "vue3-markdown-it";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
 
-import "highlight.js/styles/github.css";
-import "github-markdown-css/github-markdown-light.css";
-
 const props = defineProps({
   message: {
     type: Object,
@@ -136,6 +133,10 @@ function handleClick(event) {
 </script>
 
 <style scoped>
+.markdown-body{
+  background-color: rgb(var(--v-theme-response));
+}
+
 .message {
   border-radius: 8px;
   padding: 16px;
@@ -148,9 +149,9 @@ function handleClick(event) {
 }
 
 .prompt {
-  background-color: #95EC69;
-  width: fit-content;
-  grid-column: 1 / span var(--columns);
+    background-color: rgb(var(--v-theme-prompt));
+    width: fit-content;
+    grid-column: 1 / span var(--columns);
 }
 
 .prompt pre {
@@ -159,9 +160,9 @@ function handleClick(event) {
 }
 
 .response {
-  background-color: #FFF;
-  width: 100%;
-  grid-column: auto / span 1;
+    background-color: rgb(var(--v-theme-response));
+    width: 100%;
+    grid-column: auto / span 1;
 }
 
 .title {
@@ -178,10 +179,6 @@ function handleClick(event) {
   margin-right: 4px;
 }
 
-.markdown-body {
-  background-color: inherit;
-  font-family: inherit;
-}
 .prompt-div{
     display: flex;
     align-items: center;
