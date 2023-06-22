@@ -2,7 +2,6 @@
   <div class="footer">
     <!-- :custom-filter="filterItems"
     :item-text="itemText"
-    :label="$t('footer.promptPlaceholder')"
   -->
     <v-autocomplete
       v-model="prompt"
@@ -10,6 +9,7 @@
       item-title="name"
       item-value="ind"
       :menu-props="{ closeOnContentClick: true }"
+      :label="$t('footer.promptPlaceholder')"
       auto-grow
       max-rows="8.5"
       rows="1"
