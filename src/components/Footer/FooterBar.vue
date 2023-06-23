@@ -1,11 +1,11 @@
 <template>
-  <div class="footer">
-    <!-- :custom-filter="filterItems"
-    :item-text="itemText"
-  -->
+  <div class="footer"
+    v-shortkey.once="['alt', 'k']" 
+    @shortkey="focusPromptTextarea"
+  >
     <v-autocomplete
       v-model="prompt"
-      ref="autocomplete"
+      ref="promptTextArea"
       :items="autocompleteItems"
       item-title="name"
       item-value="ind"
@@ -40,6 +40,8 @@
         :active="activeBots[bot.classname]"
         size="36"
         @click="toggleSelected(bot.instance)"
+        v-shortkey.once="['alt', `${index + 1}`]"
+        @shortkey="toggleSelected(bot.instance)" 
       />
       <BotsMenu :favBots="favBots" />
     </div>
@@ -83,7 +85,7 @@ const props = defineProps(["changeColumns"]);
 const store = useStore();
 
 const confirmModal = ref(null);
-const autocomplete = ref(null);
+const promptTextArea = ref(null);
 
 const bots = ref(_bots.all);
 const activeBots = reactive({});
@@ -147,6 +149,10 @@ async function updateActiveBots() {
   // store.commit("updateCurrentChatFavBots", activeBots);
 }
 
+function focusPromptTextarea() {
+  promptTextArea.value.$el.querySelector('textarea').focus()
+}
+
 // Send the prompt when the user presses enter and prevent the default behavior
 // But if the shift, ctrl, alt, or meta keys are pressed, do as default
 function filterEnterKey(event) {
@@ -159,8 +165,7 @@ function filterEnterKey(event) {
     !event.metaKey
   ) {
     event.preventDefault();
-    autocomplete.value.menu = false;
-    // autocomplete.value.closeMenu()
+    promptTextArea.value.menu = false;
     sendPromptToBots();
   }
 }
