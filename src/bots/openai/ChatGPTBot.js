@@ -45,9 +45,9 @@ export default class ChatGPTBot extends Bot {
         this.constructor._isAvailable = false;
       }
     } catch (error) {
-      const html=error.response.data
-      const message = this.get_message(html, );
-      console.warn("Error checking ChatGPT login status:", error,message);
+      const html = error.response?.data || error.message;
+      const message = this.get_message(html);
+      console.warn("Error checking ChatGPT login status:", error, message);
       this.constructor._isAvailable = false;
     }
     // Toggle periodic session refreshing based on login status
@@ -59,18 +59,21 @@ export default class ChatGPTBot extends Bot {
     return { conversationId: undefined, parentMessageId: uuidv4() };
   }
 
-  refreshSession(resolve=_=>_,reject=_=>_) {
-    return axios.get(REFRESH_SESSION_URL).then(_=>resolve).catch((error) => {
-      // the REFRESH_SESSION_URL always returns a 404 error
-      // if 403, then the session has expired
-      if (error.response && [403,].includes(error.response.status)) {
-        this.constructor._isAvailable = false;
-        this.toggleSessionRefreshing(false);
-        reject()
-      } else {
-        resolve()
-      }
-    });
+  refreshSession(resolve = (_) => _, reject = (_) => _) {
+    return axios
+      .get(REFRESH_SESSION_URL)
+      .then((_) => resolve)
+      .catch((error) => {
+        // the REFRESH_SESSION_URL always returns a 404 error
+        // if 403, then the session has expired
+        if (error.response && [403].includes(error.response.status)) {
+          this.constructor._isAvailable = false;
+          this.toggleSessionRefreshing(false);
+          reject();
+        } else {
+          resolve();
+        }
+      });
   }
 
   /**
@@ -90,14 +93,16 @@ export default class ChatGPTBot extends Bot {
       sr.id = null;
     }
     return new Promise((resolve, reject) => {
-      
       if (shouldRefresh && sr.interval > 0) {
         this.refreshSession();
-        sr.id = setInterval(this.refreshSession.bind(this,resolve,reject), sr.interval);
+        sr.id = setInterval(
+          this.refreshSession.bind(this, resolve, reject),
+          sr.interval,
+        );
       } else {
-        resolve()
+        resolve();
       }
-    })
+    });
   }
 
   getArkoseToken() {
@@ -224,7 +229,7 @@ export default class ChatGPTBot extends Bot {
               message = data.detail?.message || data.detail;
             } catch (e) {
               const html = error.data;
-              message = this.get_message(html, );
+              message = this.get_message(html);
             }
           } else {
             message = error.source.url;
@@ -240,7 +245,7 @@ export default class ChatGPTBot extends Bot {
     });
   }
 
-  get_message(html, ) {
+  get_message(html) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const msg = doc.querySelector(".message p");
@@ -249,9 +254,14 @@ export default class ChatGPTBot extends Bot {
     if (msg || explanation) {
       message += explanation ? explanation.textContent : "";
     } else {
-      const p = doc.querySelector("p").textContent;
-      const span = doc.querySelector("span")?.textContent || '';
-      message = `${p}. ${span}`;
+      const p = doc.querySelector("p");
+      if (p) {
+        const p_text = p.textContent;
+        const span = doc.querySelector("span")?.textContent || "";
+        message = `${p_text}. ${span}`;
+      } else {
+        message = html;
+      }
     }
     return message;
   }

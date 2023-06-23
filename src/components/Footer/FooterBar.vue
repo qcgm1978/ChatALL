@@ -5,10 +5,12 @@
   -->
     <v-autocomplete
       v-model="prompt"
+      ref="autocomplete"
       :items="autocompleteItems"
       item-title="name"
       item-value="ind"
       :menu-props="{ closeOnContentClick: true }"
+      :hide-no-data="true"
       :label="$t('footer.promptPlaceholder')"
       auto-grow
       max-rows="8.5"
@@ -76,14 +78,12 @@ const filterItems = (item, queryText, itemText) => {
   const is_filter = item.toLowerCase().indexOf(queryText.toLowerCase()) > -1;
   return is_filter; // 过滤选项
 };
-const props = defineProps([
-  "changeColumns",
-  // 'confirmModal'
-]);
+const props = defineProps(["changeColumns"]);
 
 const store = useStore();
 
 const confirmModal = ref(null);
+const autocomplete = ref(null);
 
 const bots = ref(_bots.all);
 const activeBots = reactive({});
@@ -159,9 +159,9 @@ function filterEnterKey(event) {
     !event.metaKey
   ) {
     event.preventDefault();
+    autocomplete.value.menu = false;
+    // autocomplete.value.closeMenu()
     sendPromptToBots();
-    // Clear the textarea after sending the prompt
-    prompt.value = "";
   }
 }
 function changePrompt(evt) {
@@ -201,7 +201,8 @@ function sendPromptToBots() {
             isMakeAvailableOpen.value = true;
           });
         } else {
-          
+          // Clear the textarea after sending the prompt
+          prompt.value = "";
         }
       });
     });
