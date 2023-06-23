@@ -49,6 +49,7 @@
 <script setup>
 import { ref, computed, onBeforeMount, reactive, watch } from "vue";
 import { useStore } from "vuex";
+const { ipcRenderer } = window.require("electron");
 const axios = require("axios");
 
 // Components
@@ -71,9 +72,6 @@ const autocompleteItems = computed(() => {
   const its = Array.from(set);
   return its;
 });
-const itemText = () => {
-  return "text"; // 指定选项的文本属性名
-};
 const filterItems = (item, queryText, itemText) => {
   const is_filter = item.toLowerCase().indexOf(queryText.toLowerCase()) > -1;
   return is_filter; // 过滤选项
@@ -82,7 +80,6 @@ const props = defineProps([
   "changeColumns",
   // 'confirmModal'
 ]);
-const { ipcRenderer } = window.require("electron");
 
 const store = useStore();
 
@@ -154,6 +151,7 @@ async function updateActiveBots() {
 // But if the shift, ctrl, alt, or meta keys are pressed, do as default
 function filterEnterKey(event) {
   if (
+    prompt.value &&
     event.keyCode == 13 &&
     !event.shiftKey &&
     !event.ctrlKey &&
@@ -162,6 +160,8 @@ function filterEnterKey(event) {
   ) {
     event.preventDefault();
     sendPromptToBots();
+    // Clear the textarea after sending the prompt
+    prompt.value = "";
   }
 }
 function changePrompt(evt) {
@@ -200,9 +200,8 @@ function sendPromptToBots() {
             clickedBot.value = bot.reason.bot;
             isMakeAvailableOpen.value = true;
           });
-          // Clear the textarea after sending the prompt
         } else {
-          prompt.value = "";
+          
         }
       });
     });
