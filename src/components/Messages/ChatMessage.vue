@@ -135,6 +135,7 @@ function handleClick(event) {
 <style scoped>
 .markdown-body{
   background-color: rgb(var(--v-theme-response));
+  font-family: inherit;
 }
 
 .message {
