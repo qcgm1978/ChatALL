@@ -122,3 +122,4 @@ dist
 /dist_electron
 
 sse.js
+src/components/Footer/FooterBar copy.vue
