@@ -1,7 +1,6 @@
 {
   "name": "chatall",
   "version": "1.28.36",
-  "main": "background.js",
   "description": "Chat with multiple AI bots and discover the best.",
   "author": "Sunner",
   "repository": {
@@ -77,7 +76,7 @@
     "md5": "^2.3.0",
     "prettier-plugin-vue": "^1.1.6",
     "sse.js": "*",
-    "vue-cli-plugin-electron-builder": "github:nklayman/vue-cli-plugin-electron-builder"
+    "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4"
   },
   "eslintConfig": {
     "root": true,
@@ -103,6 +102,5 @@
     "not dead",
     "not ie 11"
   ],
-  "license": "Apache-2.0",
-  "__npminstall_done": false
+  "license": "Apache-2.0"
 }

@@ -85,7 +85,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from "vue";
+import { ref, computed, onMounted, reactive, nextTick } from "vue";
+
 import { useTheme } from "vuetify";
 import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
@@ -164,7 +165,11 @@ function set_filter_table() {
   return { search, headers, desserts };
 }
 
-function openSettingsModal() {
+async function openSettingsModal() {
+  if (isSettingsOpen.value) { // click too fast
+    isSettingsOpen.value = false;
+    await nextTick();
+  } 
   isSettingsOpen.value = true;
 }
 
