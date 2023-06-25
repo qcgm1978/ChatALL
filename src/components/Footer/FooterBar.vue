@@ -1,9 +1,14 @@
 <template>
-  <div class="footer"
-    v-shortkey.once="['ctrl', 'k']" 
-    @shortkey="focusPromptTextarea"
+  <div
+    class="footer"
+    v-shortkey.once="{
+      focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
+      toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
+    }"
+    @shortkey="handleShortcut"
   >
     <v-autocomplete
+    :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
       v-model="prompt"
       ref="promptTextArea"
       :items="autocompleteItems"
@@ -35,15 +40,20 @@
     <div class="bot-logos margin-bottom">
       <BotLogo
         v-for="(bot, index) in favBots"
+        :id="`fav-bot-${index + 1}`"
         :key="index"
         :bot="bot.instance"
         :active="activeBots[bot.classname]"
         size="36"
         @click="toggleSelected(bot.instance)"
         v-shortkey.once="['ctrl', `${index + 1}`]"
-        @shortkey="toggleSelected(bot.instance)" 
+        @shortkey="toggleSelected(bot.instance)"
       />
-      <BotsMenu :favBots="favBots" />
+      <BotsMenu
+        :id="SHORTCUT_BOTS_MENU.elementId"
+        ref="botsMenuRef"
+        :favBots="favBots"
+      />
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
     <ConfirmModal ref="confirmModal" />
@@ -53,18 +63,21 @@
 <script setup>
 import { ref, computed, onBeforeMount, reactive, watch } from "vue";
 import { useStore } from "vuex";
-const { ipcRenderer } = window.require("electron");
-const axios = require("axios");
 
 // Components
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import BotLogo from "./BotLogo.vue";
 import BotsMenu from "./BotsMenu.vue";
+import {
+  SHORTCUT_PROMPT_TEXTAREA,
+  SHORTCUT_BOTS_MENU,
+} from "./../ShortcutGuide/shortcut.const";
 
 // Composables
 
 import _bots from "@/bots";
+const { ipcRenderer } = window.require("electron");
 const autocompleteItems = computed(() => {
   const messages = store.getters.currentChat.messages.filter(
     (message) => !message.hide,
@@ -76,16 +89,14 @@ const autocompleteItems = computed(() => {
   const its = Array.from(set);
   return its;
 });
-const filterItems = (item, queryText, itemText) => {
-  const is_filter = item.toLowerCase().indexOf(queryText.toLowerCase()) > -1;
-  return is_filter; // 过滤选项
-};
 const props = defineProps(["changeColumns"]);
+
 
 const store = useStore();
 
 const confirmModal = ref(null);
 const promptTextArea = ref(null);
+const botsMenuRef = ref(null);
 
 const bots = ref(_bots.all);
 const activeBots = reactive({});
@@ -150,7 +161,19 @@ async function updateActiveBots() {
 }
 
 function focusPromptTextarea() {
-  promptTextArea.value.$el.querySelector('textarea').focus()
+  promptTextArea.value.$el.querySelector("textarea").focus();
+}
+
+function toggleBotsMenu() {
+  botsMenuRef.value.toggleMenu();
+}
+
+function handleShortcut(event) {
+  if (event.srcKey === "focusPromptTextarea") {
+    focusPromptTextarea();
+  } else if (event.srcKey === "toggleBotsMenu") {
+    toggleBotsMenu();
+  }
 }
 
 // Send the prompt when the user presses enter and prevent the default behavior

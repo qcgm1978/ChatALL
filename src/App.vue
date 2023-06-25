@@ -10,38 +10,32 @@
         />
         <div class="column-icons">
           <img
-            src="@/assets/column-1.svg"
-            @click="changeColumns(1)"
-            @shortkey="changeColumns(1)"
-            v-shortkey.once="['f1']"
+            v-for="columnCount in 3"
+            :id="`column-${columnCount}`"
+            :key="columnCount"
+            :src="getColumnImage(columnCount)"
+            @click="changeColumns(columnCount)"
+            @shortkey="changeColumns(columnCount)"
+            v-shortkey.once="[`f${columnCount}`]"
             :class="{
-              selected: columns === 1,
-              'dark-png': store.state.theme === Theme.DARK,
-            }"
-          />
-          <img
-            src="@/assets/column-2.svg"
-            @click="changeColumns(2)"
-            @shortkey="changeColumns(2)"
-            v-shortkey.once="['f2']"
-            :class="{
-              selected: columns === 2,
-              'dark-png': store.state.theme === Theme.DARK,
-            }"
-          />
-          <img
-            src="@/assets/column-3.svg"
-            @click="changeColumns(3)"
-            @shortkey="changeColumns(3)"
-            v-shortkey.once="['f3']"
-            :class="{
-              selected: columns === 3,
+              selected: columns === columnCount,
               'dark-png': store.state.theme === Theme.DARK,
             }"
           />
         </div>
         <div>
           <v-icon
+            :id="SHORTCUT_FIND.elementId"
+            class="cursor-pointer"
+            color="primary"
+            icon="mdi-magnify"
+            size="x-large"
+            @click="openFind()"
+          ></v-icon>
+          <v-icon
+            v-shortkey.once="SHORTCUT_CLEAR_MESSAGES.key"
+            @shortkey="clearMessages"
+            :id="SHORTCUT_CLEAR_MESSAGES.elementId"
             class="cursor-pointer"
             color="primary"
             icon="mdi-broom"
@@ -49,15 +43,28 @@
             @click="clearMessages()"
           ></v-icon>
           <v-icon
+            v-shortkey.once="SHORTCUT_SETTINGS.key"
+            @shortkey="openSettingsModal"
+            :id="SHORTCUT_SETTINGS.elementId"
             class="cursor-pointer"
             color="primary"
             icon="mdi-cog"
             size="x-large"
             @click="openSettingsModal()"
           ></v-icon>
+          <v-icon
+            v-shortkey.once="SHORTCUT_SHORTCUT_GUIDE.key"
+            @shortkey="toggleShortcutGuide"
+            :id="SHORTCUT_SHORTCUT_GUIDE.elementId"
+            class="cursor-pointer"
+            color="primary"
+            icon="mdi-help"
+            size="x-large"
+            @click="toggleShortcutGuide()"
+          ></v-icon>
         </div>
       </div>
-      <FindModal></FindModal>
+      <FindModal ref="findRef"></FindModal>
     </header>
 
     <main class="content">
@@ -81,6 +88,10 @@
     />
     <ConfirmModal ref="confirmModal" />
     <UpdateNotification></UpdateNotification>
+    <ShortcutGuide
+      ref="shortcutGuideRef"
+      v-model:open="isShortcutGuideOpen"
+    ></ShortcutGuide>
   </div>
 </template>
 
@@ -91,6 +102,12 @@ import { useTheme } from "vuetify";
 import { useStore } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 import { applyTheme, resolveTheme, Theme } from "./theme";
+import {
+  SHORTCUT_FIND,
+  SHORTCUT_SETTINGS,
+  SHORTCUT_SHORTCUT_GUIDE,
+  SHORTCUT_CLEAR_MESSAGES,
+} from "./components/ShortcutGuide/shortcut.const";
 
 import i18n from "./i18n";
 
@@ -102,6 +119,7 @@ import FooterBarSelect from "@/components/Footer/FooterBarSelect.vue";
 import FooterBar from "@/components/Footer/FooterBar.vue";
 import UpdateNotification from "@/components/Notification/UpdateNotificationModal.vue";
 import FindModal from "@/components/FindModal.vue";
+import ShortcutGuide from "@/components/ShortcutGuide/ShortcutGuide.vue";
 
 // Styles
 import "@mdi/font/css/materialdesignicons.css";
@@ -121,6 +139,9 @@ const onUpdatedSystemTheme = async () => {
 ipcRenderer.on("on-updated-system-theme", onUpdatedSystemTheme);
 
 const confirmModal = ref(null);
+const findRef = ref(null);
+const shortcutGuideRef = ref(null);
+const isShortcutGuideOpen = ref(false);
 const isSettingsOpen = ref(false);
 const columns = computed(() => store.state.columns);
 
@@ -166,11 +187,20 @@ function set_filter_table() {
 }
 
 async function openSettingsModal() {
-  if (isSettingsOpen.value) { // click too fast
+  if (isSettingsOpen.value) {
+    // click too fast
     isSettingsOpen.value = false;
     await nextTick();
-  } 
+  }
   isSettingsOpen.value = true;
+}
+
+function openFind() {
+  findRef.value.showFindTextField();
+}
+
+function toggleShortcutGuide() {
+  shortcutGuideRef.value.toggleShortcutGuide();
 }
 
 async function clearMessages() {
@@ -189,6 +219,10 @@ onMounted(() => {
   const ver = require("../package.json").version;
   document.title = `ChatALL.ai - v${ver}`;
 });
+
+function getColumnImage(columnCount) {
+  return require(`@/assets/column-${columnCount}.svg`);
+}
 </script>
 
 <style>

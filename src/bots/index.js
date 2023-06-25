@@ -29,6 +29,7 @@ import ClaudePlusPoeBot from "./poe/ClaudePlusPoeBot";
 import SkyWorkBot from "./SkyWorkBot";
 import ChatGPT4MobileBot from "./openai/ChatGPT4MobileBot";
 import OpenAIAPI3516KBot from "./openai/OpenAIAPI3516KBot";
+import AzureOpenAIAPIBot from "./microsoft/AzureOpenAIAPIBot";
 
 const all = [
   AlpacaBot.getInstance(),
@@ -40,9 +41,9 @@ const all = [
   ChatGPT35Bot.getInstance(),
   ChatGPT35PoeBot.getInstance(),
   ChatGPT4PoeBot.getInstance(),
-  ClaudeBot.getInstance(),
   ClaudeInstantPoeBot.getInstance(),
   ClaudeInstant100kPoeBot.getInstance(),
+  ClaudeBot.getInstance(),
   ClaudePlusPoeBot.getInstance(),
   GradioAppBot.getInstance(),
   HuggingChatBot.getInstance(),
@@ -51,6 +52,7 @@ const all = [
   OpenAIAPI3516KBot.getInstance(),
   OpenAIAPI4Bot.getInstance(),
   ClaudeInSlackBot.getInstance(), 
+  AzureOpenAIAPIBot.getInstance(),
   QianWenBot.getInstance(),
   SageBot.getInstance(),
   SkyWorkBot.getInstance(),
