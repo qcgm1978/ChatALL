@@ -158,11 +158,10 @@ function copyToClipboard(is_code = false) {
   if (format === "html") {
     content = content.replace(/<[^>]*>?/gm, "");
   } else if (format == "markdown" && is_code) {
-    const arr = content.match(/^```([\s\S]*?)^```/gm);
-    const arr1=content
-      .match(/^```([\s\S]*)^(```)?/gm)
+    const full_block = content.match(/^```([\s\S]*?)^```/gm);
+    const not_full_block = content.match(/^```([\s\S]*)^(```)?/gm);
     // content = set_markdown_button(content);
-    content = (arr||arr1).map((d) => d.match(/\n[\s\S]+\n/gm)[0].trim());
+    content = (full_block || not_full_block).map((d) => d.match(/\n[\s\S]+\n/gm)[0].trim());
   }
   navigator.clipboard.writeText(content);
 }
