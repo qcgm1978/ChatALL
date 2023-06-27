@@ -11,7 +11,6 @@
           v-if="checkIsMessagePromptTypeAndEmptyResponsesIfTrue(message)"
           :columns="columns"
           :message="message"
-          :copyToClipboard="copyToClipboard"
           @update-message="updateMessage"
         ></chat-prompt>
         <template v-else>

@@ -187,6 +187,7 @@ function filterEnterKey(event) {
     !event.altKey &&
     !event.metaKey
   ) {
+    promptTextArea.value.menu = false;
     event.preventDefault();
     sendPromptToBots();
   }

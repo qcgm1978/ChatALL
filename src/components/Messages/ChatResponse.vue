@@ -14,7 +14,7 @@
         v-if="isShowPagingButton"
         @click="carouselModel = Math.max(carouselModel - 1, 0)"
         :disabled="carouselModel === 0"
-        style="margin-left: .5rem"
+        style="margin-left: 0.5rem"
       >
         <v-icon>mdi-menu-left</v-icon>
       </v-btn>
@@ -49,6 +49,9 @@
       </v-btn>
       <v-btn flat size="x-small" icon @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon>
+      </v-btn>
+      <v-btn flat size="x-small" icon @click="copyToClipboard(true)">
+        <v-icon>mdi-code-braces</v-icon>
       </v-btn>
       <v-btn flat size="x-small" icon @click="hide">
         <v-icon>mdi-delete</v-icon>
@@ -148,10 +151,16 @@ onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
 });
 
-function copyToClipboard() {
+function copyToClipboard(is_code = false) {
   let content = props.messages[carouselModel.value].content;
+  debugger;
   if (props.messages[carouselModel.value].format === "html") {
     content = content.replace(/<[^>]*>?/gm, "");
+  }
+  if (is_code) {
+    content = content
+      .match(/^```([\s\S]*?)^```/gm)
+      .map((d) => d.match(/\n[\s\S]+\n/gm)[0].trim());
   }
   navigator.clipboard.writeText(content);
 }

@@ -1,8 +1,7 @@
 <template>
   <v-card ref="root" class="message prompt">
-    <!-- <pre>{{ props.message.content }}</pre> -->
     <span>{{ props.message.content }} </span>
-    <v-btn flat size="x-small" icon @click="props.copyToClipboard">
+    <v-btn flat size="x-small" icon @click="copyToClipboard">
       <v-icon>mdi-content-copy</v-icon>
     </v-btn>
   </v-card>
@@ -21,10 +20,6 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  copyToClipboard: {
-    type: Function,
-    required:true
-  }
 });
 
 watch(
@@ -37,6 +32,16 @@ watch(
 onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
 });
+function copyToClipboard(is_code = false) {
+  let content 
+  if (is_code) {
+    content = content
+      .match(/^```([\s\S]*?)^```/gm)
+      .map((d) => d.match(/\n[\s\S]+\n/gm)[0].trim());
+  }
+  navigator.clipboard.writeText(content);
+}
+
 </script>
 
 <style scoped>
