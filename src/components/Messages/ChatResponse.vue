@@ -154,16 +154,42 @@ onMounted(() => {
 
 function copyToClipboard(is_code = false) {
   let content = props.messages[carouselModel.value].content;
-  debugger;
-  if (props.messages[carouselModel.value].format === "html") {
+  const format = props.messages[carouselModel.value].format;
+  if (format === "html") {
     content = content.replace(/<[^>]*>?/gm, "");
-  }
-  if (is_code) {
+  } else if (format == "markdown" && is_code) {
+    // content = set_markdown_button(content);
     content = content
       .match(/^```([\s\S]*?)^```/gm)
       .map((d) => d.match(/\n[\s\S]+\n/gm)[0].trim());
   }
   navigator.clipboard.writeText(content);
+}
+
+function set_markdown_button(content) {
+  let result,
+    enable_button = true,
+    reg = /```/gm,
+    indices = [];
+  while ((result = reg.exec(content))) {
+    if (enable_button) {
+      indices.push(result.index);
+      enable_button = false;
+    } else {
+      enable_button = true;
+    }
+  }
+  debugger;
+  const button = `<v-btn flat size="x-small" icon @click="copyToClipboard">
+        <v-icon>mdi-content-copy</v-icon>
+      </v-btn>`;
+  indices.forEach((d, i) => {
+    const ind = d + i * button.length;
+    const firstPart = content.slice(0, ind);
+    const lastPart = content.slice(ind);
+    content = firstPart.concat(button, lastPart);
+  });
+  return content;
 }
 
 function toggleHighlight() {

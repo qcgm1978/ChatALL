@@ -235,7 +235,7 @@ export default createStore({
         promptIndex = promptMessage.index;
       }
       commit("setLatestPromptIndex", promptIndex); // to keep track of the latest prompt index for hiding old prompt's resend button
-
+      let ret=[]
       for (const bot of bots) {
         const message = {
           type: "response",
