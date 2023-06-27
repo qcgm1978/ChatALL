@@ -16,6 +16,7 @@
       item-value="ind"
       :menu-props="{ closeOnContentClick: true }"
       :hide-no-data="true"
+      clearable
       :label="$t('footer.promptPlaceholder')"
       auto-grow
       max-rows="8.5"
@@ -25,7 +26,6 @@
       variant="solo"
       autofocus
       @keydown="filterEnterKey"
-      @input="changePrompt"
       style="min-width: 390px"
     ></v-autocomplete>
     <v-btn
@@ -190,6 +190,8 @@ function filterEnterKey(event) {
     event.preventDefault();
     promptTextArea.value.menu = false;
     sendPromptToBots();
+  } else {
+    changePrompt(event)
   }
 }
 function changePrompt(evt) {

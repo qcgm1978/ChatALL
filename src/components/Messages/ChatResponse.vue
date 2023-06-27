@@ -88,7 +88,6 @@ import { onMounted, ref, watch, computed } from "vue";
 import { useStore } from "vuex";
 import i18n from "@/i18n";
 import Markdown from "vue3-markdown-it";
-import { useMatomo } from "@/composables/matomo";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
 
@@ -105,7 +104,6 @@ const props = defineProps({
 
 const emits = defineEmits(["update-message"]);
 
-const matomo = useMatomo();
 const store = useStore();
 
 const root = ref();
@@ -155,19 +153,12 @@ function copyToClipboard() {
     content = content.replace(/<[^>]*>?/gm, "");
   }
   navigator.clipboard.writeText(content);
-  matomo.value?.trackEvent("vote", "copy", props.messages[0].className, 1);
 }
 
 function toggleHighlight() {
   emits("update-message", props.messages[carouselModel.value].index, {
     highlight: !props.messages[carouselModel.value].highlight,
   });
-  matomo.value?.trackEvent(
-    "vote",
-    "highlight",
-    props.messages[carouselModel.value].className,
-    props.messages[carouselModel.value].highlight ? -1 : 1,
-  );
 }
 
 async function hide() {
@@ -176,7 +167,6 @@ async function hide() {
   );
   if (result) {
     emits("update-message", props.messages[0].index, { hide: true });
-    matomo.value?.trackEvent("vote", "hide", props.messages[0].className, 1);
   }
 }
 
