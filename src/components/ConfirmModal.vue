@@ -11,25 +11,31 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary darken-1" @click="close(false)">{{
+        <v-btn variant="outlined" color="primary" @click="close(false)">{{
           $t("header.no")
         }}</v-btn>
-        <v-btn color="primary darken-1" @click="close(true)">{{
-          $t("header.yes")
-        }}</v-btn>
+        <v-btn
+          ref="defaultButton"
+          variant="flat"
+          color="primary"
+          @click="close(true)"
+          >{{ $t("header.yes") }}</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch, nextTick } from "vue";
 
 let dialog = ref(false);
 let _title = ref("");
 let _text = ref("");
 let num=290
 let max_width = ref(num);
+const defaultButton = ref(null);
+
 let close;
 
 const showModal = (title, text = "",width=null) => {
@@ -46,6 +52,18 @@ const showModal = (title, text = "",width=null) => {
     };
   });
 };
+
+watch(
+  dialog,
+  () => {
+    if (dialog.value) {
+      nextTick(() => {
+        defaultButton.value.$el.focus();
+      });
+    }
+  },
+  { immediate: true },
+);
 
 // Using defineExpose to expose showModal and close methods to be accessible from outside and template
 defineExpose({

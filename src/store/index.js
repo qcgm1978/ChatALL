@@ -2,7 +2,6 @@ import { createStore } from "vuex";
 import VuexPersist from "vuex-persist";
 import i18n from "@/i18n";
 import messagesPersist from "./messagesPersist";
-import { v4 as uuidv4 } from "uuid";
 
 // 初始化 VuexPersist 实例
 const vuexPersist = new VuexPersist({
@@ -160,13 +159,9 @@ export default createStore({
     setGradio(state, values) {
       state.gradio = { ...state.gradio, ...values };
     },
-    addMessage(state, message) {
+    setLatestPromptIndex(state, promptIndex) {
       const currentChat = state.chats[state.currentChatIndex];
-      currentChat.messages.push(message);
-    },
-    setLatestPromptId(state, id) {
-      const currentChat = state.chats[state.currentChatIndex];
-      currentChat.latestPromptId = id;
+      currentChat.latestPromptIndex = promptIndex;
     },
     updateMessage(state, { indexes, message }) {
       const { chatIndex, messageIndex } = indexes;
@@ -224,20 +219,23 @@ export default createStore({
     },
   },
   actions: {
-    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptId }) {
-      const id = promptId ? promptId : uuidv4();
-      if (!promptId) {
-        // if promptId not found, not a resend
-        commit("addMessage", {
+    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex }) {
+      const currentChat = state.chats[state.currentChatIndex];
+      if (!promptIndex) {
+        // if promptIndex not found, not resend, push to messages array
+        const promptMessage = {
           type: "prompt",
           content: prompt,
           done: true,
           hide: false,
-          id: id,
-        });
+        };
+        // add message
+        const index = currentChat.messages.push(promptMessage);
+        promptMessage.index = index - 1;
+        promptIndex = promptMessage.index;
       }
-      commit("setLatestPromptId", id); // to keep track of the latest prompt for hiding old prompt's resend button
-      const ret = [];
+      commit("setLatestPromptIndex", promptIndex); // to keep track of the latest prompt index for hiding old prompt's resend button
+
       for (const bot of bots) {
         const message = {
           type: "response",
@@ -248,11 +246,10 @@ export default createStore({
           highlight: false,
           hide: false,
           className: bot.getClassname(),
-          promptId: id,
+          promptIndex: promptIndex,
         };
 
         // workaround for tracking message position
-        const currentChat = state.chats[state.currentChatIndex];
         message.index = currentChat.messages.push(message) - 1;
 
         const bot_sendPrompt = bot.sendPrompt(
