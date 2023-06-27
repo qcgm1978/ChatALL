@@ -33,12 +33,7 @@ onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
 });
 function copyToClipboard(is_code = false) {
-  let content 
-  if (is_code) {
-    content = content
-      .match(/^```([\s\S]*?)^```/gm)
-      .map((d) => d.match(/\n[\s\S]+\n/gm)[0].trim());
-  }
+  let content=props.message.content 
   navigator.clipboard.writeText(content);
 }
 
