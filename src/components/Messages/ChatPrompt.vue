@@ -1,6 +1,10 @@
 <template>
   <v-card ref="root" class="message prompt">
-    <pre>{{ props.message.content }}</pre>
+    <!-- <pre>{{ props.message.content }}</pre> -->
+    <span>{{ props.message.content }} </span>
+    <v-btn flat size="x-small" icon @click="props.copyToClipboard">
+      <v-icon>mdi-content-copy</v-icon>
+    </v-btn>
   </v-card>
 </template>
 
@@ -17,6 +21,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  copyToClipboard: {
+    type: Function,
+    required:true
+  }
 });
 
 watch(

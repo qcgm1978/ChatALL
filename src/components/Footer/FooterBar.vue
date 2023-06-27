@@ -8,7 +8,7 @@
     @shortkey="handleShortcut"
   >
     <v-autocomplete
-    :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
+      :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
       v-model="prompt"
       ref="promptTextArea"
       :items="autocompleteItems"
@@ -26,6 +26,7 @@
       variant="solo"
       autofocus
       @keydown="filterEnterKey"
+      @input="changePrompt"
       style="min-width: 390px"
     ></v-autocomplete>
     <v-btn
@@ -90,7 +91,6 @@ const autocompleteItems = computed(() => {
   return its;
 });
 const props = defineProps(["changeColumns"]);
-
 
 const store = useStore();
 
@@ -188,13 +188,11 @@ function filterEnterKey(event) {
     !event.metaKey
   ) {
     event.preventDefault();
-    promptTextArea.value.menu = false;
     sendPromptToBots();
-  } else {
-    changePrompt(event)
   }
 }
 function changePrompt(evt) {
+  promptTextArea.value.menu = false;
   const value = evt.target.value;
   if (
     value
