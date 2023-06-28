@@ -1,12 +1,10 @@
 <template>
-  <div
-    class="footer"
-    v-shortkey.once="{
+  <div class="footer">
+    <!-- v-shortkey.once="{
       focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
       toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
     }"
-    @shortkey="handleShortcut"
-  >
+    @shortkey="handleShortcut" -->
     <v-autocomplete
       :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
       v-model="prompt"
@@ -47,9 +45,10 @@
         :active="activeBots[bot.classname]"
         size="36"
         @click="toggleSelected(bot.instance)"
-        v-shortkey.once="['ctrl', `${index + 1}`]"
-        @shortkey="toggleSelected(bot.instance)"
       />
+      <!-- v-shortkey.once="['ctrl', `${index + 1}`]"
+        v-shortkey.disabled="shortkey_disabled"
+        @shortkey="toggleSelected(bot.instance)" -->
       <BotsMenu
         :id="SHORTCUT_BOTS_MENU.elementId"
         ref="botsMenuRef"
@@ -116,6 +115,7 @@ const prompt = ref("");
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 const disabled = ref(true);
+const shortkey_disabled = ref(true);
 
 watch(favBots, async (newValue, oldValue) => {
   const botsToCheck = newValue.filter((newBot) => {
@@ -188,6 +188,7 @@ function filterEnterKey(event) {
     !event.metaKey
   ) {
     promptTextArea.value.menu = false;
+    shortkey_disabled.value = false;
     event.preventDefault();
     sendPromptToBots();
   }
@@ -222,6 +223,7 @@ function sendPromptToBots() {
     })
     .then((checkAvailabilityPromises) => {
       Promise.allSettled(checkAvailabilityPromises).then((promises) => {
+        shortkey_disabled.value = true;
         adaptColumns(toBots.length);
         const rejected = promises.filter((d) => d.status == "rejected");
         if (rejected.length) {
