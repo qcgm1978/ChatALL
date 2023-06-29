@@ -15,7 +15,8 @@
     "theme": "Theme",
     "system": "System",
     "light": "Light",
-    "dark": "Dark"
+    "dark": "Dark",
+    "bots": "AI Bots"
   },
   "header": {
     "clearMessages": "Clear all messages?",
@@ -51,6 +52,19 @@
     "waiting": "Waiting for other { botName } request(s) to complete...",
     "pastRounds": "How many rounds of past chats to carry?",
     "pastRoundsPrompt": "The more historical chats carried, the better the effect of multi-round dialogue, but it will also consume more costs"
+  },
+  "azureOpenaiApi": {
+    "name": "Azure OpenAI Service",
+    "temperature": "Temperature",
+    "temperaturePrompt": "The higher the temperature, the more creative the text, but the more likely it is to be incoherent",
+    "temperature0": "More deterministic",
+    "temperature2": "More random",
+    "azureOpenAIApiKey": "Azure OpenAI API Key",
+    "azureApiInstanceName": "Azure OpenAI API InstanceName",
+    "azureApiInstanceNamePrompt": "View the instance name in Cognitive Services on https://portal.azure.com/",
+    "azureOpenAIApiDeploymentName": "Azure OpenAI API DeploymentName",
+    "azureOpenAIApiDeploymentNamePrompt": "View the deployment name in deployment list on https://oai.azure.com/",
+    "azureOpenAIApiVersion": "Azure OpenAI API Version"
   },
   "bard": {
     "name": "Bard"
@@ -113,19 +127,6 @@
     "temperature2": "More random",
     "apiKey": "API Key"
   },
-  "azureOpenaiApi": {
-    "name": "Azure OpenAI Service",
-    "temperature": "Temperature",
-    "temperaturePrompt": "The higher the temperature, the more creative the text, but the more likely it is to be incoherent",
-    "temperature0": "More deterministic",
-    "temperature2": "More random",
-    "azureOpenAIApiKey": "Azure OpenAI API Key",
-    "azureApiInstanceName": "Azure OpenAI API InstanceName",
-    "azureApiInstanceNamePrompt": "View the instance name in Cognitive Services on https://portal.azure.com/",
-    "azureOpenAIApiDeploymentName": "Azure OpenAI API DeploymentName",
-    "azureOpenAIApiDeploymentNamePrompt": "View the deployment name in deployment list on https://oai.azure.com/",
-    "azureOpenAIApiVersion": "Azure OpenAI API Version"
-  },
   "poe": {
     "name": "Poe",
     "a2": "Claude-instant",
@@ -166,5 +167,38 @@
     "noMatches": "No matches",
     "matchCase": "Match case",
     "wrapAround": "Wrap around"
+  },
+  "proxy":{
+    "name": "Proxy",
+    "address": "Proxy Server Address",
+    "addressExample":"http://127.0.0.1:7890, socks5://127.0.0.1:1080",
+    "enableProxy":"Enable Proxy",
+    "proxyMode":"Proxy Mode",
+    "globalMode":"Normal Mode",
+    "pacFileMode":"PAC File Mode",
+    "PACUrlMode":"PAC URL Mode",
+    "byPass":"Non-proxy Addresses (only effective for Normal Mode)",
+    "byPassHint":"Non-proxy addresses, separated by ';', but no ';' at the end. E.g., '<local>;*.aliyun.com;*.tiangong.cn;*.xfyun.cn;*.baidu.com;*.baidubce.com'",
+    "fromFile":"Load from File",
+    "fromURL":"Load from URL",
+    "PACUrl":"PAC URL Address",
+    "pacFile":"PAC File",
+    "pacFileUsing":"Currently Used PAC File",
+    "pacFileNew":"Select Other PAC File",
+    "quickSet":"Quick Configuration",
+    "fullSet":"Advanced Configuration",
+    "action":"Action",
+    "onlySave":"Save Only",
+    "saveAndApply":"Save and Apply",
+    "reload":"Reload",
+    "reset":"Reset",
+    "proxyFilePath":"Path of Proxy Configuration File",
+    "proxyFilePathHint":"You can backup this file, or modify it with other programs",
+    "saveSuccess":"Save Successful",
+    "saveFailed":"Save Failed",
+    "resetAllMessage":"All settings (include saved) will be lost. Are you sure to reset to default?",
+    "reloadMessage":"All settings without save will be lost. Are you sure to reload configure file?",
+    "saveAndActiveMessage":"Apply the proxy configuration will restart ChatALL. Are you sure?",
+    "googleService":"Google Service"
   }
 }
