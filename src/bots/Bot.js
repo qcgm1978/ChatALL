@@ -105,8 +105,8 @@ export default class Bot {
   async acquireLock(key, lockedFn, onLockUnavailable) {
     const self = this;
     return new Promise((resolve, reject) => {
-      (async () => {
-        await this.constructor._lock.acquire(
+      return (async () => {
+        return await this.constructor._lock.acquire(
           key,
           async () => {
             try {
@@ -181,11 +181,16 @@ export default class Bot {
         });
       });
     }
-    ret.catch((err) => {
-      console.warn(`Error send prompt to ${this.getFullname()}:`, err);
-      onUpdateResponse(callbackParam, { content: err.toString(), done: true }); // Make sure stop loading
-      return new Error({ err, bot: this });
-    });
+    if (ret && ret.catch) {
+      ret.catch((err) => {
+        console.warn(`Error send prompt to ${this.getFullname()}:`, err);
+        onUpdateResponse(callbackParam, {
+          content: err.toString(),
+          done: true,
+        }); // Make sure stop loading
+        return new Error({ err, bot: this });
+      });
+    }
     return ret;
   }
 

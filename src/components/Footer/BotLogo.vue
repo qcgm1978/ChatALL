@@ -1,7 +1,7 @@
 <template>
   <v-avatar
     rounded="rounded"
-    :class="{ active: active }"
+    :class="{ active: active,'filter':enable_filer.includes(bot.getClassname()) }"
     :image="bot.getLogo()"
     :alt="bot.getFullname()"
     :title="bot.getFullname()"
@@ -10,6 +10,7 @@
 
 <script setup>
 defineProps(["bot", "active"]);
+const enable_filer=['OpenAIAPI35Bot']
 </script>
 
 <style>
@@ -22,5 +23,8 @@ defineProps(["bot", "active"]);
 .active {
   opacity: 1;
   filter: grayscale(0%);
+}
+.filter{
+  filter: invert(100%);
 }
 </style>

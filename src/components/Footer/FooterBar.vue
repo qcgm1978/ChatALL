@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount, reactive, watch,toRefs } from "vue";
+import { ref, computed, onBeforeMount, reactive, watch, toRefs } from "vue";
 
 import { useStore } from "vuex";
 
@@ -89,8 +89,8 @@ const autocompleteItems = computed(() => {
     // .filter((d) => d.type == "prompt")
     .map((d, i) => ({ name: d.content, ind: d.content }));
   const set = new Set(items);
-  const its = Array.from(set)
-    // .slice(0, 10);
+  const its = Array.from(set);
+  // .slice(0, 10);
   return its;
 });
 const props = defineProps(["changeColumns"]);
@@ -118,12 +118,11 @@ const favBots = computed(() => {
 const prompt = ref("");
 // 创建一个响应式对象
 const prompt_reactive = reactive({
-  value: ''
+  value: "",
 });
 
 // 将响应式对象转换为普通对象，以便在模板中使用
 // const { prompt } = toRefs(prompt_reactive);
-
 
 // 输出结果
 console.log(prompt.value); // 'New Value'
@@ -244,8 +243,13 @@ function sendPromptToBots() {
         const rejected = promises.filter((d) => d.status == "rejected");
         if (rejected.length) {
           rejected.forEach((bot) => {
-            clickedBot.value = bot.reason.bot;
-            isMakeAvailableOpen.value = true;
+            const cur_bot = bot.reason.bot;
+            if (cur_bot) {
+              clickedBot.value = cur_bot;
+              isMakeAvailableOpen.value = true;
+            } else {
+              throw "missing bot, reject error need add this prop";
+            }
           });
         } else {
           // Clear the textarea after sending the prompt

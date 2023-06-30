@@ -132,21 +132,24 @@ export default class BingChatBot extends Bot {
     return new Promise((resolve, reject) => {
       try {
         const seperator = String.fromCharCode(30);
-        const wsp = new WebSocketAsPromised(
-          "wss://sydney.bing.com/sydney/ChatHub",
-          {
-            packMessage: (data) => {
-              return JSON.stringify(data) + seperator;
+        if (!this.wsp) {
+          this.wsp = new WebSocketAsPromised(
+            "wss://sydney.bing.com/sydney/ChatHub",
+            {
+              packMessage: (data) => {
+                return JSON.stringify(data) + seperator;
+              },
+              unpackMessage: (data) => {
+                return data
+                  .toString()
+                  .split(seperator)
+                  .filter(Boolean)
+                  .map((r) => JSON.parse(r));
+              },
             },
-            unpackMessage: (data) => {
-              return data
-                .toString()
-                .split(seperator)
-                .filter(Boolean)
-                .map((r) => JSON.parse(r));
-            },
-          },
-        );
+          );
+        }
+        const wsp = this.wsp;
 
         wsp.onOpen.addListener(() => {
           wsp.sendPacked({ protocol: "json", version: 1 });
@@ -178,7 +181,14 @@ export default class BingChatBot extends Bot {
                     this.setChatContext(context);
                     this._sendPrompt(prompt, onUpdateResponse, callbackParam);
                     reject(
-                      new Error(i18n.global.t("bot.creatingConversation")),
+                      new Error({
+                        bot: {
+                          reason: {
+                            message: i18n.global.t("bot.creatingConversation"),
+                            bot: this,
+                          },
+                        },
+                      }),
                     );
                   } else if (event.item.result.value === "Throttled") {
                     if (await this.isAnonymous(context.clientId)) {
@@ -192,7 +202,15 @@ export default class BingChatBot extends Bot {
                       });
                       this.setChatContext(null);
                     } else {
-                      reject(new Error(event.item.result.message));
+                      const err = new Error({
+                        bot: {
+                          reason: {
+                            message: event.item.result.message,
+                            bot: this,
+                          },
+                        },
+                      });
+                      reject(err);
                     }
                   } else if (event.item.result.value === "CaptchaChallenge") {
                     const url = "https://www.bing.com/turing/captcha/challenge";
@@ -204,7 +222,15 @@ export default class BingChatBot extends Bot {
                       done: false,
                     });
                   } else {
-                    reject(new Error(event.item.result.message));
+                    const err = new Error({
+                      bot: {
+                        reason: {
+                          message: event.item.result.message,
+                          bot: this,
+                        },
+                      },
+                    });
+                    reject(err);
                   }
                 } else if (
                   event.item.throttling.maxNumUserMessagesInConversation ===
@@ -214,8 +240,8 @@ export default class BingChatBot extends Bot {
                   context = await this.createChatContext();
                   this.setChatContext(context);
                 }
-                wsp.removeAllListeners();
-                wsp.close();
+                // wsp.removeAllListeners();
+                // wsp.close();
                 resolve();
               } else if (event.type === 1) {
                 // Content response
@@ -238,12 +264,16 @@ export default class BingChatBot extends Bot {
               } else if (event.type === 7) {
                 wsp.removeAllListeners();
                 wsp.close();
-                reject(new Error(event.error));
+                const err = new Error({
+                  bot: { reason: { message: event.error, bot: this } },
+                });
+                reject(err);
               } else {
                 console.warn("Unknown Bing Chat response:", event);
               }
             }
           } catch (error) {
+            error.reason.bot = this;
             reject(error);
           }
         });
@@ -252,11 +282,14 @@ export default class BingChatBot extends Bot {
           wsp.removeAllListeners();
           wsp.close();
           reject(
-            new Error(
-              i18n.global.t("error.failedConnectUrl", {
-                url: event.target.url,
-              }),
-            ),
+            new Error({
+              bot: {
+                reason: i18n.global.t("error.failedConnectUrl", {
+                  url: event.target.url,
+                }),
+                bot: this,
+              },
+            }),
           );
         });
 
@@ -266,6 +299,7 @@ export default class BingChatBot extends Bot {
 
         wsp.open();
       } catch (error) {
+        error.reason.bot = this;
         reject(error);
       }
     });

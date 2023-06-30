@@ -10,6 +10,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:browser": "electron-builder --dir",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
@@ -24,6 +25,10 @@
       "provider": "github",
       "owner": "sunner",
       "repo": "ChatALL"
+    },
+    "browser": {
+      "package": "dist",
+      "buildDir": "../webbuild"
     }
   },
   "browser": {
@@ -39,7 +44,6 @@
     "axios": "^1.4.0",
     "compare-versions": "^6.0.0-rc.1",
     "core-js": "^3.31.0",
-    "electron-builder": "^24.4.0",
     "github-markdown-css": "^5.2.0",
     "highlight.js": "^11.8.0",
     "langchain": "0.0.97",
@@ -92,7 +96,7 @@
       "no-unused-vars": "off",
       "no-empty": "off",
       "no-debugger": "off",
-      "semi": "off" 
+      "semi": "off"
     }
   },
   "browserslist": [
