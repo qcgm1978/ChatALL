@@ -5,6 +5,7 @@
     "title": "Settings",
     "general": "General",
     "enableScroll": "Automatic scrolling of chat window",
+    "fontSize": "Font Size",
     "auto": "Automatic",
     "language": "Language",
     "languagePrompt": "Relaunch the app to apply the new language",

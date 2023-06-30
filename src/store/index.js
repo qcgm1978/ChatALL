@@ -19,6 +19,7 @@ export default createStore({
     uuid: "",
     lang: "auto",
     enableScroll: true,
+    fontSize:16,
     columns: 2,
     openaiApi: {
       apiKey: "",
@@ -132,6 +133,10 @@ export default createStore({
     setCurrentScroll(state, scroll) {
       state.enableScroll = scroll;
       i18n.global.locale = scroll;
+    },
+    setCurrentFontSize(state, fontSize) {
+      state.fontSize = fontSize;
+      i18n.global.locale = fontSize;
     },
     setChatgpt(state, refreshCycle) {
       state.chatgpt.refreshCycle = refreshCycle;
@@ -348,12 +353,6 @@ export default createStore({
         },
       );
 
-      getMatomo().trackEvent(
-        "prompt",
-        "sendTo",
-        bot.getClassname(),
-        prompt.length,
-      );
     },
     updateMessage({ commit, state }, { indexes, message: values }) {
       commit("updateMessage", { indexes, message: values });
@@ -379,14 +378,6 @@ export default createStore({
       const chat = state.chats[i];
       let message = { ...chat.threads[indexes.threadIndex], ...values };
 
-      if (values.done) {
-        getMatomo().trackEvent(
-          "prompt",
-          "received",
-          message.className,
-          message.content.length,
-        );
-      }
     },
   },
   getters: {

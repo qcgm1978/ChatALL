@@ -68,7 +68,7 @@
     </header>
 
     <main class="content">
-      <div id="content">
+      <div id="content" >
         <ChatMessages :columns="columns"></ChatMessages>
       </div>
       <!-- <v-card class="filter-table">
@@ -226,6 +226,7 @@ function getColumnImage(columnCount) {
 </script>
 
 <style>
+
 * {
   margin: 0;
   padding: 0;
@@ -280,7 +281,6 @@ img.selected {
     background-color: rgb(var(--v-theme-background));
     padding: 16px;
 }
-
 .cursor-pointer {
   cursor: pointer;
 }

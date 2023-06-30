@@ -56,6 +56,17 @@
                   @update:model-value="setCurrentScroll($event)"
                 ></v-checkbox>
               </v-list-item>
+              <v-list-item>
+                <v-list-item-title>{{
+                  $t("settings.fontSize")
+                }}</v-list-item-title>
+                <v-text-field
+                  v-model="fontSize"
+                  label="Number Input"
+                  type="number"
+                  @update:model-value="setFontSize($event)"
+                ></v-text-field>
+              </v-list-item>
             </div>
             <div class="section" v-if="tab == 'general'">
               <v-list-item>
@@ -166,6 +177,7 @@ const modes = computed(() => [
 
 const lang = computed(() => store.state.lang);
 const enableScroll = computed(() => store.state.enableScroll);
+const fontSize = computed(() => store.state.fontSize);
 const currentMode = computed(() => store.state.mode);
 
 const setCurrentLanguage = (lang) => {
@@ -175,6 +187,10 @@ const setCurrentLanguage = (lang) => {
 const setCurrentScroll = (scroll) => {
   locale.enableScroll = scroll;
   store.commit("setCurrentScroll", scroll);
+};
+const setFontSize = (fontSize) => {
+  locale.fontSize = fontSize;
+  store.commit("setCurrentFontSize", fontSize);
 };
 const setCurrentMode = async (mode) => {
   const resolvedTheme = await resolveTheme(mode, ipcRenderer);
