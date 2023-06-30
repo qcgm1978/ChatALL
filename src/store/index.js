@@ -114,6 +114,15 @@ export default createStore({
     updateCurrentChatFavBots(state,favBots) {
       this.getters.currentChat.favBots = favBots;
     },
+    setFavBotOrder(state, newOrder) {
+      const currentChat = state.chats[state.currentChatIndex];
+      newOrder.forEach((botClassname, order) => {
+        const bot = currentChat.favBots.find(
+          (bot) => bot.classname === botClassname,
+        );
+        if (bot) bot.order = order;
+      });
+    },
     addFavoriteBot(state, botClassname) {
       const currentChat = state.chats[state.currentChatIndex];
       const favBots = currentChat.favBots;

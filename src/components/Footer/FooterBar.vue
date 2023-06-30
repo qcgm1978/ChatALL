@@ -39,18 +39,20 @@
       {{ $t("footer.sendPrompt") }}
     </v-btn>
     <div class="bot-logos margin-bottom">
-      <BotLogo
-        v-for="(bot, index) in favBots"
-        :id="`fav-bot-${index + 1}`"
-        :key="index"
-        :bot="bot.instance"
-        :active="activeBots[bot.classname]"
-        size="36"
-        @click="toggleSelected(bot.instance)"
-      />
-      <!-- v-shortkey.once="['ctrl', `${index + 1}`]"
-        v-shortkey.disabled="shortkey_disabled"
-        @shortkey="toggleSelected(bot.instance)" -->
+      <div class="bot-logos" ref="favBotLogosRef" :key="rerenderFavBotLogos">
+        <BotLogo
+          v-for="(bot, index) in favBots"
+          :id="`fav-bot-${index + 1}`"
+          :key="index"
+          :bot="bot.instance"
+          :active="activeBots[bot.classname]"
+          :data-id="bot.classname"
+          size="36"
+          @click="toggleSelected(bot.instance)"
+          v-shortkey.once="['ctrl', `${index + 1}`]"
+          @shortkey="toggleSelected(bot.instance)"
+        />
+      </div>
       <BotsMenu
         :id="SHORTCUT_BOTS_MENU.elementId"
         ref="botsMenuRef"
@@ -63,9 +65,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount, reactive, watch, toRefs } from "vue";
-
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeMount,
+  reactive,
+  watch,
+  nextTick,
+} from "vue";
 import { useStore } from "vuex";
+import Sortable from "sortablejs";
 
 // Components
 import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
@@ -100,9 +110,11 @@ const store = useStore();
 const confirmModal = ref(null);
 const promptTextArea = ref(null);
 const botsMenuRef = ref(null);
+const favBotLogosRef = ref();
 
 const bots = ref(_bots.all);
 const activeBots = reactive({});
+const rerenderFavBotLogos = ref(0);
 const favBots = computed(() => {
   const _favBots = [];
   store.getters.currentChat.favBots.forEach((favBot) => {
@@ -112,7 +124,7 @@ const favBots = computed(() => {
       instance: _bots.getBotByClassName(favBot.classname),
     });
   });
-  return _favBots;
+  return _favBots.sort((a, b) => a.order - b.order); // sort by order property
 });
 
 const prompt = ref("");
@@ -301,6 +313,29 @@ onBeforeMount(async () => {
     });
   });
 });
+
+onMounted(() => {
+  initializeSortable();
+});
+
+let sortable = undefined;
+function initializeSortable() {
+  sortable = new Sortable(favBotLogosRef.value, {
+    animation: 200, // ms, animation speed moving items when sorting
+    // dragging ended
+    onEnd: async function (favBot) {
+      if (favBot.oldIndex === favBot.newIndex) {
+        return; // order not changed, return
+      }
+      store.commit("setFavBotOrder", sortable.toArray());
+      rerenderFavBotLogos.value++; // trigger re-render to refresh order and shortkey
+      nextTick().then(() => {
+        sortable = undefined;
+        initializeSortable(); // re-initialize sortable instance after re-render
+      });
+    },
+  });
+}
 </script>
 
 <style>
