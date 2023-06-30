@@ -168,26 +168,25 @@ export default class Bot {
       await this._sendPrompt(prompt, onUpdateResponse, callbackParam);
     };
 
-    let ret
-    try {
-      if (!this.constructor._lock) {
-        ret=await executeSendPrompt();
-      } else {
-        ret=await this.acquireLock("sendPrompt", executeSendPrompt, () => {
-          onUpdateResponse(callbackParam, {
-            content: i18n.global.t("bot.waiting", {
-              botName: this.getBrandName(),
-            }),
-            done: false,
-          });
+    let ret;
+    if (!this.constructor._lock) {
+      ret = await executeSendPrompt();
+    } else {
+      ret = await this.acquireLock("sendPrompt", executeSendPrompt, () => {
+        onUpdateResponse(callbackParam, {
+          content: i18n.global.t("bot.waiting", {
+            botName: this.getBrandName(),
+          }),
+          done: false,
         });
-      }
-    } catch (err) {
+      });
+    }
+    ret.catch((err) => {
       console.warn(`Error send prompt to ${this.getFullname()}:`, err);
       onUpdateResponse(callbackParam, { content: err.toString(), done: true }); // Make sure stop loading
-      return new Promise((r,reject)=>reject({err,bot:this}))
-    }
-    return ret
+      return new Error({ err, bot: this });
+    });
+    return ret;
   }
 
   /**

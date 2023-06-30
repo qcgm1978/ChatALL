@@ -14,6 +14,8 @@
       item-value="ind"
       :menu-props="{ closeOnContentClick: true }"
       :hide-no-data="true"
+      theme="store.state.theme"
+      bg-color="purple"
       clearable
       :label="$t('footer.promptPlaceholder')"
       auto-grow
@@ -61,7 +63,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount, reactive, watch } from "vue";
+import { ref, computed, onBeforeMount, reactive, watch,toRefs } from "vue";
+
 import { useStore } from "vuex";
 
 // Components
@@ -83,10 +86,11 @@ const autocompleteItems = computed(() => {
     (message) => !message.hide,
   );
   const items = messages
-    .filter((d) => d.type == "prompt")
+    // .filter((d) => d.type == "prompt")
     .map((d, i) => ({ name: d.content, ind: d.content }));
   const set = new Set(items);
-  const its = Array.from(set);
+  const its = Array.from(set)
+    // .slice(0, 10);
   return its;
 });
 const props = defineProps(["changeColumns"]);
@@ -112,6 +116,18 @@ const favBots = computed(() => {
 });
 
 const prompt = ref("");
+// 创建一个响应式对象
+const prompt_reactive = reactive({
+  value: ''
+});
+
+// 将响应式对象转换为普通对象，以便在模板中使用
+// const { prompt } = toRefs(prompt_reactive);
+
+
+// 输出结果
+console.log(prompt.value); // 'New Value'
+
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 const disabled = ref(true);
@@ -130,14 +146,14 @@ watch(favBots, async (newValue, oldValue) => {
   });
   updateActiveBots();
 });
-watch(prompt, (newValue, oldValue) => {
-  const dis =
-    newValue &&
-    (newValue.trim() === "" ||
-      favBots.value.filter((favBot) => activeBots[favBot.classname]).length ===
-        0);
-  disabled.value = dis;
-});
+// watch(prompt, (newValue, oldValue) => {
+//   const dis =
+//     newValue &&
+//     (newValue.trim() === "" ||
+//       favBots.value.filter((favBot) => activeBots[favBot.classname]).length ===
+//         0);
+//   disabled.value = dis;
+// });
 async function updateActiveBots() {
   for (const bot of store.getters.currentChat.favBots) {
     // Unselect the bot if user has not confirmed to use it
@@ -317,4 +333,7 @@ textarea::placeholder {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* .v-list-item--variant-text:hover {
+    background: red!important;
+} */
 </style>

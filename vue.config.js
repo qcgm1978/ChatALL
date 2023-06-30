@@ -6,6 +6,12 @@ module.exports = defineConfig({
       alias: {
         'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js'
       }
+    },
+    devServer: {
+      client: {
+        overlay:
+          false
+      }
     }
   },
   transpileDependencies: ["vuetify"],

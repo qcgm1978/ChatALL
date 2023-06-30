@@ -50,8 +50,8 @@ export default class BingChatBot extends Bot {
     return conversation;
   }
 
-  checkAvailability() {
-    return axios
+  async checkAvailability() {
+    return await axios
       .get("https://www.bing.com/turing/conversation/chats")
       .then((response) => {
         this.constructor._isAvailable =
