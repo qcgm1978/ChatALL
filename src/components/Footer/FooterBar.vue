@@ -176,7 +176,7 @@ async function updateActiveBots() {
 }
 
 function focusPromptTextarea() {
-  promptTextArea.value.$el.querySelector("textarea").focus();
+  promptTextArea.value.focus();
 }
 
 function toggleBotsMenu() {
