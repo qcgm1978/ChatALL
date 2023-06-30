@@ -1,7 +1,7 @@
 <template>
   <v-avatar
     rounded="rounded"
-    :class="{ active: active,'filter':enable_filer.includes(bot.getClassname()) }"
+    :class="{ active: active,'filter':enable_filter(bot) }"
     :image="bot.getLogo()"
     :alt="bot.getFullname()"
     :title="bot.getFullname()"
@@ -9,8 +9,15 @@
 </template>
 
 <script setup>
+import { useStore } from "vuex";
+const store = useStore();
 defineProps(["bot", "active"]);
-const enable_filer=['OpenAIAPI35Bot']
+const enable_filer_bots = ['OpenAIAPI35Bot']
+function enable_filter(bot) {
+  const is_dark = store.state.theme == 'dark'
+  const is_dark_bot=enable_filer_bots.includes(bot.getClassname())
+  return is_dark && is_dark_bot
+}
 </script>
 
 <style>
