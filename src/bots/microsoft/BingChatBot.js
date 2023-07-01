@@ -51,7 +51,7 @@ export default class BingChatBot extends Bot {
   }
 
   async checkAvailability() {
-    return await axios
+    await axios
       .get("https://www.bing.com/turing/conversation/chats")
       .then((response) => {
         this.constructor._isAvailable =
@@ -66,10 +66,8 @@ export default class BingChatBot extends Bot {
       .catch((error) => {
         this.constructor._isAvailable = false;
         console.error("Error checking Bing Chat login status:", error);
-      })
-      .finally((_) => {
-        return this.isAvailable();
       });
+    return this.isAvailable();
   }
 
   async makePromptRequest(prompt) {
@@ -132,176 +130,140 @@ export default class BingChatBot extends Bot {
     return new Promise((resolve, reject) => {
       try {
         const seperator = String.fromCharCode(30);
-        if (!this.wsp) {
-          this.wsp = new WebSocketAsPromised(
-            "wss://sydney.bing.com/sydney/ChatHub",
-            {
-              packMessage: (data) => {
-                return JSON.stringify(data) + seperator;
-              },
-              unpackMessage: (data) => {
-                return data
-                  .toString()
-                  .split(seperator)
-                  .filter(Boolean)
-                  .map((r) => JSON.parse(r));
-              },
+        const wsp = new WebSocketAsPromised(
+          "wss://sydney.bing.com/sydney/ChatHub",
+          {
+            packMessage: (data) => {
+              return JSON.stringify(data) + seperator;
             },
-          );
-          const wsp = this.wsp;
-          wsp.onOpen.addListener(() => {
-            wsp.sendPacked({ protocol: "json", version: 1 });
-          });
+            unpackMessage: (data) => {
+              return data
+                .toString()
+                .split(seperator)
+                .filter(Boolean)
+                .map((r) => JSON.parse(r));
+            },
+          },
+        );
 
-          let beginning = "";
-          let body = "";
-          let ending = "";
-          wsp.onUnpackedMessage.addListener(async (events) => {
-            try {
-              for (const event of events) {
-                if (JSON.stringify(event) === "{}") {
-                  wsp.sendPacked({ type: 6 });
-                  wsp.sendPacked(await this.makePromptRequest(prompt));
-                  context.invocationId += 1;
-                } else if (event.type === 6) {
-                  wsp.sendPacked({ type: 6 });
-                } else if (event.type === 3) {
-                  onUpdateResponse(callbackParam, { done: true });
-                  wsp.removeAllListeners();
-                  wsp.close();
-                  resolve();
-                } else if (event.type === 2) {
-                  if (event.item.result.value !== "Success") {
-                    console.error("Error sending prompt to Bing Chat:", event);
-                    if (event.item.result.value === "InvalidSession") {
-                      // Create a new conversation and retry
-                      context = await this.createChatContext();
-                      this.setChatContext(context);
-                      this._sendPrompt(prompt, onUpdateResponse, callbackParam);
-                      reject(
-                        new Error({
-                          bot: {
-                            reason: {
-                              message: i18n.global.t(
-                                "bot.creatingConversation",
-                              ),
-                              bot: this,
-                            },
-                          },
-                        }),
-                      );
-                    } else if (event.item.result.value === "Throttled") {
-                      if (await this.isAnonymous(context.clientId)) {
-                        const url = this.getLoginUrl();
-                        onUpdateResponse(callbackParam, {
-                          content: i18n.global.t("bingChat.loginToContinue", {
-                            attributes: `href="${url}" title="${url}" target="innerWindow"`,
-                          }),
-                          format: "html",
-                          done: false,
-                        });
-                        this.setChatContext(null);
-                      } else {
-                        const err = new Error({
-                          bot: {
-                            reason: {
-                              message: event.item.result.message,
-                              bot: this,
-                            },
-                          },
-                        });
-                        reject(err);
-                      }
-                    } else if (event.item.result.value === "CaptchaChallenge") {
-                      const url =
-                        "https://www.bing.com/turing/captcha/challenge";
+        wsp.onOpen.addListener(() => {
+          wsp.sendPacked({ protocol: "json", version: 1 });
+        });
+
+        let beginning = "";
+        let body = "";
+        let ending = "";
+        wsp.onUnpackedMessage.addListener(async (events) => {
+          try {
+            for (const event of events) {
+              if (JSON.stringify(event) === "{}") {
+                wsp.sendPacked({ type: 6 });
+                wsp.sendPacked(await this.makePromptRequest(prompt));
+                context.invocationId += 1;
+              } else if (event.type === 6) {
+                wsp.sendPacked({ type: 6 });
+              } else if (event.type === 3) {
+                onUpdateResponse(callbackParam, { done: true });
+                wsp.removeAllListeners();
+                wsp.close();
+                resolve();
+              } else if (event.type === 2) {
+                if (event.item.result.value !== "Success") {
+                  console.error("Error sending prompt to Bing Chat:", event);
+                  if (event.item.result.value === "InvalidSession") {
+                    // Create a new conversation and retry
+                    context = await this.createChatContext();
+                    this.setChatContext(context);
+                    this._sendPrompt(prompt, onUpdateResponse, callbackParam);
+                    reject(
+                      new Error(i18n.global.t("bot.creatingConversation")),
+                    );
+                  } else if (event.item.result.value === "Throttled") {
+                    if (await this.isAnonymous(context.clientId)) {
+                      const url = this.getLoginUrl();
                       onUpdateResponse(callbackParam, {
-                        content: i18n.global.t("bingChat.solveCaptcha", {
+                        content: i18n.global.t("bingChat.loginToContinue", {
                           attributes: `href="${url}" title="${url}" target="innerWindow"`,
                         }),
                         format: "html",
                         done: false,
                       });
+                      this.setChatContext(null);
                     } else {
-                      const err = new Error({
-                        bot: {
-                          reason: {
-                            message: event.item.result.message,
-                            bot: this,
-                          },
-                        },
-                      });
-                      reject(err);
+                      reject(new Error(event.item.result.message));
                     }
-                  } else if (
-                    event.item.throttling.maxNumUserMessagesInConversation ===
-                    event.item.throttling.numUserMessagesInConversation
-                  ) {
-                    // Max number of messages reached
-                    context = await this.createChatContext();
-                    this.setChatContext(context);
-                  }
-                  // wsp.removeAllListeners();
-                  // wsp.close();
-                  resolve();
-                } else if (event.type === 1) {
-                  // Content response
-                  if (event.arguments[0].messages?.length > 0) {
-                    const message = event.arguments[0].messages[0];
-                    if (message.messageType === "InternalSearchQuery") {
-                      beginning += "> " + message.text + "\n";
-                    } else {
-                      body = message.adaptiveCards[0]?.body[0]?.text;
-                      const moreLinks = message.adaptiveCards[0]?.body[1]?.text;
-                      if (moreLinks !== undefined) {
-                        ending = `> ${moreLinks}`;
-                      }
-                    }
+                  } else if (event.item.result.value === "CaptchaChallenge") {
+                    const url = "https://www.bing.com/turing/captcha/challenge";
                     onUpdateResponse(callbackParam, {
-                      content: `${beginning}\n${body}\n${ending}`,
+                      content: i18n.global.t("bingChat.solveCaptcha", {
+                        attributes: `href="${url}" title="${url}" target="innerWindow"`,
+                      }),
+                      format: "html",
                       done: false,
                     });
+                  } else {
+                    reject(new Error(event.item.result.message));
                   }
-                } else if (event.type === 7) {
-                  wsp.removeAllListeners();
-                  wsp.close();
-                  const err = new Error({
-                    bot: { reason: { message: event.error, bot: this } },
-                  });
-                  reject(err);
-                } else {
-                  console.warn("Unknown Bing Chat response:", event);
+                } else if (
+                  event.item.throttling.maxNumUserMessagesInConversation ===
+                  event.item.throttling.numUserMessagesInConversation
+                ) {
+                  // Max number of messages reached
+                  context = await this.createChatContext();
+                  this.setChatContext(context);
                 }
+                wsp.removeAllListeners();
+                wsp.close();
+                resolve();
+              } else if (event.type === 1) {
+                // Content response
+                if (event.arguments[0].messages?.length > 0) {
+                  const message = event.arguments[0].messages[0];
+                  if (message.messageType === "InternalSearchQuery") {
+                    beginning += "> " + message.text + "\n";
+                  } else {
+                    body = message.adaptiveCards[0]?.body[0]?.text;
+                    const moreLinks = message.adaptiveCards[0]?.body[1]?.text;
+                    if (moreLinks !== undefined) {
+                      ending = `> ${moreLinks}`;
+                    }
+                  }
+                  onUpdateResponse(callbackParam, {
+                    content: `${beginning}\n${body}\n${ending}`,
+                    done: false,
+                  });
+                }
+              } else if (event.type === 7) {
+                wsp.removeAllListeners();
+                wsp.close();
+                reject(new Error(event.error));
+              } else {
+                console.warn("Unknown Bing Chat response:", event);
               }
-            } catch (error) {
-              error.reason.bot = this;
-              reject(error);
             }
-          });
+          } catch (error) {
+            reject(error);
+          }
+        });
 
-          wsp.onError.addListener((event) => {
-            wsp.removeAllListeners();
-            wsp.close();
-            reject(
-              new Error({
-                bot: {
-                  reason: i18n.global.t("error.failedConnectUrl", {
-                    url: event.target.url,
-                  }),
-                  bot: this,
-                },
+        wsp.onError.addListener((event) => {
+          wsp.removeAllListeners();
+          wsp.close();
+          reject(
+            new Error(
+              i18n.global.t("error.failedConnectUrl", {
+                url: event.target.url,
               }),
-            );
-          });
+            ),
+          );
+        });
 
-          wsp.onClose.addListener(() => {
-            onUpdateResponse(callbackParam, { done: true });
-          });
+        wsp.onClose.addListener(() => {
+          onUpdateResponse(callbackParam, { done: true });
+        });
 
-          wsp.open();
-        }
+        wsp.open();
       } catch (error) {
-        error.reason.bot = this;
         reject(error);
       }
     });
