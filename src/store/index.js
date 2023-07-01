@@ -179,7 +179,8 @@ export default createStore({
       currentChat.latestPromptIndex = promptIndex;
     },
     setLatestThreadPromptIndex(state, { threadIndex, promptIndex }) {
-      const currentChat = state.chats[state.currentChatIndex].threads[threadIndex];
+      const currentChat =
+        state.chats[state.currentChatIndex].threads[threadIndex];
       currentChat.latestPromptIndex = promptIndex;
     },
     setResponseThreadIndex(state, { responseIndex, threadIndex }) {
@@ -323,17 +324,22 @@ export default createStore({
         });
       }
 
-      if (promptIndex === undefined) { // index starts at zero, using `if (!promptIndex)` will enter wrong condition for first time.
+      if (promptIndex === undefined) {
+        // index starts at zero, using `if (!promptIndex)` will enter wrong condition for first time.
         // if promptIndex not found, not resend, push to messages array
         const threadPromptMessage = {
           type: "prompt",
           content: prompt,
         };
         // add message
-        threadPromptMessage.index = thread.messages.push(threadPromptMessage) - 1;
+        threadPromptMessage.index =
+          thread.messages.push(threadPromptMessage) - 1;
         promptIndex = threadPromptMessage.index;
       }
-      commit("setLatestThreadPromptIndex", {threadIndex: thread.index, promptIndex}); // to keep track of the latest prompt index for hiding old prompt's resend button
+      commit("setLatestThreadPromptIndex", {
+        threadIndex: thread.index,
+        promptIndex,
+      }); // to keep track of the latest prompt index for hiding old prompt's resend button
 
       const threadResponseMessage = {
         type: "response",
