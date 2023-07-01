@@ -49,9 +49,9 @@
           :data-id="bot.classname"
           size="36"
           @click="toggleSelected(bot.instance)"
-          v-shortkey.once="['ctrl', `${index + 1}`]"
-          @shortkey="toggleSelected(bot.instance)"
-        />
+          />
+          <!-- v-shortkey.once="['ctrl', `${index + 1}`]"
+          @shortkey="toggleSelected(bot.instance)" -->
       </div>
       <BotsMenu
         :id="SHORTCUT_BOTS_MENU.elementId"
