@@ -86,7 +86,7 @@
           :chat-index="store.state.currentChatIndex"
           :columns="columns"
         ></ChatMessages>
-        <FooterBar ref="footerBarRef"></FooterBar>
+        <FooterBar ref="footerBarRef" :changeColumns='changeColumns'></FooterBar>
       </v-main>
       <SettingsModal v-model:open="isSettingsOpen" />
       <ConfirmModal ref="confirmModal" />
@@ -121,7 +121,6 @@ import ChatDrawer from "@/components/ChatDrawer/ChatDrawer.vue";
 import ChatMessages from "@/components/Messages/ChatMessages.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import FooterBarSelect from "@/components/Footer/FooterBarSelect.vue";
 import FooterBar from "@/components/Footer/FooterBar.vue";
 import UpdateNotification from "@/components/Notification/UpdateNotificationModal.vue";
 import FindModal from "@/components/FindModal.vue";
