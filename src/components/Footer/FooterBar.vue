@@ -254,6 +254,7 @@ function sendPromptToBots() {
         adaptColumns(toBots.length);
         const rejected = promises.filter((d) => d.status == "rejected");
         if (rejected.length) {
+          debugger
           rejected.forEach((bot) => {
             const cur_bot = bot.reason.bot;
             if (cur_bot) {
