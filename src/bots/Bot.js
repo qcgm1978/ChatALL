@@ -15,7 +15,7 @@ export default class Bot {
   static _settingsComponent = ""; // Vue component filename for settings
   static _outputFormat = "markdown"; // "markdown" or "html"
 
-  constructor() {}
+  constructor() { }
 
   static getInstance() {
     return new this();
@@ -165,8 +165,10 @@ export default class Bot {
     const executeSendPrompt = async () => {
       // Begin thinking...
       onUpdateResponse(callbackParam, { content: "...", done: false });
-      const ret=await this._sendPrompt(prompt, onUpdateResponse, callbackParam);
-      return ret
+      return this._sendPrompt(prompt, onUpdateResponse, callbackParam).catch(e => {
+        const err = { ret: e, bot: this }
+        throw (err)
+      })
     };
 
     let ret;

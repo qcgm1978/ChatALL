@@ -259,17 +259,6 @@ function filterEnterKey(event) {
     sendPromptToBots();
   }
 }
-function changePrompt(evt) {
-  promptTextArea.value.menu = false;
-  const value = evt.target.value;
-  if (
-    value
-    // && !autocompleteItems.value.includes(value)
-  ) {
-    // autocompleteItems.value.push(value);
-    prompt.value = value;
-  }
-}
 function adaptColumns(num) {
   props.changeColumns(num >= 3 ? 3 : num);
 }
@@ -287,15 +276,15 @@ function sendPromptToBots() {
       prompt: prompt.value,
       bots: toBots,
     })
-    .then((checkAvailabilityPromises) => {
-      Promise.allSettled(checkAvailabilityPromises).then((promises) => {
+    .then((promises) => {
+      Promise.allSettled(promises).then((ps) => {
+        debugger;
         shortkey_disabled.value = true;
         adaptColumns(toBots.length);
-        const rejected = promises.filter((d) => d.status == "rejected");
+        const rejected = ps.filter((d) => d.status == "rejected");
         if (rejected.length) {
-          debugger
-          rejected.forEach((bot) => {
-            const cur_bot = bot.reason.bot;
+          rejected.forEach((p) => {
+            const cur_bot = p.bot;
             if (cur_bot) {
               clickedBot.value = cur_bot;
               isMakeAvailableOpen.value = true;
