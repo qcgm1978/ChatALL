@@ -1,3 +1,18 @@
+const is_mac = OSnow();
+function OSnow() {
+  const agent = navigator.userAgent.toLowerCase();
+  const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+  if (agent.indexOf("win32") >= 0 || agent.indexOf("wow32") >= 0) {
+    console.log("这是windows32位系统");
+    return false;
+  } else if (agent.indexOf("win64") >= 0 || agent.indexOf("wow64") >= 0) {
+    console.log("这是windows64位系统");
+    return false;
+  } else if (isMac) {
+    console.log("这是Mac系统");
+    return true;
+  }
+}
 export const SHORTCUT_PROMPT_TEXTAREA = {
   elementId: "prompt-textarea",
   key: ["ctrl", "k"],
@@ -9,7 +24,8 @@ export const SHORTCUT_PROMPT_TEXTAREA = {
 
 export const SHORTCUT_FIND = {
   elementId: "find-btn",
-  key: ["ctrl", "f"],
+  // key: is_mac ? ["command", "f"] : ["ctrl", "f"],
+  key:  ["ctrl", "f"],
   offset: {
     top: 40,
   },

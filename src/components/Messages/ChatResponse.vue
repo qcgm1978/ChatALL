@@ -424,13 +424,6 @@ function handleClick(event) {
 }
 
 function resendPrompt(responseMessage) {
-  matomo.value?.trackEvent(
-    "vote",
-    "resend",
-    responseMessage.className,
-    1,
-  );
-
   if (responseMessage.promptIndex === undefined) {
     return;
   }
