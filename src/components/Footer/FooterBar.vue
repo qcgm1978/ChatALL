@@ -1,11 +1,11 @@
 <template>
-  <div class="footer">
+  <!-- <div class="footer"> -->
     <!-- v-shortkey.once="{
       focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
       toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
     }"
     @shortkey="handleShortcut" -->
-    <v-autocomplete
+    <!-- <v-autocomplete
       :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
       v-model="prompt"
       ref="promptTextArea"
@@ -34,11 +34,49 @@
       elevation="2"
       class="margin-bottom"
       :disabled="disabled"
-      @click="sendPromptToBots"
+      @click="sendPromptToBots" -->
+  <v-bottom-navigation
+    class="footer"
+    v-shortkey.once="{
+      focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
+      toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
+    }"
+    @shortkey="handleShortcut"
+  >
+    <div
+      style="
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+      "
     >
-      {{ $t("footer.sendPrompt") }}
-    </v-btn>
-    <div class="bot-logos margin-bottom">
+      <v-textarea
+        :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
+        v-model="prompt"
+        ref="promptTextArea"
+        auto-grow
+        max-rows="8.5"
+        rows="1"
+        density="comfortable"
+        hide-details
+        variant="solo"
+        :placeholder="$t('footer.promptPlaceholder')"
+        autofocus
+        @keydown="filterEnterKey"
+        style="min-width: 390px"
+      ></v-textarea>
+      <v-btn
+        class="send-prompt-btn"
+        elevation="2"
+        :disabled="
+          prompt.trim() === '' ||
+          favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
+        "
+        @click="sendPromptToBots"
+      >
+        {{ $t("footer.sendPrompt") }}
+      </v-btn>
       <div class="bot-logos" ref="favBotLogosRef" :key="rerenderFavBotLogos">
         <BotLogo
           v-for="(bot, index) in favBots"
@@ -54,6 +92,7 @@
           @shortkey="toggleSelected(bot.instance)" -->
       </div>
       <BotsMenu
+        style="padding-bottom: 0.5rem; padding-left: 4px"
         :id="SHORTCUT_BOTS_MENU.elementId"
         ref="botsMenuRef"
         :favBots="favBots"
@@ -61,7 +100,7 @@
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
     <ConfirmModal ref="confirmModal" />
-  </div>
+  </v-bottom-navigation>
 </template>
 
 <script setup>
@@ -337,30 +376,32 @@ function initializeSortable() {
     },
   });
 }
+
+defineExpose({
+  focusPromptTextarea,
+});
 </script>
 
-<style>
+<style scoped>
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  background-color: transparent!important;
+  height: auto!important;
   display: flex;
-  align-items: flex-end;
+  align-items: center!important;
   justify-content: space-between;
   padding: 8px 16px;
   gap: 8px;
   box-sizing: border-box;
+  padding-bottom: .5rem;
+  box-shadow: none!important;
 }
 
 .bot-logos {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-}
-
-.margin-bottom {
-  margin-bottom: 5px;
+  align-items: center;
+  padding-bottom: 0.5rem;
 }
 
 /* Override default style of vuetify v-textarea */
@@ -373,7 +414,18 @@ textarea::placeholder {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* .v-list-item--variant-text:hover {
-    background: red!important;
-} */
+
+:deep() .v-field__field > textarea {
+  overflow-y: auto;
+}
+
+.send-prompt-btn {
+  height: 40px!important;
+  margin: 0.4rem!important;
+  text-transform: uppercase!important;
+  font-size: small!important;
+  color: rgb(var(--v-theme-on-primary));
+  background-color: rgb(var(--v-theme-primary));
+  border-radius: 4px!important;
+}
 </style>
