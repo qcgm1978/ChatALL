@@ -25,7 +25,7 @@
       <v-btn flat size="x-small" icon @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon>
       </v-btn>
-      <v-btn flat size="x-small" icon @click="copyToClipboard(true)">
+      <v-btn flat size="x-small" icon @click="evt=>copyToClipboard(evt,true)">
         <v-icon>mdi-code-braces</v-icon>
       </v-btn>
       <v-btn flat size="x-small" icon @click="hide">
@@ -336,7 +336,8 @@ onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
 });
 
-function copyToClipboard(is_code = false) {
+function copyToClipboard(evt,is_code = false) {
+  debugger;
   let content = props.messages[carouselModel.value].content;
   const format = props.messages[carouselModel.value].format;
   if (format === "html") {
