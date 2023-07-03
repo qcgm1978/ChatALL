@@ -242,13 +242,11 @@ function sendPromptToBots() {
     })
     .then((promises) => {
       Promise.allSettled(promises).then((ps) => {
-        debugger;
         shortkey_disabled.value = true;
         adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
         if (rejected.length) {
           rejected.forEach((e) => {
-
           });
         } else {
           // Clear the textarea after sending the prompt

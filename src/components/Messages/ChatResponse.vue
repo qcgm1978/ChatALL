@@ -347,8 +347,8 @@ function copyToClipboard(evt,is_code = false) {
     const not_full_block = content.match(/^```([\s\S]*)(```)?/gm);
     // content = set_markdown_button(content);
     content = (full_block || not_full_block || [content]).map((d) =>
-      d.match(/\n[\s\S]+/gm)[0].trim(),
-    );
+      d.match(/\n[\s\S]+/gm)[0].replace(/```/g,'').trim(),
+    ).join('\n\n');
   }
   navigator.clipboard.writeText(content);
 }
