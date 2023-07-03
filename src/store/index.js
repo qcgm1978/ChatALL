@@ -288,7 +288,7 @@ export default createStore({
     },
   },
   actions: {
-    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex, callback: error_callback }) {
+    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex, error_callback }) {
       const currentChat = state.chats[state.currentChatIndex];
       if (promptIndex === undefined) {
         // if promptIndex not found, not resend, push to messages array
