@@ -19,7 +19,7 @@ export default createStore({
     uuid: "",
     lang: "auto",
     enableScroll: true,
-    fontSize:16,
+    fontSize: 16,
     columns: 2,
     openaiApi: {
       apiKey: "",
@@ -112,7 +112,7 @@ export default createStore({
       // this.commit('updateCurrentChatFavBots',currentChat.favBots)
       // this.getters.currentChat = state.chats[state.currentChatIndex];
     },
-    updateCurrentChatFavBots(state,favBots) {
+    updateCurrentChatFavBots(state, favBots) {
       this.getters.currentChat.favBots = favBots;
     },
     setFavBotOrder(state, newOrder) {
@@ -271,9 +271,8 @@ export default createStore({
           createdTime: new Date().getTime(),
         }) - 1;
       state.chats[chatIndex].index = chatIndex;
-      state.chats[chatIndex].title = `${i18n.global.t("chat.newChat")} ${
-        chatIndex + 1
-      }`;
+      state.chats[chatIndex].title = `${i18n.global.t("chat.newChat")} ${chatIndex + 1
+        }`;
     },
     selectChat(state, index) {
       state.currentChatIndex = index;
@@ -289,7 +288,7 @@ export default createStore({
     },
   },
   actions: {
-    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex }) {
+    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex, callback: error_callback }) {
       const currentChat = state.chats[state.currentChatIndex];
       if (promptIndex === undefined) {
         // if promptIndex not found, not resend, push to messages array
@@ -305,7 +304,7 @@ export default createStore({
         promptIndex = promptMessage.index;
       }
       commit("setLatestPromptIndex", promptIndex); // to keep track of the latest prompt index for hiding old prompt's resend button
-      let ret=[]
+      let ret = []
       for (const bot of bots) {
         const message = {
           type: "response",
@@ -327,6 +326,7 @@ export default createStore({
           (indexes, values) =>
             dispatch("updateMessage", { indexes, message: values }),
           { chatIndex: state.currentChatIndex, messageIndex: message.index },
+          error_callback
         );
         ret.push(bot_sendPrompt);
       }

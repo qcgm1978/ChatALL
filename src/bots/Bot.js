@@ -150,7 +150,7 @@ export default class Bot {
   }
   /* eslint-enable no-unused-vars */
 
-  async sendPrompt(prompt, onUpdateResponse, callbackParam) {
+  async sendPrompt(prompt, onUpdateResponse, callbackParam,error_callback) {
     // If not logged in, handle the error
     if (!this.isAvailable()) {
       onUpdateResponse(callbackParam, {
@@ -162,20 +162,17 @@ export default class Bot {
       return;
     }
 
-    const executeSendPrompt = async () => {
+    const executeSendPrompt = () => {
       // Begin thinking...
       onUpdateResponse(callbackParam, { content: "...", done: false });
-      return this._sendPrompt(prompt, onUpdateResponse, callbackParam).catch(e => {
-        const err = { ret: e, bot: this }
-        throw (err)
-      })
+      return this._sendPrompt(prompt, onUpdateResponse, callbackParam)
     };
 
     let ret;
     if (!this.constructor._lock) {
-      ret = await executeSendPrompt();
+      ret = executeSendPrompt();
     } else {
-      ret = await this.acquireLock("sendPrompt", executeSendPrompt, () => {
+      ret = this.acquireLock("sendPrompt", executeSendPrompt, () => {
         onUpdateResponse(callbackParam, {
           content: i18n.global.t("bot.waiting", {
             botName: this.getBrandName(),
@@ -184,15 +181,20 @@ export default class Bot {
         });
       });
     }
-    if (ret && ret.catch) {
+    if (ret.catch) {
       ret.catch((err) => {
         console.warn(`Error send prompt to ${this.getFullname()}:`, err);
         onUpdateResponse(callbackParam, {
           content: err.toString(),
           done: true,
         }); // Make sure stop loading
-        return new Error({ err, bot: this });
+        if (error_callback) {
+          error_callback(this);
+        }
+        throw err;
       });
+    } else {
+      debugger
     }
     return ret;
   }

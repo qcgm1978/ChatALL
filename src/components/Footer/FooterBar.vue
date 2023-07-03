@@ -144,7 +144,6 @@ console.log(prompt.value); // 'New Value'
 
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
-const disabled = ref(true);
 const shortkey_disabled = ref(true);
 
 watch(favBots, async (newValue, oldValue) => {
@@ -239,6 +238,7 @@ function sendPromptToBots() {
     .dispatch("sendPrompt", {
       prompt: prompt.value,
       bots: toBots,
+      error_callback:open_bot
     })
     .then((promises) => {
       Promise.allSettled(promises).then((ps) => {
@@ -247,14 +247,8 @@ function sendPromptToBots() {
         adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
         if (rejected.length) {
-          rejected.forEach((p) => {
-            const cur_bot = p.bot;
-            if (cur_bot) {
-              clickedBot.value = cur_bot;
-              isMakeAvailableOpen.value = true;
-            } else {
-              throw "missing bot, reject error need add this prop";
-            }
+          rejected.forEach((e) => {
+
           });
         } else {
           // Clear the textarea after sending the prompt
@@ -276,9 +270,7 @@ async function toggleSelected(bot) {
       const availability = await bot.checkAvailability();
       if (!availability) {
         selected = false;
-        clickedBot.value = bot;
-        // Open the bot's settings dialog
-        isMakeAvailableOpen.value = true;
+        open_bot(bot);
       } else {
         selected = true;
       }
@@ -312,6 +304,11 @@ onMounted(() => {
 });
 
 let sortable = undefined;
+function open_bot(bot) {
+  clickedBot.value = bot;
+  isMakeAvailableOpen.value = true;
+}
+
 function initializeSortable() {
   sortable = new Sortable(favBotLogosRef.value, {
     animation: 200, // ms, animation speed moving items when sorting
