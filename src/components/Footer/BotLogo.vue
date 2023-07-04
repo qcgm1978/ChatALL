@@ -12,10 +12,10 @@
 import { useStore } from "vuex";
 const store = useStore();
 defineProps(["bot", "active"]);
-const enable_filer_bots = ['OpenAIAPI35Bot']
+const dark_icon_classname = ['OpenAIAPI35Bot','OpenAIAPI3516KBot','OpenAIAPI4Bot','SkyWorkBot','AzureOpenAIAPIBot','DevBot']
 function enable_filter(bot) {
   const is_dark = store.state.theme == 'dark'
-  const is_dark_bot=enable_filer_bots.includes(bot.getClassname())
+  const is_dark_bot=dark_icon_classname.includes(bot.getClassname())
   return is_dark && is_dark_bot
 }
 </script>
