@@ -214,7 +214,6 @@ function sendPromptToBots() {
 
   if (toBots.length === 0) return;
   const val = store.state.enableRepliedLang ? `${prompt.value}. Replied by ${store.state.langName}` : prompt.value;
-  debugger;
   store
     .dispatch("sendPrompt", {
       prompt: val,

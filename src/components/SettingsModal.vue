@@ -1,5 +1,10 @@
 <template>
-  <v-dialog :model-value="props.open" fullscreen :scrim="false" transition="dialog-bottom-transition">
+  <v-dialog
+    :model-value="props.open"
+    fullscreen
+    :scrim="false"
+    transition="dialog-bottom-transition"
+  >
     <v-card>
       <v-toolbar dark color="primary">
         <v-toolbar-title>{{ $t("settings.title") }}</v-toolbar-title>
@@ -14,7 +19,11 @@
           <v-tabs v-model="tab" direction="vertical" color="primary">
             <v-tab value="general">{{ $t("settings.general") }}</v-tab>
             <v-tab value="proxy">{{ $t("proxy.name") }}</v-tab>
-            <v-tab v-for="(setting, index) in botSettings" :key="index" :value="index">
+            <v-tab
+              v-for="(setting, index) in botSettings"
+              :key="index"
+              :value="index"
+            >
               {{ $t(`${setting.brand}.name`) }}
             </v-tab>
           </v-tabs>
@@ -26,24 +35,49 @@
                 <v-list-item-title>{{
                   $t("settings.language")
                 }}</v-list-item-title>
-                <v-select :items="languages" item-title="name" item-value="code" hide-details :model-value="lang"
-                  @update:model-value="setCurrentLanguage($event)"></v-select>
-                  <v-checkbox v-model="enableRepliedLang" color="primary" hideDetails="auto" :label="$t('settings.enable_replied_lang')"
-                  @update:model-value="setRepliedLang($event)"></v-checkbox>
+                <v-select
+                  :items="languages"
+                  item-title="name"
+                  item-value="code"
+                  hide-details
+                  :model-value="lang"
+                  @update:model-value="setCurrentLanguage($event)"
+                ></v-select>
+                <!-- :true-value="$t('header.yes')"
+                :false-value="$t('header.no')" -->
+                <v-switch
+                  v-model="enableRepliedLang"
+                  color="primary"
+                  hideDetails="auto"
+                  :label="`${$t('settings.enable_replied_lang')}: ${enableRepliedLang}`"
+                  inset
+                  :true-value="$t('header.yes')"
+                  :false-value="$t('header.no')"
+                  @update:model-value="setRepliedLang($event)"
+                ></v-switch>
               </v-list-item>
               <v-list-item>
                 <v-list-item-title>{{
                   $t("settings.enableScroll")
                 }}</v-list-item-title>
-                <v-checkbox v-model="enableScroll" color="primary" hideDetails="auto" :label="$t('settings.enable')"
-                  @update:model-value="setCurrentScroll($event)"></v-checkbox>
+                <v-checkbox
+                  v-model="enableScroll"
+                  color="primary"
+                  hideDetails="auto"
+                  :label="$t('settings.enable')"
+                  @update:model-value="setCurrentScroll($event)"
+                ></v-checkbox>
               </v-list-item>
               <v-list-item>
                 <v-list-item-title>{{
                   $t("settings.fontSize")
                 }}</v-list-item-title>
-                <v-text-field v-model="fontSize" label="Number Input" type="number"
-                  @update:model-value="setFontSize($event)"></v-text-field>
+                <v-text-field
+                  v-model="fontSize"
+                  label="Number Input"
+                  type="number"
+                  @update:model-value="setFontSize($event)"
+                ></v-text-field>
               </v-list-item>
             </div>
             <div class="section" v-if="tab == 'general'">
@@ -51,8 +85,14 @@
                 <v-list-item-title>{{
                   $t("settings.theme")
                 }}</v-list-item-title>
-                <v-select :items="modes" item-title="name" item-value="code" hide-details :model-value="currentMode"
-                  @update:model-value="setCurrentMode($event)"></v-select>
+                <v-select
+                  :items="modes"
+                  item-title="name"
+                  item-value="code"
+                  hide-details
+                  :model-value="currentMode"
+                  @update:model-value="setCurrentMode($event)"
+                ></v-select>
               </v-list-item>
             </div>
 
@@ -61,7 +101,10 @@
             </div>
 
             <template v-for="(setting, index) in botSettings" :key="index">
-              <component v-if="tab == index" :is="setting.component"></component>
+              <component
+                v-if="tab == index"
+                :is="setting.component"
+              ></component>
             </template>
           </v-list>
         </v-col>
@@ -150,12 +193,12 @@ const enableRepliedLang = ref(store.state.enableRepliedLang);
 const fontSize = computed(() => store.state.fontSize);
 const currentMode = computed(() => store.state.mode);
 
-const setCurrentLanguage = (lan=lang.value) => {
+const setCurrentLanguage = (lan = lang.value) => {
   if (lan == "auto") {
     const lang = navigator.language || navigator.userLanguage || "en";
     lan = lang.substr(0, 2); // Only use the first two characters (e.g. "en")
   }
-  const name = languages.value.filter(d => d.code == lan)[0].name
+  const name = languages.value.filter((d) => d.code == lan)[0].name;
   locale.value = lan;
   store.commit("setCurrentLanguage", lan);
   store.commit("setCurrentLanguageName", name);
@@ -165,7 +208,7 @@ const setCurrentScroll = (scroll) => {
   store.commit("setCurrentScroll", scroll);
 };
 const setRepliedLang = (enable) => {
-  setCurrentLanguage()
+  setCurrentLanguage();
   locale.enableRepliedLang = enable;
   store.commit("enableRepliedLang", enable);
 };
