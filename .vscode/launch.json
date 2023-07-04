@@ -7,6 +7,15 @@
     {
       "type": "node",
       "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "electron:serve"],
+      "name": "Launch Program",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/**/*.js", "!**/node_modules/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Electron: Main",
       // "preLaunchTask": "webpack",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
@@ -26,15 +35,6 @@
       "runtimeArgs": ["run", "electron:serve"],
       "outputCapture": "std"
       //   "port": 9229
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "electron:serve"],
-      "name": "Launch Program",
-      "skipFiles": ["<node_internals>/**"],
-      "outFiles": ["${workspaceFolder}/**/*.js", "!**/node_modules/**"]
     },
     {
       "type": "node",
