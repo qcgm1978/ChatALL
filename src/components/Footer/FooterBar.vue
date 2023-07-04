@@ -18,7 +18,7 @@
       bg-color="purple"
       clearable
       :label="$t('footer.promptPlaceholder')"
-      auto-grow
+      auto-gro vbw
       max-rows="8.5"
       rows="1"
       density="comfortable"
@@ -89,8 +89,6 @@ import {
   SHORTCUT_PROMPT_TEXTAREA,
   SHORTCUT_BOTS_MENU,
 } from "./../ShortcutGuide/shortcut.const";
-
-// Composables
 
 import _bots from "@/bots";
 const { ipcRenderer } = window.require("electron");
@@ -238,7 +236,7 @@ function sendPromptToBots() {
     .dispatch("sendPrompt", {
       prompt: prompt.value,
       bots: toBots,
-      error_callback:open_bot
+      error_callback: open_bot
     })
     .then((promises) => {
       Promise.allSettled(promises).then((ps) => {
