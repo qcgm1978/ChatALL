@@ -1,6 +1,7 @@
 {
   "settings": {
     "enable": "Enable",
+    "enable_replied_lang": "The robot replies in this language",
     "forExample": "E.g. { example }",
     "title": "Settings",
     "general": "General",

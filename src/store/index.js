@@ -19,6 +19,7 @@ export default createStore({
     uuid: "",
     lang: "auto",
     enableScroll: true,
+    enableRepliedLang: false,
     fontSize: 16,
     columns: 2,
     openaiApi: {
@@ -140,9 +141,15 @@ export default createStore({
       state.lang = language;
       i18n.global.locale = language;
     },
+    setCurrentLanguageName(state, languagename) {
+      state.langName = languagename;
+    },
     setCurrentScroll(state, scroll) {
       state.enableScroll = scroll;
       i18n.global.locale = scroll;
+    },
+    enableRepliedLang(state, enable) {
+      state.enableRepliedLang = enable;
     },
     setCurrentFontSize(state, fontSize) {
       state.fontSize = fontSize;

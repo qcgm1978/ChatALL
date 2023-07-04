@@ -59,19 +59,13 @@ export default class ChatGPTBot extends Bot {
     return { conversationId: undefined, parentMessageId: uuidv4() };
   }
 
-  refreshSession(resolve = (_) => _, reject = (_) => _) {
-    return axios
-      .get(REFRESH_SESSION_URL)
-      .then((_) => resolve)
-      .catch((error) => {
+  refreshSession() {
+    axios.get(REFRESH_SESSION_URL).catch((error) => {
         // the REFRESH_SESSION_URL always returns a 404 error
         // if 403, then the session has expired
-        if (error.response && [403].includes(error.response.status)) {
+      if (error.response && error.response.status === 403) {
           this.constructor._isAvailable = false;
           this.toggleSessionRefreshing(false);
-          reject();
-        } else {
-          resolve();
         }
       });
   }
@@ -92,17 +86,11 @@ export default class ChatGPTBot extends Bot {
       clearInterval(sr.id);
       sr.id = null;
     }
-    return new Promise((resolve, reject) => {
+
       if (shouldRefresh && sr.interval > 0) {
         this.refreshSession();
-        sr.id = setInterval(
-          this.refreshSession.bind(this, resolve, reject),
-          sr.interval,
-        );
-      } else {
-        resolve();
+      sr.id = setInterval(this.refreshSession.bind(this), sr.interval);
       }
-    });
   }
 
   // Credit: https://github.com/linweiyuan/go-chatgpt-api/issues/175

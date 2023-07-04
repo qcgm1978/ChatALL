@@ -129,17 +129,6 @@ const favBots = computed(() => {
 });
 
 const prompt = ref("");
-// 创建一个响应式对象
-const prompt_reactive = reactive({
-  value: "",
-});
-
-// 将响应式对象转换为普通对象，以便在模板中使用
-// const { prompt } = toRefs(prompt_reactive);
-
-// 输出结果
-console.log(prompt.value); // 'New Value'
-
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 const shortkey_disabled = ref(true);
@@ -157,14 +146,6 @@ watch(favBots, async (newValue, oldValue) => {
   });
   updateActiveBots();
 });
-// watch(prompt, (newValue, oldValue) => {
-//   const dis =
-//     newValue &&
-//     (newValue.trim() === "" ||
-//       favBots.value.filter((favBot) => activeBots[favBot.classname]).length ===
-//         0);
-//   disabled.value = dis;
-// });
 async function updateActiveBots() {
   for (const bot of store.getters.currentChat.favBots) {
     // Unselect the bot if user has not confirmed to use it
@@ -232,9 +213,11 @@ function sendPromptToBots() {
     .map((favBot) => favBot.instance);
 
   if (toBots.length === 0) return;
+  const val = store.state.enableRepliedLang ? `${prompt.value}. Replied by ${store.state.langName}` : prompt.value;
+  debugger;
   store
     .dispatch("sendPrompt", {
-      prompt: prompt.value,
+      prompt: val,
       bots: toBots,
       error_callback: open_bot
     })

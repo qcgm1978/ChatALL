@@ -1,6 +1,7 @@
 {
   "settings": {
     "enable": "启用",
+    "enable_replied_lang": "机器人使用该语言回答",
     "noDataText":"没有数据",
     "forExample": "例如：{ example }",
     "title": "设置",
