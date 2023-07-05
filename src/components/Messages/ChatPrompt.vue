@@ -5,7 +5,7 @@
     :class="props.isThread ? 'thread-prompt' : ''"
   >
   <span>{{ props.message.content }} </span>
-    <v-btn flat size="x-small" icon @click="copyToClipboard">
+    <v-btn flat size="x-small" icon @click="copyToClipboard" class="copy_btn_bg">
       <v-icon>mdi-content-copy</v-icon>
     </v-btn>
   </v-card>
@@ -70,5 +70,8 @@ function copyToClipboard(is_code = false) {
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+.copy_btn_bg{
+  background-color: inherit;
 }
 </style>
