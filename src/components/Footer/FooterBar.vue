@@ -288,8 +288,29 @@ function open_bot(bot) {
 }
 
 function initializeSortable() {
+  let isDropOnFavBotBar = false;
+  const onDragEnd = (event) => {
+    event.target.removeEventListener("dragend", onDragEnd);
+    if (isDropOnFavBotBar) {
+      return; // dropped on fav bot bar
+    }
+    // if not drop on fav bot bar, remove it from favorite bar
+    event.target.parentNode.removeChild(event.target);
+    store.commit("removeFavoriteBot", event.target.dataset.id);
+    rerenderFavBotLogos.value++; // trigger re-render to refresh order and shortkey
+    nextTick().then(() => {
+      sortable = undefined;
+      initializeSortable(); // re-initialize sortable instance after re-render
+    });
+  };
+
   sortable = new Sortable(favBotLogosRef.value, {
     animation: 200, // ms, animation speed moving items when sorting
+    // dragging started
+    onStart: function (favBot) {
+      isDropOnFavBotBar = false;
+      favBot.item.addEventListener("dragend", onDragEnd);
+    },
     // dragging ended
     onEnd: async function (favBot) {
       if (favBot.oldIndex === favBot.newIndex) {
@@ -302,6 +323,9 @@ function initializeSortable() {
         initializeSortable(); // re-initialize sortable instance after re-render
       });
     },
+  });
+  favBotLogosRef.value.addEventListener("drop", () => {
+    isDropOnFavBotBar = true;
   });
 }
 
