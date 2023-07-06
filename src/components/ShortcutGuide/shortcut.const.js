@@ -24,8 +24,8 @@ export const SHORTCUT_PROMPT_TEXTAREA = {
 
 export const SHORTCUT_FIND = {
   elementId: "find-btn",
-  // key: is_mac ? ["command", "f"] : ["ctrl", "f"],
-  key:  ["ctrl", "f"],
+  key: {windows: ['ctrl', 'f'], mac: ['meta', 'f']},
+  // key:  ["ctrl", "f"],
   offset: {
     top: 40,
   },
