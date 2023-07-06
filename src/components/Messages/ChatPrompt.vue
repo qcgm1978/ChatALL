@@ -1,5 +1,9 @@
 <template>
-  <v-card ref="root" class="message prompt" :class="props.isThread ? 'thread-prompt' : ''">
+  <v-card
+    ref="root"
+    class="message prompt"
+    :class="props.isThread ? 'thread-prompt' : ''"
+  >
     <span>{{ props.message.content }} </span>
     <v-btn flat size="x-small" icon @click="copyToClipboard" class="copy_btn_bg">
       <v-icon>mdi-content-copy</v-icon>
@@ -40,7 +44,6 @@ function copyToClipboard() {
   let content = props.message.content
   navigator.clipboard.writeText(content);
 }
-
 </script>
 
 <style scoped>
@@ -67,7 +70,6 @@ function copyToClipboard() {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
-
 .copy_btn_bg {
   background-color: inherit;
 }
