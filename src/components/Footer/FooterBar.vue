@@ -245,7 +245,9 @@ async function toggleSelected(bot) {
     if (bot.isAvailable()) {
       selected = true;
     } else {
-      const availability = await bot.checkAvailability();
+      const availability = await bot.checkAvailability().catch(e => {
+        return open_bot(bot)
+      });
       if (!availability) {
         selected = false;
         open_bot(bot);
