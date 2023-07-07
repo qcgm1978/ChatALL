@@ -1,69 +1,72 @@
 <template>
-  <!-- <div class="footer"> -->
-  <!-- v-shortkey.once="{
+  <v-bottom-navigation
+    class="footer"
+    v-shortkey.once="{
       focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
       toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
     }"
-    @shortkey="handleShortcut" -->
-  <!-- <v-autocomplete
-      :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
-      v-model="prompt"
-      ref="promptTextArea"
-      :items="autocompleteItems"
-      item-title="name"
-      item-value="ind"
-      :menu-props="{ closeOnContentClick: true }"
-      :hide-no-data="true"
-      theme="store.state.theme"
-      bg-color="purple"
-      clearable
-      :label="$t('footer.promptPlaceholder')"
-      auto-gro vbw
-      max-rows="8.5"
-      rows="1"
-      density="comfortable"
-      hide-details
-      variant="solo"
-      autofocus
-      @keydown="filterEnterKey"
-      @input="changePrompt"
-      style="min-width: 390px"
-    ></v-autocomplete>
-    <v-btn
-      color="primary"
-      elevation="2"
-      class="margin-bottom"
-      :disabled="disabled"
-      @click="sendPromptToBots" -->
-  <v-bottom-navigation class="footer" v-shortkey.once="{
-    focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
-    toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
-  }" @shortkey="handleShortcut">
-    <div style="
+    @shortkey="handleShortcut"
+  >
+    <div
+      style="
         width: 100%;
         display: flex;
         flex-direction: row;
         align-items: flex-end;
-      ">
-      <v-autocomplete :id="SHORTCUT_PROMPT_TEXTAREA.elementId" :items="autocompleteItems" item-title="name"
-        item-value="ind" :persistent-hint="true" ref="promptTextArea" auto-grow max-rows="8.5" rows="1"
-        density="comfortable" hide-details variant="solo" :placeholder="$t('footer.promptPlaceholder')" autofocus
-        @keydown="filterEnterKey" style="min-width: 390px">
-        {{ prompt_text }}
+      "
+    >
+      <v-autocomplete
+        :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
+        :items="autocompleteItems"
+        item-title="name"
+        item-value="ind"
+        :persistent-hint="true"
+        ref="promptTextArea"
+        auto-grow
+        max-rows="8.5"
+        rows="1"
+        density="comfortable"
+        hide-details
+        variant="solo"
+        :placeholder="$t('footer.promptPlaceholder')"
+        autofocus
+        @keydown="filterEnterKey"
+        @input="input_prompt"
+        style="min-width: 390px"
+      >
+        {{ prompt }}
       </v-autocomplete>
-      <v-btn class="send-prompt-btn" elevation="2" :disabled="prompt_text.trim() === '' ||
-        favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
-        " @click="sendPromptToBots">
+      <v-btn
+        class="send-prompt-btn"
+        elevation="2"
+        :disabled="
+          !prompt.trim() ||
+          favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
+        "
+        @click="sendPromptToBots"
+      >
         {{ $t("footer.sendPrompt") }}
       </v-btn>
       <div class="bot-logos" ref="favBotLogosRef" :key="rerenderFavBotLogos">
-        <BotLogo v-for="(bot, index) in favBots" :id="`fav-bot-${index + 1}`" :key="index" :bot="bot.instance"
-          :active="activeBots[bot.classname]" :data-id="bot.classname" size="36" @click="toggleSelected(bot.instance)" />
+        <BotLogo
+          v-for="(bot, index) in favBots"
+          :id="`fav-bot-${index + 1}`"
+          :key="index"
+          :bot="bot.instance"
+          :active="activeBots[bot.classname]"
+          :data-id="bot.classname"
+          size="36"
+          @click="toggleSelected(bot.instance)"
+        />
         <!-- v-shortkey.once="['ctrl', `${index + 1}`]"
           @shortkey="toggleSelected(bot.instance)" -->
       </div>
-      <BotsMenu style="padding-bottom: 0.5rem; padding-left: 4px" :id="SHORTCUT_BOTS_MENU.elementId" ref="botsMenuRef"
-        :favBots="favBots" />
+      <BotsMenu
+        style="padding-bottom: 0.5rem; padding-left: 4px"
+        :id="SHORTCUT_BOTS_MENU.elementId"
+        ref="botsMenuRef"
+        :favBots="favBots"
+      />
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
     <ConfirmModal ref="confirmModal" />
@@ -136,7 +139,7 @@ const favBots = computed(() => {
   return _favBots.sort((a, b) => a.order - b.order); // sort by order property
 });
 
-const prompt_text = ref("");
+const prompt = ref("");
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 const shortkey_disabled = ref(true);
@@ -191,10 +194,8 @@ function handleShortcut(event) {
 // Send the prompt when the user presses enter and prevent the default behavior
 // But if the shift, ctrl, alt, or meta keys are pressed, do as default
 function filterEnterKey(event) {
-  const value = event.target.value;
-  prompt_text.value = value;
   if (
-    prompt_text.value &&
+    prompt.value &&
     event.keyCode == 13 &&
     !event.shiftKey &&
     !event.ctrlKey &&
@@ -208,12 +209,18 @@ function filterEnterKey(event) {
   } else {
   }
 }
+function input_prompt(event) {
+  const value = event.target.value;
+  prompt.value = value;
+  console.log(value);
+}
+
 function adaptColumns(num) {
   props.changeColumns(num >= 3 ? 3 : num);
 }
 
 function sendPromptToBots() {
-  if (prompt_text.value.trim() === "") return;
+  if (prompt.value.trim() === "") return;
 
   const toBots = favBots.value
     .filter((favBot) => activeBots[favBot.classname])
@@ -221,8 +228,8 @@ function sendPromptToBots() {
 
   if (toBots.length === 0) return;
   const val = store.state.enableRepliedLang
-    ? `${prompt_text.value}. Replied by ${store.state.langName}`
-    : prompt_text.value;
+    ? `${prompt.value}. Replied by ${store.state.langName}`
+    : prompt.value;
   store
     .dispatch("sendPrompt", {
       prompt: val,
@@ -235,7 +242,7 @@ function sendPromptToBots() {
         adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
         if (rejected.length) {
-          rejected.forEach((e) => { });
+          rejected.forEach((e) => {});
         } else {
           // Clear the textarea after sending the prompt
           promptTextArea.value.blur();
@@ -397,7 +404,6 @@ textarea::placeholder {
   background-color: rgb(var(--v-theme-primary));
   border-radius: 4px !important;
 }
-
 </style>
 <style>
 span.v-autocomplete__mask {
