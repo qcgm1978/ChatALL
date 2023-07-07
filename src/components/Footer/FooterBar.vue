@@ -212,7 +212,6 @@ function filterEnterKey(event) {
 function input_prompt(event) {
   const value = event.target.value;
   prompt.value = value;
-  console.log(value);
 }
 
 function adaptColumns(num) {
@@ -245,6 +244,7 @@ function sendPromptToBots() {
           rejected.forEach((e) => {});
         } else {
           // Clear the textarea after sending the prompt
+          prompt.value=''
           promptTextArea.value.blur();
           promptTextArea.value.focus();
         }
