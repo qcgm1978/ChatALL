@@ -1,6 +1,6 @@
 <template>
   <v-card ref="root" class="message prompt" :class="props.isThread ? 'thread-prompt' : ''">
-    <pre>{{ props.message.content }} </pre>
+    <pre>{{ message.content }} </pre>
     <v-btn flat size="x-small" icon @click="copyToClipboard" class="copy_btn_bg">
       <v-icon>mdi-content-copy</v-icon>
     </v-btn>
@@ -25,7 +25,8 @@ const props = defineProps({
     default: false,
   },
 });
-
+const message = ref({ ...props.message });
+message.value.content=message.value.content.replace(/Replied by.+$/,'')
 watch(
   () => props.columns,
   () => {
