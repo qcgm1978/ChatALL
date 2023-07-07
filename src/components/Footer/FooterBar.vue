@@ -45,9 +45,13 @@
         flex-direction: row;
         align-items: flex-end;
       ">
-      <v-textarea :id="SHORTCUT_PROMPT_TEXTAREA.elementId" v-model="prompt" ref="promptTextArea" auto-grow max-rows="8.5"
+      <v-autocomplete :id="SHORTCUT_PROMPT_TEXTAREA.elementId" v-model="prompt" 
+      :items="autocompleteItems"
+      item-title="name"
+      item-value="ind"
+      ref="promptTextArea" auto-grow max-rows="8.5"
         rows="1" density="comfortable" hide-details variant="solo" :placeholder="$t('footer.promptPlaceholder')" autofocus
-        @keydown="filterEnterKey" style="min-width: 390px"></v-textarea>
+        @keydown="filterEnterKey" style="min-width: 390px"></v-autocomplete>
       <v-btn class="send-prompt-btn" elevation="2" :disabled="prompt.trim() === '' ||
         favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
         " @click="sendPromptToBots">
@@ -97,13 +101,18 @@ const autocompleteItems = computed(() => {
     (message) => !message.hide,
   );
   const items = messages
-    // .filter((d) => d.type == "prompt")
+    .filter((d) => d.type == "prompt")
     .map((d, i) => ({ name: d.content, ind: d.content }));
-  const set = new Set(items);
-  const its = Array.from(set);
-  // .slice(0, 10);
+  const its = setByProp(items,'name');
   return its;
 });
+function setByProp(data, p) {
+  let ps = p instanceof Array ? p : [p];
+  return data.filter(
+    (value, index, self) =>
+      index === self.findIndex((t) => ps.every((p) => t[p] === value[p]))
+  );
+}
 const props = defineProps(["changeColumns"]);
 
 const store = useStore();
@@ -199,6 +208,9 @@ function filterEnterKey(event) {
     shortkey_disabled.value = false;
     event.preventDefault();
     sendPromptToBots();
+  } else {
+    const value = event.target.value;
+    prompt.value = value;
   }
 }
 function adaptColumns(num) {

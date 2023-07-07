@@ -77,6 +77,7 @@ const favorited = computed(() => {
 });
 
 const toggleFavorite = (bot) => {
+  debugger
   const classname = bot.getClassname();
   if (favorited.value.includes(classname)) {
     store.commit("removeFavoriteBot", classname);
