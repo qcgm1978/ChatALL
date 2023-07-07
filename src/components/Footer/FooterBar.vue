@@ -35,72 +35,35 @@
       class="margin-bottom"
       :disabled="disabled"
       @click="sendPromptToBots" -->
-  <v-bottom-navigation
-    class="footer"
-    v-shortkey.once="{
-      focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
-      toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
-    }"
-    @shortkey="handleShortcut"
-  >
-    <div
-      style="
+  <v-bottom-navigation class="footer" v-shortkey.once="{
+    focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
+    toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
+  }" @shortkey="handleShortcut">
+    <div style="
         width: 100%;
         display: flex;
         flex-direction: row;
         align-items: flex-end;
-      "
-    >
-      <v-autocomplete
-        :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
-        :items="autocompleteItems"
-        item-title="name"
-        item-value="ind"
-        ref="promptTextArea"
-        auto-grow
-        max-rows="8.5"
-        rows="1"
-        density="comfortable"
-        hide-details
-        variant="solo"
-        :placeholder="$t('footer.promptPlaceholder')"
-        autofocus
-        @keydown="filterEnterKey"
-        style="min-width: 390px"
-      >
+      ">
+      <v-autocomplete :id="SHORTCUT_PROMPT_TEXTAREA.elementId" :items="autocompleteItems" item-title="name"
+        item-value="ind" :persistent-hint="true" ref="promptTextArea" auto-grow max-rows="8.5" rows="1"
+        density="comfortable" hide-details variant="solo" :placeholder="$t('footer.promptPlaceholder')" autofocus
+        @keydown="filterEnterKey" style="min-width: 390px">
         {{ prompt_text }}
       </v-autocomplete>
-      <v-btn
-        class="send-prompt-btn"
-        elevation="2"
-        :disabled="
-          prompt_text.trim() === '' ||
-          favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
-        "
-        @click="sendPromptToBots"
-      >
+      <v-btn class="send-prompt-btn" elevation="2" :disabled="prompt_text.trim() === '' ||
+        favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
+        " @click="sendPromptToBots">
         {{ $t("footer.sendPrompt") }}
       </v-btn>
       <div class="bot-logos" ref="favBotLogosRef" :key="rerenderFavBotLogos">
-        <BotLogo
-          v-for="(bot, index) in favBots"
-          :id="`fav-bot-${index + 1}`"
-          :key="index"
-          :bot="bot.instance"
-          :active="activeBots[bot.classname]"
-          :data-id="bot.classname"
-          size="36"
-          @click="toggleSelected(bot.instance)"
-        />
+        <BotLogo v-for="(bot, index) in favBots" :id="`fav-bot-${index + 1}`" :key="index" :bot="bot.instance"
+          :active="activeBots[bot.classname]" :data-id="bot.classname" size="36" @click="toggleSelected(bot.instance)" />
         <!-- v-shortkey.once="['ctrl', `${index + 1}`]"
           @shortkey="toggleSelected(bot.instance)" -->
       </div>
-      <BotsMenu
-        style="padding-bottom: 0.5rem; padding-left: 4px"
-        :id="SHORTCUT_BOTS_MENU.elementId"
-        ref="botsMenuRef"
-        :favBots="favBots"
-      />
+      <BotsMenu style="padding-bottom: 0.5rem; padding-left: 4px" :id="SHORTCUT_BOTS_MENU.elementId" ref="botsMenuRef"
+        :favBots="favBots" />
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
     <ConfirmModal ref="confirmModal" />
@@ -272,7 +235,7 @@ function sendPromptToBots() {
         adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
         if (rejected.length) {
-          rejected.forEach((e) => {});
+          rejected.forEach((e) => { });
         } else {
           // Clear the textarea after sending the prompt
           promptTextArea.value.blur();
@@ -433,5 +396,11 @@ textarea::placeholder {
   color: rgb(var(--v-theme-on-primary));
   background-color: rgb(var(--v-theme-primary));
   border-radius: 4px !important;
+}
+
+</style>
+<style>
+span.v-autocomplete__mask {
+  background: yellowgreen;
 }
 </style>
