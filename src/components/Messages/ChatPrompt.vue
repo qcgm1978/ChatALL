@@ -1,10 +1,9 @@
 <template>
-  <v-card
-    ref="root"
-    class="message prompt"
-    :class="props.isThread ? 'thread-prompt' : ''"
-  >
-    <pre>{{ props.message.content }}</pre>
+  <v-card ref="root" class="message prompt" :class="props.isThread ? 'thread-prompt' : ''">
+    <pre>{{ props.message.content }} </pre>
+    <v-btn flat size="x-small" icon @click="copyToClipboard" class="copy_btn_bg">
+      <v-icon>mdi-content-copy</v-icon>
+    </v-btn>
   </v-card>
 </template>
 
@@ -48,6 +47,8 @@ onMounted(() => {
 }
 
 .prompt {
+  display: flex;
+  align-items: center;
   background-color: rgb(var(--v-theme-prompt));
   width: fit-content;
   grid-column: 1 / span var(--columns);
@@ -62,5 +63,9 @@ onMounted(() => {
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.copy_btn_bg {
+  background-color: inherit;
 }
 </style>
