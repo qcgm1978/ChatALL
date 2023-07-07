@@ -11,7 +11,7 @@
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "electron:serve"],
-      "outputCapture": "std"
+      "outputCapture": "std",
       //   "port": 9229
     },
     {
