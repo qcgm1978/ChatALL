@@ -156,27 +156,23 @@ watch(favBots, async (newValue, oldValue) => {
   updateActiveBots();
 });
 async function updateActiveBots() {
-  for (const bot of store.getters.currentChat.favBots) {
+  for (const favBot of favBots.value) {
     // Unselect the bot if user has not confirmed to use it
-    const favBot = favBots.value.find((d) => d.classname == bot.classname);
-    favBot.selected = bot.selected;
     if (favBot.selected) {
       const confirmed = await favBot.instance.confirmBeforeUsing(
         confirmModal.value,
       );
-      // if (!confirmed) {
-      store.commit("setBotSelected", {
-        botClassname: favBot.classname,
-        selected: confirmed,
-      });
-      // }
+      if (!confirmed) {
+        store.commit("setBotSelected", {
+          botClassname: favBot.classname,
+          selected: false,
+        });
+      }
     }
-    const val = favBot.instance.isAvailable() && favBot.selected;
-    activeBots[favBot.classname] = val;
+    activeBots[favBot.classname] =
+      favBot.instance.isAvailable() && favBot.selected;
   }
-  // store.commit("updateCurrentChatFavBots", activeBots);
 }
-
 function focusPromptTextarea() {
   promptTextArea.value.focus();
 }
