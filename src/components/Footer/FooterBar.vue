@@ -98,7 +98,14 @@ import {
 
 import _bots from "@/bots";
 const { ipcRenderer } = window.require("electron");
-const autocompleteItems = computed(() => {
+const store = useStore();
+const customPhrases = [
+  "以下翻译为英语",
+  '以下数据提取歌曲和歌手名称，构建list，元素为"歌曲名（歌手）"，用双引号，使用简体字',
+].map((d, i) => ({ name: `/${d}：`, ind: i }));
+const history_prompts = get_prompts();
+const autocompleteItems = ref([]);
+function get_prompts() {
   const messages = store.getters.currentChat.messages.filter(
     (message) => !message.hide,
   );
@@ -107,7 +114,8 @@ const autocompleteItems = computed(() => {
     .map((d, i) => ({ name: d.content, ind: d.content }));
   const its = setByProp(items, "name");
   return its;
-});
+}
+
 function setByProp(data, p) {
   let ps = p instanceof Array ? p : [p];
   return data.filter(
@@ -117,7 +125,6 @@ function setByProp(data, p) {
 }
 const props = defineProps(["changeColumns"]);
 
-const store = useStore();
 
 const confirmModal = ref(null);
 const promptTextArea = ref(null);
@@ -211,6 +218,9 @@ function filterEnterKey(event) {
 }
 function input_prompt(event) {
   const value = event.target.value;
+  autocompleteItems.value = value.startsWith("/")
+    ? customPhrases
+    : history_prompts;
   prompt.value = value;
 }
 
