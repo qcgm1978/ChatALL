@@ -229,6 +229,7 @@ function sendPromptToBots() {
   const val = store.state.enableRepliedLang
     ? `${prompt.value}. Replied by ${store.state.langName}`
     : prompt.value;
+  const isFirstPrompt = store.getters.currentChat.messages.length === 0;
   store
     .dispatch("sendPrompt", {
       prompt: val,
@@ -237,6 +238,7 @@ function sendPromptToBots() {
     })
     .then((promises) => {
       Promise.allSettled(promises).then((ps) => {
+        updateChatTitleWithFirstPrompt(isFirstPrompt)
         shortkey_disabled.value = true;
         adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
@@ -348,6 +350,15 @@ function initializeSortable() {
   favBotLogosRef.value.addEventListener("drop", () => {
     isDropOnFavBotBar = true;
   });
+}
+
+function updateChatTitleWithFirstPrompt(isFirstPrompt) {
+  if (isFirstPrompt) {
+    // if this is first prompt, update chat title to first 30 characters of user prompt
+    store.commit("editChatTitle", {
+      title: store.getters.currentChat.messages[0].content.substring(0, 30),
+    });
+  }
 }
 
 defineExpose({
