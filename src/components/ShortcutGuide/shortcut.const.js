@@ -4,13 +4,10 @@ function OSnow() {
   const agent = navigator.userAgent.toLowerCase();
   const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
   if (agent.indexOf("win32") >= 0 || agent.indexOf("wow32") >= 0) {
-    console.log("这是windows32位系统");
     return false;
   } else if (agent.indexOf("win64") >= 0 || agent.indexOf("wow64") >= 0) {
-    console.log("这是windows64位系统");
     return false;
   } else if (isMac) {
-    console.log("这是Mac系统");
     return true;
   }
 }

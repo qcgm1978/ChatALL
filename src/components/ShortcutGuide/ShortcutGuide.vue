@@ -69,7 +69,7 @@ function kbd(text) {
 }
 
 function capitalizeFirstLetter(string) {
-  const s=string.replace('meta','cmd')
+  const s = string.replace('meta', 'cmd');
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
