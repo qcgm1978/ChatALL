@@ -275,7 +275,7 @@ async function toggleSelected(bot) {
     }
   }
   store.commit("setBotSelected", { botClassname, selected });
-  updateActiveBots();
+  // updateActiveBots();
 }
 
 onBeforeMount(async () => {
