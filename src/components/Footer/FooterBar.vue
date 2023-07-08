@@ -1,7 +1,7 @@
 <template>
   <v-bottom-navigation
     class="footer"
-    v-shortkey.once="{
+    v-shortkey="{
       focusPromptTextarea: SHORTCUT_PROMPT_TEXTAREA.key,
       toggleBotsMenu: SHORTCUT_BOTS_MENU.key,
     }"
@@ -58,7 +58,7 @@
           size="36"
           @click="toggleSelected(bot.instance)"
         />
-        <!-- v-shortkey.once="['ctrl', `${index + 1}`]"
+        <!-- v-shortkey="['ctrl', `${index + 1}`]"
           @shortkey="toggleSelected(bot.instance)" -->
       </div>
       <BotsMenu
@@ -238,7 +238,7 @@ function sendPromptToBots() {
     })
     .then((promises) => {
       Promise.allSettled(promises).then((ps) => {
-        updateChatTitleWithFirstPrompt(isFirstPrompt)
+        updateChatTitleWithFirstPrompt(isFirstPrompt);
         shortkey_disabled.value = true;
         adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
@@ -246,7 +246,7 @@ function sendPromptToBots() {
           rejected.forEach((e) => {});
         } else {
           // Clear the textarea after sending the prompt
-          prompt.value=''
+          prompt.value = "";
           promptTextArea.value.blur();
           promptTextArea.value.focus();
         }

@@ -1,4 +1,5 @@
 const is_mac = OSnow();
+const control = is_mac ? "meta" : "ctrl";
 function OSnow() {
   const agent = navigator.userAgent.toLowerCase();
   const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
@@ -15,7 +16,7 @@ function OSnow() {
 }
 export const SHORTCUT_PROMPT_TEXTAREA = {
   elementId: "prompt-textarea",
-  key: ["ctrl", "k"],
+  key: [control, "k"],
   offset: {
     top: 10,
   },
@@ -24,8 +25,7 @@ export const SHORTCUT_PROMPT_TEXTAREA = {
 
 export const SHORTCUT_FIND = {
   elementId: "find-btn",
-  key: {windows: ['ctrl', 'f'], mac: ['meta', 'f']},
-  // key:  ["ctrl", "f"],
+  key: [control, "f"],
   offset: {
     top: 40,
   },
@@ -34,7 +34,7 @@ export const SHORTCUT_FIND = {
 
 export const SHORTCUT_CLEAR_MESSAGES = {
   elementId: "clear-messages-btn",
-  key: ["ctrl", "e"],
+  key: [control, "e"],
   offset: {
     top: 40,
   },
@@ -43,7 +43,7 @@ export const SHORTCUT_CLEAR_MESSAGES = {
 
 export const SHORTCUT_SETTINGS = {
   elementId: "settings-btn",
-  key: ["ctrl", ","],
+  key: [control, ","],
   offset: {
     top: 40,
   },
@@ -52,7 +52,7 @@ export const SHORTCUT_SETTINGS = {
 
 export const SHORTCUT_SHORTCUT_GUIDE = {
   elementId: "shortcut-guide-btn",
-  key: ["ctrl", "/"],
+  key: [control, "/"],
   offset: {
     top: 40,
   },
@@ -70,7 +70,7 @@ export const SHORTCUT_BOTS_MENU = {
 
 export const SHORTCUT_CHAT_DRAWER = {
   elementId: "chat-drawer-btn",
-  key: ["ctrl", "d"],
+  key: [control, "d"],
   offset: {
     left: -10,
     top: 40,
@@ -80,7 +80,7 @@ export const SHORTCUT_CHAT_DRAWER = {
 
 export const SHORTCUT_NEW_CHAT = {
   elementId: "new-chat-list-item",
-  key: ["ctrl", "n"],
+  key: [control, "n"],
   offset: {
     top: 12,
     left: 20,
@@ -123,7 +123,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-1",
-    key: ["ctrl", "1"],
+    key: [control, "1"],
     offset: {
       top: -70,
     },
@@ -131,7 +131,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-2",
-    key: ["ctrl", "2"],
+    key: [control, "2"],
     offset: {
       top: -70,
     },
@@ -139,7 +139,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-3",
-    key: ["ctrl", "3"],
+    key: [control, "3"],
     offset: {
       top: -70,
     },
@@ -147,7 +147,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-4",
-    key: ["ctrl", "4"],
+    key: [control, "4"],
     offset: {
       top: -70,
     },
@@ -155,7 +155,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-5",
-    key: ["ctrl", "5"],
+    key: [control, "5"],
     offset: {
       top: -70,
     },
@@ -163,7 +163,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-6",
-    key: ["ctrl", "6"],
+    key: [control, "6"],
     offset: {
       top: -70,
     },
@@ -171,7 +171,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-7",
-    key: ["ctrl", "7"],
+    key: [control, "7"],
     offset: {
       top: -70,
     },
@@ -179,7 +179,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-8",
-    key: ["ctrl", "8"],
+    key: [control, "8"],
     offset: {
       top: -70,
     },
@@ -187,7 +187,7 @@ export const SHORTCUT_LIST = [
   },
   {
     elementId: "fav-bot-9",
-    key: ["ctrl", "9"],
+    key: [control, "9"],
     offset: {
       top: -70,
     },

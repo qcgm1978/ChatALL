@@ -69,7 +69,8 @@ function kbd(text) {
 }
 
 function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  const s=string.replace('meta','cmd')
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function addWindowResizeListener() {

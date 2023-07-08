@@ -14,7 +14,7 @@
               variant="text"
               @click.stop="isChatDrawerOpen = !isChatDrawerOpen"
               @shortkey="isChatDrawerOpen = !isChatDrawerOpen"
-              v-shortkey.once="SHORTCUT_CHAT_DRAWER.key"
+              v-shortkey="SHORTCUT_CHAT_DRAWER.key"
             >
             </v-app-bar-nav-icon>
             <img
@@ -32,7 +32,7 @@
               :src="getColumnImage(columnCount)"
               @click="changeColumns(columnCount)"
               @shortkey="changeColumns(columnCount)"
-              v-shortkey.once="[`f${columnCount}`]"
+              v-shortkey="[`f${columnCount}`]"
               :class="{
                 selected: columns === columnCount,
                 'dark-png': store.state.theme === Theme.DARK,
@@ -49,7 +49,7 @@
               @click="openFind()"
             ></v-icon>
             <v-icon
-              v-shortkey.once="SHORTCUT_CLEAR_MESSAGES.key"
+              v-shortkey="SHORTCUT_CLEAR_MESSAGES.key"
               @shortkey="clearMessages"
               :id="SHORTCUT_CLEAR_MESSAGES.elementId"
               class="cursor-pointer"
@@ -59,7 +59,7 @@
               @click="clearMessages()"
             ></v-icon>
             <v-icon
-              v-shortkey.once="SHORTCUT_SETTINGS.key"
+              v-shortkey="SHORTCUT_SETTINGS.key"
               @shortkey="openSettingsModal"
               :id="SHORTCUT_SETTINGS.elementId"
               class="cursor-pointer"
@@ -69,7 +69,7 @@
               @click="openSettingsModal()"
             ></v-icon>
             <v-icon
-              v-shortkey.once="SHORTCUT_SHORTCUT_GUIDE.key"
+              v-shortkey="SHORTCUT_SHORTCUT_GUIDE.key"
               @shortkey="toggleShortcutGuide"
               :id="SHORTCUT_SHORTCUT_GUIDE.elementId"
               class="cursor-pointer"
@@ -86,7 +86,10 @@
           :chat-index="store.state.currentChatIndex"
           :columns="columns"
         ></ChatMessages>
-        <FooterBar ref="footerBarRef" :changeColumns='changeColumns'></FooterBar>
+        <FooterBar
+          ref="footerBarRef"
+          :changeColumns="changeColumns"
+        ></FooterBar>
       </v-main>
       <SettingsModal v-model:open="isSettingsOpen" />
       <ConfirmModal ref="confirmModal" />
@@ -247,7 +250,6 @@ function getColumnImage(columnCount) {
 </script>
 
 <style>
-
 * {
   margin: 0;
   padding: 0;
