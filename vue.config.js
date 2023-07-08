@@ -17,6 +17,7 @@ module.exports = defineConfig({
   transpileDependencies: ["vuetify"],
   pluginOptions: {
     electronBuilder: {
+      electronReloadDelay: 5000,
       builderOptions: {
         // options placed here will be merged with default configuration and passed to electron-builder
         appId: "ai.chatall",
