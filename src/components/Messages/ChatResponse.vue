@@ -337,7 +337,7 @@ onMounted(() => {
 });
 
 function copyToClipboard(evt,is_code = false) {
-  debugger;
+  // debugger;
   let content = props.messages[carouselModel.value].content;
   const format = props.messages[carouselModel.value].format;
   if (format === "html") {
