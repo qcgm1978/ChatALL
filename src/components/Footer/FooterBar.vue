@@ -20,6 +20,7 @@
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
+        :hide-no-data="true"
         :persistent-hint="true"
         ref="promptTextArea"
         auto-grow
