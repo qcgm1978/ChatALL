@@ -12,6 +12,8 @@ import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
 // import './update-info'
 import fs from "fs";
 import path from "path";
+const Store = require("electron-store");
+import { save_localStorage } from "./save";
 import updateApp from "./update";
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -135,6 +137,7 @@ async function createWindow() {
   mainWindow = win;
   // 窗口加载完成后最大化
   win.webContents.on("did-finish-load", () => {
+    const store = new Store();
     win.maximize();
   });
   // win.setFullScreen(true)
@@ -246,15 +249,18 @@ function createNewWindow(url, userAgent = "") {
   newWin.loadURL(url);
   newWin.show();
 
+  const getLocalStorage = async (key) => {
+    return await newWin.webContents.executeJavaScript(
+      `localStorage.getItem("${key}");`,
+    );
+  };
+  // todo
+  // save_localStorage(getLocalStorage);
+
   newWin.on("close", async (e) => {
     e.preventDefault(); // Prevent the window from closing
 
     // Hacking secrets
-    const getLocalStorage = async (key) => {
-      return await newWin.webContents.executeJavaScript(
-        `localStorage.getItem("${key}");`,
-      );
-    };
     if (url.startsWith("https://moss.fastnlp.top/")) {
       // Get the secret of MOSS
       const secret = await getLocalStorage("flutter.token");

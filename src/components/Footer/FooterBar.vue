@@ -17,7 +17,6 @@
     >
       <v-autocomplete
         :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
-        v-model="prompt"
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
@@ -37,6 +36,7 @@
         @input="input_prompt"
         style="min-width: 390px"
       >
+      {{ prompt }}
       </v-autocomplete>
       <v-btn
         class="send-prompt-btn"
