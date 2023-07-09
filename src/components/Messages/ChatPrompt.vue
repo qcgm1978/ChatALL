@@ -37,6 +37,10 @@ watch(
 onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
 });
+function copyToClipboard() {
+  let content = message.value.content
+  navigator.clipboard.writeText(content);
+}
 </script>
 
 <style scoped>
