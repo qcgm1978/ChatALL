@@ -17,9 +17,11 @@
     >
       <v-autocomplete
         :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
+        v-model="prompt"
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
+        allow-input
         :hide-no-data="true"
         :persistent-hint="true"
         ref="promptTextArea"
@@ -35,7 +37,6 @@
         @input="input_prompt"
         style="min-width: 390px"
       >
-        {{ prompt }}
       </v-autocomplete>
       <v-btn
         class="send-prompt-btn"
@@ -148,11 +149,18 @@ const favBots = computed(() => {
   return _favBots.sort((a, b) => a.order - b.order); // sort by order property
 });
 
-const prompt = ref("");
+const prompt = ref('')
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 const shortkey_disabled = ref(true);
 
+watch(
+  () => store.state.prompt,
+  (newValue, oldValue) => {
+    prompt.value = newValue
+  },
+  { deep: true }
+)
 watch(favBots, async (newValue, oldValue) => {
   const botsToCheck = newValue.filter((newBot) => {
     return !oldValue.some((oldBot) => oldBot.classname === newBot.classname);
@@ -258,8 +266,6 @@ function sendPromptToBots() {
         } else {
           // Clear the textarea after sending the prompt
           prompt.value = "";
-          promptTextArea.value.blur();
-          promptTextArea.value.focus();
         }
       });
     });

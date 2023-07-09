@@ -1,15 +1,36 @@
 <template>
-  <v-card ref="root" class="message prompt" :class="props.isThread ? 'thread-prompt' : ''">
+  <v-card
+    ref="root"
+    class="message prompt"
+    :class="props.isThread ? 'thread-prompt' : ''"
+  >
     <pre>{{ message.content }} </pre>
-    <v-btn flat size="x-small" icon @click="copyToClipboard" class="copy_btn_bg">
+    <v-btn
+      flat
+      size="x-small"
+      icon
+      @click="copyToClipboard"
+      class="copy_btn_bg"
+    >
       <v-icon>mdi-content-copy</v-icon>
+    </v-btn>
+    <v-btn
+      flat
+      size="x-small"
+      icon
+      @click="setPrompt"
+      class="copy_btn_bg"
+    >
+      <v-icon>mdi-pencil-outline</v-icon>
     </v-btn>
   </v-card>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
+import { useStore } from "vuex";
 
+const store = useStore();
 const root = ref();
 const props = defineProps({
   message: {
@@ -26,7 +47,7 @@ const props = defineProps({
   },
 });
 const message = ref({ ...props.message });
-message.value.content=message.value.content.replace(/Replied by.+$/,'')
+message.value.content = message.value.content.replace(/Replied by.+$/, "");
 watch(
   () => props.columns,
   () => {
@@ -38,8 +59,12 @@ onMounted(() => {
   root.value.$el.style.setProperty("--columns", props.columns);
 });
 function copyToClipboard() {
-  let content = message.value.content
+  let content = message.value.content;
   navigator.clipboard.writeText(content);
+}
+function setPrompt() {
+  let content = message.value.content;
+  store.commit("setPrompt", content);
 }
 </script>
 

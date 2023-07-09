@@ -11,7 +11,7 @@ module.exports = defineConfig({
       client: {
         overlay:
           false
-      }
+      },
     }
   },
   transpileDependencies: ["vuetify"],

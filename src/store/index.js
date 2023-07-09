@@ -19,6 +19,7 @@ export default createStore({
     uuid: "",
     lang: "auto",
     enableScroll: true,
+    prompt:'',
     enableRepliedLang: false,
     fontSize: 16,
     columns: 2,
@@ -147,6 +148,9 @@ export default createStore({
     setCurrentScroll(state, scroll) {
       state.enableScroll = scroll;
       i18n.global.locale = scroll;
+    },
+    setPrompt(state, prompt) {
+      state.prompt = prompt;
     },
     enableRepliedLang(state, enable) {
       state.enableRepliedLang = enable;

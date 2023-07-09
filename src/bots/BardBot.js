@@ -54,6 +54,7 @@ export default class BardBot extends Bot {
   }
 
   async _sendPrompt(prompt, onUpdateResponse, callbackParam) {
+    prompt=prompt.replace('Replied by 简体中文','')
     if (/[\u4e00-\u9fa5]/.test(prompt)) {
           onUpdateResponse(callbackParam, { content: 'Bard不支持中文', done: true });
           return Promise.resolve()
