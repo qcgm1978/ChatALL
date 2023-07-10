@@ -223,7 +223,7 @@ function filterEnterKey(event) {
     promptTextArea.value.menu = false;
     shortkey_disabled.value = false;
     event.preventDefault();
-    sendPromptToBots();
+    sendPromptToBots(event);
   } 
 }
 function input_prompt(event) {
@@ -238,7 +238,7 @@ function adaptColumns(num) {
   props.changeColumns(num >= 3 ? 3 : num);
 }
 
-function sendPromptToBots() {
+function sendPromptToBots(event) {
   if (prompt.value.trim() === "") return;
 
   const toBots = favBots.value
@@ -267,6 +267,7 @@ function sendPromptToBots() {
         } else {
           // Clear the textarea after sending the prompt
           prompt.value = "";
+          // event.target.value = '';
         }
       });
     });
