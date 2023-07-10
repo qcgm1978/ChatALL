@@ -65,12 +65,12 @@ function getShortcutLabelHTML(keys) {
 }
 
 function kbd(text) {
-  return `<kbd>${capitalizeFirstLetter(text)}</kbd>`;
+  return `<kbd>${formatModifierText(text)}</kbd>`;
 }
 
-function capitalizeFirstLetter(string) {
-  const s = string.replace('meta', 'cmd');
-  return s.charAt(0).toUpperCase() + s.slice(1);
+function formatModifierText(string) {
+  string = string.replace('meta', 'cmd');
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function addWindowResizeListener() {

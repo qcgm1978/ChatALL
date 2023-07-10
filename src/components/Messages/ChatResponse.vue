@@ -527,6 +527,7 @@ function toggleReplyButton() {
   width: 99%;
   grid-column: auto / span 1;
   margin: auto;
+  margin-bottom: 0.2rem;
 }
 
 .title {
@@ -541,5 +542,9 @@ function toggleReplyButton() {
   width: 20px;
   height: 20px;
   margin-right: 4px;
+}
+
+.v-btn {
+  background-color: inherit;
 }
 </style>
