@@ -132,7 +132,6 @@ async function createWindow() {
     frame: false,
     maximizable: true,
   });
-  // 窗口加载完成后最大化
 
   mainWindow = win;
   // 窗口加载完成后最大化

@@ -220,6 +220,19 @@ const setRepliedLang = (enable) => {
   locale.enableRepliedLang = enable;
   store.commit("enableRepliedLang", enable);
 };
+// Yes, you can set a CSS global font-size and not change other CSS styles, but the UI would change according to the global by ratio. To do this, you can use the rem unit and the :root selector. The :root selector is a special selector that targets the root element of the document.
+
+// For example, the following code will set the global font-size to 1rem and scale all other CSS properties to 100% of the global font-size:
+
+// :root {
+//   font-size: 1rem;
+// }
+
+// * {
+//   /* All other CSS properties are scaled to 100% of the global font-size */
+//   font-size: 100%;
+// }
+// This means that all other CSS properties will be scaled to 100% of the root font-size, which is 1rem. For example, if the width property of an element is set to 100px, the width property will be scaled to 100px * 1rem / 16px = 6.25rem.
 const setFontSize = (fontSize) => {
   locale.fontSize = fontSize;
   store.commit("setCurrentFontSize", fontSize);
