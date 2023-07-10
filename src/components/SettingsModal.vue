@@ -50,7 +50,9 @@
                   v-model="enableRepliedLang"
                   color="primary"
                   hideDetails="auto"
-                  :label="`${$t('settings.enable_replied_lang')}: ${enableRepliedLang}`"
+                  :label="`${$t(
+                    'settings.enable_replied_lang',
+                  )}: ${enableRepliedLang}`"
                   inset
                   :true-value="$t('header.yes')"
                   :false-value="$t('header.no')"
@@ -119,7 +121,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { watch, computed, ref } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { useTheme } from "vuetify";
@@ -198,7 +200,13 @@ const modes = computed(() => [
 const lang = computed(() => store.state.lang);
 const enableScroll = computed(() => store.state.enableScroll);
 const enableRepliedLang = ref(store.state.enableRepliedLang);
-const fontSize = computed(() => store.state.fontSize);
+const fontSize = computed(() => {
+  return store.state.fontSize;
+});
+watch(fontSize, async (newV, oldV) => {
+  // debugger;
+  add_font_size(newV);
+});
 const currentMode = computed(() => store.state.mode);
 
 const setCurrentLanguage = (lan = lang.value) => {
@@ -220,23 +228,25 @@ const setRepliedLang = (enable) => {
   locale.enableRepliedLang = enable;
   store.commit("enableRepliedLang", enable);
 };
-// Yes, you can set a CSS global font-size and not change other CSS styles, but the UI would change according to the global by ratio. To do this, you can use the rem unit and the :root selector. The :root selector is a special selector that targets the root element of the document.
-
-// For example, the following code will set the global font-size to 1rem and scale all other CSS properties to 100% of the global font-size:
-
-// :root {
-//   font-size: 1rem;
-// }
-
-// * {
-//   /* All other CSS properties are scaled to 100% of the global font-size */
-//   font-size: 100%;
-// }
-// This means that all other CSS properties will be scaled to 100% of the root font-size, which is 1rem. For example, if the width property of an element is set to 100px, the width property will be scaled to 100px * 1rem / 16px = 6.25rem.
 const setFontSize = (fontSize) => {
   locale.fontSize = fontSize;
   store.commit("setCurrentFontSize", fontSize);
 };
+add_font_size();
+function add_font_size(newV = fontSize.value) {
+  const rule = `
+  * {
+  font-size: ${newV}%!important;
+}
+  `;
+  add_css(rule);
+}
+
+function add_css(styles) {
+  var styleSheet = document.createElement("style");
+  styleSheet.innerText = styles;
+  document.head.appendChild(styleSheet);
+}
 const setCurrentMode = async (mode) => {
   const resolvedTheme = await resolveTheme(mode, ipcRenderer);
   store.commit("setMode", mode);
@@ -257,5 +267,10 @@ const closeDialog = () => {
 /* Keep the orignal case of tab names */
 .v-btn {
   text-transform: none !important;
+}
+</style>
+<style>
+:root {
+  font-size: 1rem!important;
 }
 </style>

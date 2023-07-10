@@ -35,7 +35,6 @@
     <template v-if="props.messages.length === 1">
       <Markdown
         class="markdown-body"
-        :style="`font-size: ${store.state.fontSize}px;`"
         :breaks="true"
         :html="messages[0].format === 'html'"
         :source="messages[0].content"
@@ -62,7 +61,6 @@
       <v-carousel-item v-for="(message, i) in messages" :key="i">
         <Markdown
           class="markdown-body"
-          :style="`font-size: ${store.state.fontSize}px;`"
           :breaks="true"
           :html="message.format === 'html'"
           :source="message.content"

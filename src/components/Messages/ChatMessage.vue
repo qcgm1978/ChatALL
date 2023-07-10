@@ -37,7 +37,6 @@
     <Markdown
       v-else
       class="markdown-body"
-      :style="`font-size: ${store.state.fontSize}px;`"
       :breaks="true"
       :html="message.format === 'html'"
       :source="message.content"

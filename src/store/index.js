@@ -21,7 +21,7 @@ export default createStore({
     enableScroll: true,
     prompt:'',
     enableRepliedLang: false,
-    fontSize: 16,
+    fontSize: 100,
     columns: 2,
     openaiApi: {
       apiKey: "",
