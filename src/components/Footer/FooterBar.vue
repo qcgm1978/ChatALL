@@ -43,7 +43,7 @@
         class="send-prompt-btn"
         elevation="2"
         :disabled="
-          !prompt.trim() ||
+          !prompt || !prompt.trim() ||
           favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
         "
         @click="sendPromptToBots"
