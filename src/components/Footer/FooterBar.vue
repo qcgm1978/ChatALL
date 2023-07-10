@@ -17,10 +17,12 @@
     >
       <v-autocomplete
         :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
+        v-model="prompt"
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
         allow-input
+        clearable
         :hide-no-data="true"
         :persistent-hint="true"
         ref="promptTextArea"
@@ -36,7 +38,6 @@
         @input="input_prompt"
         style="min-width: 390px"
       >
-      {{ prompt }}
       </v-autocomplete>
       <v-btn
         class="send-prompt-btn"
@@ -245,6 +246,7 @@ function sendPromptToBots() {
     .map((favBot) => favBot.instance);
 
   if (toBots.length === 0) return;
+  adaptColumns(toBots.length);
   const val = store.state.enableRepliedLang
     ? `${prompt.value}. Replied by ${store.state.langName}`
     : prompt.value;
@@ -259,7 +261,6 @@ function sendPromptToBots() {
       Promise.allSettled(promises).then((ps) => {
         updateChatTitleWithFirstPrompt(isFirstPrompt);
         shortkey_disabled.value = true;
-        adaptColumns(toBots.length);
         const rejected = ps.filter((d) => d.status == "rejected");
         if (rejected.length) {
           rejected.forEach((e) => {});
