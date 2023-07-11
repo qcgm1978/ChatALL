@@ -160,6 +160,9 @@
   "youChat": {
     "name": "YouChat"
   },
+  "pi": {
+    "name": "Pi"
+  },
   "dev": {
     "name": "开发专用 Bot"
   },

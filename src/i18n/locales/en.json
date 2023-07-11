@@ -159,6 +159,9 @@
   "youChat": {
     "name": "YouChat"
   },
+  "pi": {
+    "name": "Pi"
+  },
   "dev": {
     "name": "Dev Bot"
   },
