@@ -17,7 +17,6 @@
     >
       <v-autocomplete
         :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
-        v-model="prompt"
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
@@ -38,12 +37,14 @@
         @input="input_prompt"
         style="min-width: 390px"
       >
+        {{ prompt }}
       </v-autocomplete>
       <v-btn
         class="send-prompt-btn"
         elevation="2"
         :disabled="
-          !prompt || !prompt.trim() ||
+          !prompt ||
+          !prompt.trim() ||
           favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
         "
         @click="sendPromptToBots"
@@ -129,7 +130,6 @@ function setByProp(data, p) {
 }
 const props = defineProps(["changeColumns"]);
 
-
 const confirmModal = ref(null);
 const promptTextArea = ref(null);
 const botsMenuRef = ref(null);
@@ -150,7 +150,7 @@ const favBots = computed(() => {
   return _favBots.sort((a, b) => a.order - b.order); // sort by order property
 });
 
-const prompt = ref('')
+const prompt = ref("");
 const clickedBot = ref(null);
 const isMakeAvailableOpen = ref(false);
 const shortkey_disabled = ref(true);
@@ -158,10 +158,10 @@ const shortkey_disabled = ref(true);
 watch(
   () => store.state.prompt,
   (newValue, oldValue) => {
-    prompt.value = newValue
+    prompt.value = newValue;
   },
-  { deep: true }
-)
+  { deep: true },
+);
 watch(favBots, async (newValue, oldValue) => {
   const botsToCheck = newValue.filter((newBot) => {
     return !oldValue.some((oldBot) => oldBot.classname === newBot.classname);
@@ -224,7 +224,7 @@ function filterEnterKey(event) {
     shortkey_disabled.value = false;
     event.preventDefault();
     sendPromptToBots(event);
-  } 
+  }
 }
 function input_prompt(event) {
   const value = event.target.value;
