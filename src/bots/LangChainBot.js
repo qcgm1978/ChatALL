@@ -45,11 +45,20 @@ export default class LangChainBot extends Bot {
       },
     ];
     model.callbacks = callbacks;
-    await model.call(messages);
-    messages.push(new AIMessage(res));
-    // Serialize the messages before storing
-    messages = messages.map((item) => JSON.stringify(item.toDict()));
-    this.setChatContext(messages);
+    try {
+      return model.call(messages).then(_ => {
+        messages.push(new AIMessage(res));
+        // Serialize the messages before storing
+        messages = messages.map((item) => JSON.stringify(item.toDict()));
+        this.setChatContext(messages);
+      }).catch(e => {
+        debugger;
+      });
+    } catch (e) {
+      debugger;
+    } finally {
+      debugger;
+    }
   }
 
   async createChatContext() {
