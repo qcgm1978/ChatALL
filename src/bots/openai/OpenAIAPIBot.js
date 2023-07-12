@@ -24,14 +24,18 @@ export default class OpenAIAPIBot extends LangChainBot {
         },
       );
       if (subscription.data.access_until * 1000 < new Date().getTime()) {
-        console.log(
-          "You exceeded your current quota, please check your plan and billing details.",
-        );
         this.constructor._isAvailable = false;
+        return Promise.reject({
+          message:
+            "You exceeded your current quota, please check your plan and billing details.",
+          disable_open:true
+        });
       } else {
         const chatModel = new ChatOpenAI({
           configuration: {
-          basePath: store.state.openaiApi.alterUrl ? store.state.openaiApi.alterUrl : "",
+            basePath: store.state.openaiApi.alterUrl
+              ? store.state.openaiApi.alterUrl
+              : "",
           },
           openAIApiKey: store.state.openaiApi.apiKey,
           modelName: this.constructor._model ? this.constructor._model : "",

@@ -282,12 +282,13 @@ async function toggleSelected(bot) {
     if (bot.isAvailable()) {
       selected = true;
     } else {
+      let enable_open=true
       const availability = await bot.checkAvailability().catch((e) => {
-        return open_bot(bot);
+        enable_open=!e.disable_open
       });
       if (!availability) {
         selected = false;
-        open_bot(bot);
+        enable_open && open_bot(bot);
       } else {
         selected = true;
       }
