@@ -25,9 +25,6 @@
       <v-btn flat size="x-small" icon @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon>
       </v-btn>
-      <v-btn flat size="x-small" icon @click="evt=>copyToClipboard(evt,true)">
-        <v-icon>mdi-code-braces</v-icon>
-      </v-btn>
       <v-btn flat size="x-small" icon @click="hide">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
