@@ -77,7 +77,6 @@
                 }}</v-list-item-title>
                 <v-text-field
                   v-model="fontSize"
-                  label="Number Input"
                   type="number"
                   @update:model-value="setFontSize($event)"
                 ></v-text-field>
@@ -207,7 +206,7 @@ const fontSize = computed(() => {
 });
 watch(fontSize, async (newV, oldV) => {
   // debugger;
-  add_font_size(newV);
+    add_font_size(newV);
 });
 const currentMode = computed(() => store.state.mode);
 
@@ -231,14 +230,15 @@ const setRepliedLang = (enable) => {
   store.commit("enableRepliedLang", enable);
 };
 const setFontSize = (fontSize) => {
-  locale.fontSize = fontSize;
+  debugger;
   store.commit("setCurrentFontSize", fontSize);
+  add_font_size(fontSize);
 };
 add_font_size();
 function add_font_size(newV = fontSize.value) {
   const rule = `
   * {
-  font-size: ${newV}%!important;
+  font-size: ${newV}rem;
 }
   `;
   add_css(rule);
@@ -269,10 +269,5 @@ const closeDialog = () => {
 /* Keep the orignal case of tab names */
 .v-btn {
   text-transform: none !important;
-}
-</style>
-<style>
-:root {
-  font-size: 1rem!important;
 }
 </style>

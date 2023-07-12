@@ -21,7 +21,7 @@ export default createStore({
     enableScroll: true,
     prompt:'',
     enableRepliedLang: false,
-    fontSize: 100,
+    fontSize: 1,
     columns: 2,
     openaiApi: {
       apiKey: "",
@@ -158,7 +158,6 @@ export default createStore({
     },
     setCurrentFontSize(state, fontSize) {
       state.fontSize = fontSize;
-      i18n.global.locale = fontSize;
     },
     setChatgpt(state, refreshCycle) {
       state.chatgpt.refreshCycle = refreshCycle;
