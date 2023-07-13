@@ -10,6 +10,7 @@ export default class ChatGPT4Bot extends ChatGPTBot {
 
   constructor() {
     super();
+    this.is_gpt4=true
   }
 
   async confirmBeforeUsing(confirmModal) {
@@ -33,10 +34,10 @@ export default class ChatGPT4Bot extends ChatGPTBot {
   async checkAvailability() {
     const reserved = this.constructor._isAvailable; // To supress the availablity changing
     const isAvailable = await super.checkAvailability();
-    if (this.getClassname() == 'ChatGPTBrowsingBot') {
-      this.constructor._isAvailable = isAvailable;
-    }else if (isAvailable) {
-      this.constructor._isAvailable = reserved;
+    this.constructor._isAvailable = reserved;
+
+    if (isAvailable) {
+      if(this.is_gpt4){
       try {
         const headers = {
           "Content-Type": "application/json",
@@ -52,6 +53,10 @@ export default class ChatGPT4Bot extends ChatGPTBot {
       } catch (error) {
         console.error("Error fetching paid status:", error);
         this.constructor._isAvailable = false;
+      }
+    } else {
+        this.constructor._isAvailable = true;
+        
       }
     } else {
       this.constructor._isAvailable = false;
