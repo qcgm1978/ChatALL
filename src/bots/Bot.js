@@ -185,8 +185,8 @@ export default class Bot {
       ret.catch((err) => {
         console.warn(`Error send prompt to ${this.getFullname()}:`, err);
         onUpdateResponse(callbackParam, {
-          content: err.toString(),
-          done: true,
+        content: this.wrapCollapsedSection(err),
+        done: true,
         }); // Make sure stop loading
         if (error_callback) {
           error_callback(this);
@@ -242,5 +242,18 @@ export default class Bot {
       botClassname: this.getClassname(),
       context,
     });
+  }
+
+  wrapCollapsedSection(text) {
+    // replace line break with <br/>
+    text = text?.toString()?.replace(/[\r\n]+/g, "<br/>");
+    return `<details open>
+              <summary>Error</summary>
+              <pre class="error">${text}</pre>
+            </details>`;
+  }
+
+  getSSEDisplayError(event) {
+    return `${event?.source?.xhr?.status}\n${event?.source?.xhr?.response}`;
   }
 }

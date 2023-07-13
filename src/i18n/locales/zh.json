@@ -146,6 +146,9 @@
   "qianWen": {
     "name": "通义千问"
   },
+  "360AiBrain": {
+    "name": "360 智脑"
+  },
   "skyWork": {
     "name": "天工"
   },
@@ -161,7 +164,8 @@
     "name": "YouChat"
   },
   "pi": {
-    "name": "Pi"
+    "name": "Pi",
+    "waitPiIntro": "请点击下面的网站链接，等待Pi介绍完成后，然后关闭窗口。"
   },
   "dev": {
     "name": "开发专用 Bot"

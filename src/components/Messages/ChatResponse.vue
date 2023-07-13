@@ -524,4 +524,9 @@ function toggleReplyButton() {
 .v-btn {
   background-color: inherit;
 }
+
+:deep() pre.error {
+  max-height: 200px;
+  background-color: inherit;
+}
 </style>
