@@ -279,25 +279,20 @@ async function toggleSelected(bot) {
   if (activeBots[botClassname]) {
     selected = false;
   } else {
-    if (bot.isAvailable()) {
-      selected = true;
-    } else {
-      let enable_open=true
-      const availability = await bot.checkAvailability().catch((e) => {
-        enable_open=!e.disable_open
-      });
+    selected = true;
+    if (!bot.isAvailable()) {
+      const availability = await bot.checkAvailability();
       if (!availability) {
-        selected = false;
-        enable_open && open_bot(bot);
+        clickedBot.value = bot;
+        // Open the bot's settings dialog
+        isMakeAvailableOpen.value = true;
       } else {
-        selected = true;
+        updateActiveBots();
       }
     }
   }
   store.commit("setBotSelected", { botClassname, selected });
-  // updateActiveBots();
 }
-
 onBeforeMount(async () => {
   favBots.value.forEach(async (favBot) => {
     if (favBot.selected) {
