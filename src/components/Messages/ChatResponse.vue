@@ -527,6 +527,7 @@ function toggleReplyButton() {
 
 :deep() pre.error {
   max-height: 200px;
+  white-space: inherit;
   background-color: inherit;
 }
 </style>
