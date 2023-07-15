@@ -321,6 +321,10 @@ onMounted(() => {
 
 let sortable = undefined;
 function open_bot(bot) {
+  const disable_open_bots = ['YouChatBot'];
+  if (disable_open_bots.includes(bot.getClassname())) {
+    return;
+  }
   clickedBot.value = bot;
   isMakeAvailableOpen.value = true;
 }

@@ -253,14 +253,15 @@ export default class Bot {
             </details>`;
   }
 
-  getSSEDisplayError(event) {
+  getSSEDisplayError(event,content='') {
     if (event?.source?.xhr?.getResponseHeader("cf-mitigated") === "challenge") {
       // if encounter Cloudflare challenge page, prompt user to open link and solve challenge
       return `${i18n.global.t(
         "error.solveChallenge",
       )}\n${this.getLoginHyperlink()}`;
     }
-    return `${event?.source?.xhr?.status}\n${event?.source?.xhr?.response}`;
+    let s = content ? `${content}\n` : '';
+    return `${s}${event?.source?.xhr?.status}\n${event?.source?.xhr?.response}`;
   }
 
   getLoginHyperlink() {

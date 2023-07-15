@@ -38,6 +38,11 @@ export default class YouChatBot extends Bot {
     const headers = {
       accept: "text/event-stream",
     };
+    const p = this.get_promise(prompt, context, headers, onUpdateResponse, callbackParam);
+    return p;
+  }
+
+  get_promise(prompt, context, headers, onUpdateResponse, callbackParam) {
     const payload = {
       q: prompt,
       domain: "youchat",
@@ -45,16 +50,16 @@ export default class YouChatBot extends Bot {
       queryTraceId: context.chatId,
       chat: JSON.stringify(context.chatHistory),
     };
-    return new Promise((resolve, reject) => {
+    const p = new Promise((resolve, reject) => {
       try {
         const source = new SSE(
           `https://you.com/api/streamingSearch?${queryString.stringify(
-            payload,
+            payload
           )}`,
           {
             headers,
             withCredentials: true,
-          },
+          }
         );
         let text = "";
         source.addEventListener("youChatToken", (event) => {
@@ -87,13 +92,18 @@ export default class YouChatBot extends Bot {
         });
         source.addEventListener("error", (event) => {
           console.error(event);
-          reject(this.getSSEDisplayError(event));
+          if (event?.source?.xhr?.status == 414 && context.chatHistory.length) {
+            context.chatHistory.shift();
+            resolve(this.get_promise(prompt, context, headers, onUpdateResponse, callbackParam))
+          }
+          reject(this.getSSEDisplayError(event,text));
         });
         source.stream();
       } catch (err) {
         reject(err);
       }
     });
+    return p;
   }
 
   /**
