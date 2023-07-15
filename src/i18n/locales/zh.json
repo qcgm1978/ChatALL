@@ -35,8 +35,10 @@
     "promptPlaceholder": "输入消息。（Shift+Enter 换行）"
   },
   "error": {
+    "error": "错误",
     "failedConnectUrl": "连接 { url } 失败",
-    "closedByServer": "连接被服务器关闭"
+    "closedByServer": "连接被服务器关闭",
+    "solveChallenge": "请点击下方链接，按页面指示完成质询 / 验证码，然后关闭窗口。"
   },
   "modal": {
     "confirmHide": "删除这条消息？",
@@ -168,6 +170,10 @@
   "pi": {
     "name": "Pi",
     "waitPiIntro": "请点击下面的网站链接，等待Pi介绍完成后，然后关闭窗口。"
+  },
+  "openAssistant": {
+    "name": "Open Assistant",
+    "queue": "当前有 { queue_size } 个请求在队列中，你在第 { queue_position } 位"
   },
   "dev": {
     "name": "开发专用 Bot"

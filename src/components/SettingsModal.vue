@@ -145,6 +145,7 @@ import SkyWorkBotSettings from "@/components/BotSettings/SkyWorkBotSettings.vue"
 import YouChatBotSettings from "@/components/BotSettings/YouChatBotSettings.vue";
 import PiBotSettings from "@/components/BotSettings/PiBotSettings.vue";
 import Qihoo360AIBrainBotSettings from "./BotSettings/Qihoo360AIBrainBotSettings.vue";
+import OpenAssistantBotSettings from "./BotSettings/OpenAssistantBotSettings.vue";
 
 import { resolveTheme, applyTheme, Mode } from "../theme";
 
@@ -169,6 +170,7 @@ const botSettings = [
   { brand: "lmsys", component: LMSYSBotSettings },
   { brand: "moss", component: MOSSBotSettings },
   { brand: "openaiApi", component: OpenAIAPIBotSettings },
+  { brand: "openAssistant", component: OpenAssistantBotSettings },
   { brand: "pi", component: PiBotSettings },
   { brand: "poe", component: PoeBotSettings },
   { brand: "qianWen", component: QianWenBotSettings },
