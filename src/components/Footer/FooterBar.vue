@@ -223,7 +223,7 @@ function filterEnterKey(event) {
     promptTextArea.value.menu = false;
     shortkey_disabled.value = false;
     event.preventDefault();
-    sendPromptToBots(event);
+    sendPromptToBots();
   }
 }
 function input_prompt(event) {
@@ -238,7 +238,7 @@ function adaptColumns(num) {
   props.changeColumns(num >= 3 ? 3 : num);
 }
 
-function sendPromptToBots(event) {
+function sendPromptToBots() {
   if (prompt.value.trim() === "") return;
 
   const toBots = favBots.value
@@ -251,7 +251,7 @@ function sendPromptToBots(event) {
     ? `${prompt.value}. Replied by ${store.state.langName}`
     : prompt.value;
   const isFirstPrompt = store.getters.currentChat.messages.length === 0;
-  store
+  return store
     .dispatch("sendPrompt", {
       prompt: val,
       bots: toBots,
@@ -303,6 +303,12 @@ onBeforeMount(async () => {
   });
 
   // Listen message trigged by main process
+  ipcRenderer.on("SEND-PROMPT", async (event, data) => {
+    prompt.value = data;
+    await sendPromptToBots();
+    debugger;
+    return localStorage
+  });
   ipcRenderer.on("CHECK-AVAILABILITY", async (event, url) => {
     const activeClassnames = Object.keys(activeBots);
     const botsToCheck = bots.value

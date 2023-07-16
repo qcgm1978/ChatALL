@@ -226,6 +226,7 @@
     "resetAllMessage": "所有代理的配置（包括已保存的）都会丢失。确定重置到默认状态吗？",
     "reloadMessage": "所有未经保存的设置都会丢失。确定重新加载配置文件吗？",
     "saveAndActiveMessage": "应用代理需要重启 ChatALL。确定重启吗？",
-    "googleService": "谷歌各种资源"
+    "googleService": "谷歌各种资源",
+    "openAssistant": "open-assistant"
   }
 }

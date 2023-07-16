@@ -212,6 +212,10 @@ const bots = ref([
     name: i18n.global.t("proxy.googleService"),
     bypassList: "*.google.com",
   },
+  {
+    name: i18n.global.t("proxy.openAssistant"),
+    bypassList: "*.open-assistant.io",
+  },
 ]);
 const botsProxy = ref([]);
 const newInputfile = ref("");

@@ -13,8 +13,24 @@ import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
 import fs from "fs";
 import path from "path";
 const Store = require("electron-store");
-import { save_localStorage } from "./save";
 import updateApp from "./update";
+const server = require('http').createServer()
+
+server.on('request', (req, res) => {
+  debugger;
+  req.on('data', async (data) => {
+    const body = JSON.parse(data);
+    debugger;
+    const question = `${body.prompt}:${body.data}`;
+    const ret=await mainWindow.webContents.send("SEND-PROMPT", question);
+    return ret;
+  });
+  // 处理请求 ...
+})
+
+server.listen(8000, () => {
+  console.log('HTTP server is running on port 8000!')
+})
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const DEFAULT_USER_AGENT = ""; // Empty string to use the Electron default
@@ -66,6 +82,7 @@ async function getProxySetting() {
       // Check the proxySetting file, if some key is missing, write it back to the file
       let isChanged = false;
       for (let key in defaultProxySetting) {
+        // eslint-disable-next-line no-prototype-builtins
         if (!proxySetting.hasOwnProperty(key)) {
           proxySetting[key] = defaultProxySetting[key];
           isChanged = true;

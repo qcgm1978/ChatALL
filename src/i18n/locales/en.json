@@ -225,6 +225,7 @@
     "resetAllMessage": "All settings (include saved) will be lost. Are you sure to reset to default?",
     "reloadMessage": "All settings without save will be lost. Are you sure to reload configure file?",
     "saveAndActiveMessage": "Apply the proxy configuration will restart ChatALL. Are you sure?",
-    "googleService": "Google Service"
+    "googleService": "Google Service",
+    "openAssistant": "open-assistant"
   }
 }
