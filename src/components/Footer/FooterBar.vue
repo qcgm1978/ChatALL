@@ -106,7 +106,7 @@ const store = useStore();
 const customPhrases = [
   "以下翻译为英语",
   "以下翻译为简体中文",
-  '以下数据提取歌曲和歌手名称，构建list，元素为"歌曲名（歌手）"，用双引号，元素里面的繁体字转为简体字',
+  '以下数据提取歌曲和歌手名称，构建list json，使用这样的格式：["歌曲名（歌手名）",...]. ',
 ].map((d, i) => ({ name: `/${d}：`, ind: i }));
 const history_prompts = get_prompts();
 const autocompleteItems = ref([]);
