@@ -26,21 +26,74 @@ const emit = defineEmits(["close-dialog"]);
 const confirmModal = ref();
 const store = useStore();
 
+// This function downloads the chat history as a JSON file.
 const downloadJson = () => {
-  const to_save = JSON.parse(localStorage["chatall-messages"]).chats.map((d) =>
-    d.messages.map((t) => ({ type: t.type, content: t.content })),
-  );
-  const blob = new Blob([JSON.stringify(to_save)], { type: "application/json" });
+  // Get the chat history from localStorage.
+  const chatallMessages = localStorage.getItem("chatall-messages");
+  if (!chatallMessages) {
+    console.error("chatall-messages not found in localStorage");
+    return;
+  }
+
+  const chats = JSON.parse(chatallMessages)?.chats ?? [];
+
+  // Create an array of messages from the chat history.
+  const messages = chats
+    .filter((d) => !d.hide)
+    .map((chat) => ({
+      // The title of the chat.
+      title: chat.title,
+      // The messages in the chat.
+      messages: chat.messages
+        .filter((d) => !d.hide)
+        .reduce((arr, message) => {
+          const t = message.type;
+          const content = message.content;
+          if (t == "prompt") {
+            arr.push({
+              prompt: content,
+              responses: [],
+            });
+          } else {
+            arr.at(-1).responses.push({
+              content,
+              botClassname: message.className,
+              botModelName: message.model,
+              highlighted: message.highlight,
+            });
+          }
+          return arr;
+        }, []),
+    }));
+
+  // Create a blob that contains the JSON data.
+  // The space parameter specifies the indentation of nested objects in the string representation.
+  const blob = new Blob([JSON.stringify(messages, null, 2)], {
+    // The type of the blob.
+    type: "application/json",
+  });
+
   const url = URL.createObjectURL(blob);
+
+  // Create a file name for the JSON file.
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based in JavaScript
+  const day = String(date.getDate()).padStart(2, "0");
+  const fileName = `chatall-history-${year}${month}${day}`;
+
   const a = document.createElement("a");
   a.href = url;
-  const file_name = `chatall-history-${new Date()
-    .toLocaleDateString()
-    .replace(/\//g, "")}`;
-  a.download = `${file_name}.json`;
+  a.download = `${fileName}.json`;
   document.body.appendChild(a);
+
+  // Click the anchor element to download the file.
   a.click();
+
+  // Remove the anchor element from the document body.
   document.body.removeChild(a);
+
+  // Revoke the URL for the blob.
   URL.revokeObjectURL(url);
 };
 async function deleteChats() {
