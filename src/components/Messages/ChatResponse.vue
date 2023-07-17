@@ -10,7 +10,11 @@
     :flat="props.isThread"
   >
     <v-card-title class="title">
-      <img :src="botLogo" alt="Bot Icon" />
+      <img
+        :src="botLogo"
+        :class="{ invert: isBotLogoInverted }"
+        :alt="botFullname"
+      />
       {{ botFullname }}
       <v-spacer></v-spacer>
       <v-btn
@@ -96,6 +100,7 @@
           flat
           icon
           size="x-small"
+          v-if="!(!isShowResendButton && !isShowReplyButton)"
           :style="{ visibility: isShowResendButton ? 'visible' : 'hidden' }"
           @click="resendPrompt(messages[0])"
         >
@@ -105,6 +110,7 @@
           flat
           icon
           size="x-small"
+          v-if="!(!isShowResendButton && !isShowReplyButton)"
           :style="{ visibility: isShowReplyButton ? 'visible' : 'hidden' }"
           :color="isShowReplyTextField ? 'primary' : ''"
           @click="toggleReplyButton"
@@ -154,6 +160,7 @@ import i18n from "@/i18n";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import ChatThread from "./ChatThread.vue";
 import bots from "@/bots";
+import { Theme } from "@/theme";
 
 const props = defineProps({
   messages: {
@@ -184,15 +191,20 @@ const replyRef = ref();
 const maxPage = computed(() => props.messages.length - 1);
 const carouselModel = ref(maxPage.value);
 const confirmModal = ref(null);
+const botInstance = computed(() => {
+  return bots.getBotByClassName(props.messages[0].className);
+});
 
 const botLogo = computed(() => {
-  const bot = bots.getBotByClassName(props.messages[0].className);
-  return bot ? bot.getLogo() : "";
+  return botInstance.value ? botInstance.value.getLogo() : "";
 });
 
 const botFullname = computed(() => {
-  const bot = bots.getBotByClassName(props.messages[0].className);
-  return bot ? bot.getFullname() : "";
+  return botInstance.value ? botInstance.value.getFullname() : "";
+});
+
+const isBotLogoInverted = computed(() => {
+  return store.state.theme === Theme.DARK && botInstance.value?.isDarkLogo();
 });
 
 const isHighlighted = computed(() => props.messages[maxPage.value].highlight); // if last response is hightlighted, return true
@@ -286,13 +298,11 @@ function filterEnterKey(event) {
 function sendPromptToBot() {
   if (replyModel.value.trim() === "") return;
 
-  const botInstance = bots.getBotByClassName(props.messages[0].className);
-
   store.dispatch("sendPromptInThread", {
     responseIndex: props.messages[maxPage.value].index, // always send prompt in thread to last page
     threadIndex: props.messages[carouselModel.value].threadIndex,
     prompt: replyModel.value,
-    bot: botInstance,
+    bot: botInstance.value,
   });
 
   carouselModel.value = maxPage.value; // move to last page
@@ -435,10 +445,9 @@ function resendPrompt(responseMessage) {
         responseMessage.promptIndex
       ];
     if (promptMessage) {
-      const botInstance = bots.getBotByClassName(responseMessage.className);
       store.dispatch("sendPromptInThread", {
         prompt: promptMessage.content,
-        bot: botInstance,
+        bot: botInstance.value,
         promptIndex: responseMessage.promptIndex,
         responseIndex: responseMessage.index,
         threadIndex: props.threadIndex,
@@ -450,10 +459,9 @@ function resendPrompt(responseMessage) {
     const promptMessage =
       store.getters.currentChat.messages[responseMessage.promptIndex];
     if (promptMessage) {
-      const botInstance = bots.getBotByClassName(responseMessage.className);
       store.dispatch("sendPrompt", {
         prompt: promptMessage.content,
-        bots: [botInstance],
+        bots: [botInstance.value],
         promptIndex: responseMessage.promptIndex,
       });
     } else {
@@ -530,6 +538,7 @@ function toggleReplyButton() {
   width: 20px;
   height: 20px;
   margin-right: 4px;
+  border-radius: 4px;
 }
 
 .v-btn {
@@ -549,5 +558,9 @@ function toggleReplyButton() {
     
 .response:hover .hide-btn, .response-thread:hover .hide-thread-btn {
   opacity: 1;
+}
+
+.invert{
+  filter: invert(100%);
 }
 </style>
