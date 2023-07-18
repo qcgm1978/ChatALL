@@ -22,7 +22,7 @@
       variant="outlined"
       :text="$t('chat.backupToLocal')"
       @click="downloadDataJson"
-      style="margin: 10px"
+      style="margin: 10px;float: left;"
     ></v-btn>
     <!-- <pre v-if="jsonData">{{ jsonData }}</pre> -->
     <v-file-input
@@ -30,7 +30,7 @@
       variant="outlined"
       :label="$t('chat.restoreFromLocal')"
       @change="readJson"
-      style="margin: 10px"
+      style="width:400px;"
     ></v-file-input>
   </v-list-item>
   <ConfirmModal ref="confirmModal" />
