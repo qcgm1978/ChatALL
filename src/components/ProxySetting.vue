@@ -284,7 +284,7 @@ async function saveAndActive() {
   );
   if (result) {
     await onlySave();
-    await ipcRenderer.invoke("save-proxy-and-restart");
+    await ipcRenderer.invoke("restart-app");
   }
 }
 

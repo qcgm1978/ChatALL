@@ -14,23 +14,23 @@ import fs from "fs";
 import path from "path";
 const Store = require("electron-store");
 import updateApp from "./update";
-const server = require('http').createServer()
+const server = require("http").createServer();
 
-server.on('request', (req, res) => {
+server.on("request", (req, res) => {
   debugger;
-  req.on('data', async (data) => {
+  req.on("data", async (data) => {
     const body = JSON.parse(data);
     debugger;
     const question = `${body.prompt}:${body.data}`;
-    const ret=await mainWindow.webContents.send("SEND-PROMPT", question);
+    const ret = await mainWindow.webContents.send("SEND-PROMPT", question);
     return ret;
   });
   // 处理请求 ...
-})
+});
 
 server.listen(8000, () => {
-  console.log('HTTP server is running on port 8000!')
-})
+  console.log("HTTP server is running on port 8000!");
+});
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const DEFAULT_USER_AGENT = ""; // Empty string to use the Electron default
@@ -343,7 +343,7 @@ ipcMain.handle("save-proxy-setting", async (event, args) => {
   });
 });
 
-ipcMain.handle("save-proxy-and-restart", async (event) => {
+ipcMain.handle("restart-app", async (event) => {
   app.relaunch();
   app.exit();
   return "";

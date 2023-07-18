@@ -13,6 +13,21 @@
       @click="downloadJson"
       style="margin-left: 10px"
     ></v-btn>
+    <v-btn
+      color="primary"
+      variant="outlined"
+      :text="$t('chat.backupToLocal')"
+      @click="downloadDataJson"
+      style="margin-left: 10px"
+    ></v-btn>
+    <!-- <pre v-if="jsonData">{{ jsonData }}</pre> -->
+    <v-file-input
+      color="primary"
+      variant="outlined"
+      :label="$t('chat.restoreFromLocal')"
+      @change="readJson"
+      style="margin-top: 10px"
+    ></v-file-input>
   </v-list-item>
   <ConfirmModal ref="confirmModal" />
 </template>
@@ -21,11 +36,33 @@
 import { ref } from "vue";
 import { useStore } from "vuex";
 import i18n from "@/i18n";
+const electron = window.require("electron");
+const ipcRenderer = electron.ipcRenderer;
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import bots from "@/bots";
 const emit = defineEmits(["close-dialog"]);
 const confirmModal = ref();
 const store = useStore();
+const file_data = ref(null);
+const jsonData = ref(null);
+
+const readJson = async (event) => {
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const value = JSON.parse(evt.target.result);
+    jsonData.value = value;
+    reload(value);
+  };
+  reader.readAsText(event.target.files[0]);
+};
+async function reload(value) {
+  const load = i18n.global.t("proxy.saveAndApply");
+  const result = await confirmModal.value.showModal("", `${load}?`);
+  if (result) {
+    Object.keys(value).map((d) => (localStorage[d] = value[d]));
+    await ipcRenderer.invoke("restart-app");
+  }
+}
 
 // This function downloads the chat history as a JSON file.
 const downloadJson = () => {
@@ -62,15 +99,28 @@ const downloadJson = () => {
               content,
               botName,
               botModel: message.model,
-              highlight: message.highlight
+              highlight: message.highlight,
             });
           }
           return arr;
         }, []),
     }));
-
-  // Create a blob that contains the JSON data.
-  // The space parameter specifies the indentation of nested objects in the string representation.
+  const content = "history";
+  download_by_link(messages, content);
+};
+const downloadDataJson = () => {
+  const content = "data";
+  const messages = localStorage;
+  download_by_link(messages, content);
+};
+const restoreFromLocal = () => {
+  const content = "data";
+  const messages = localStorage;
+  download_by_link(messages, content);
+};
+// Create a blob that contains the JSON data.
+// The space parameter specifies the indentation of nested objects in the string representation.
+function download_by_link(messages, content) {
   const blob = new Blob([JSON.stringify(messages, null, 2)], {
     // The type of the blob.
     type: "application/json",
@@ -83,7 +133,7 @@ const downloadJson = () => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based in JavaScript
   const day = String(date.getDate()).padStart(2, "0");
-  const fileName = `chatall-history-${year}${month}${day}`;
+  const fileName = `chatall-${content}-${year}${month}${day}`;
 
   const a = document.createElement("a");
   a.href = url;
@@ -98,7 +148,8 @@ const downloadJson = () => {
 
   // Revoke the URL for the blob.
   URL.revokeObjectURL(url);
-};
+}
+
 async function deleteChats() {
   const confirm = await confirmModal.value.showModal(
     "",
