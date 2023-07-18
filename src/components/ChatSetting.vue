@@ -1,5 +1,6 @@
 <template>
   <v-list-item>
+    <v-list-item-title>{{ $t("chat.name") }}</v-list-item-title>
     <v-btn
       color="primary"
       variant="outlined"
@@ -11,14 +12,17 @@
       variant="outlined"
       :text="$t('chat.downloadAllChatHistory')"
       @click="downloadJson"
-      style="margin-left: 10px"
+      style="margin: 10px"
     ></v-btn>
+  </v-list-item>
+  <v-list-item>
+    <v-list-item-title>{{ $t("proxy.fullSet") }}</v-list-item-title>
     <v-btn
       color="primary"
       variant="outlined"
       :text="$t('chat.backupToLocal')"
       @click="downloadDataJson"
-      style="margin-left: 10px"
+      style="margin: 10px"
     ></v-btn>
     <!-- <pre v-if="jsonData">{{ jsonData }}</pre> -->
     <v-file-input
@@ -26,7 +30,7 @@
       variant="outlined"
       :label="$t('chat.restoreFromLocal')"
       @change="readJson"
-      style="margin-top: 10px"
+      style="margin: 10px"
     ></v-file-input>
   </v-list-item>
   <ConfirmModal ref="confirmModal" />
