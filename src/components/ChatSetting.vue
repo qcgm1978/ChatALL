@@ -126,7 +126,7 @@ const restoreFromLocal = () => {
 };
 // Create a blob that contains the JSON data.
 // The space parameter specifies the indentation of nested objects in the string representation.
-function download_by_link(messages, content) {
+function download_by_link(messages, name) {
   const blob = new Blob([JSON.stringify(messages, null, 2)], {
     // The type of the blob.
     type: "application/json",
@@ -142,7 +142,7 @@ function download_by_link(messages, content) {
   const hour = String(date.getHours()).padStart(2, "0");
   const minute = String(date.getMinutes()).padStart(2, "0");
   const second = String(date.getSeconds()).padStart(2, "0");
-  const fileName = `chatall-history-${year}${month}${day}-${hour}${minute}${second}`;
+  const fileName = `chatall-${name}-${year}${month}${day}-${hour}${minute}${second}`;
 
   const a = document.createElement("a");
   a.href = url;
