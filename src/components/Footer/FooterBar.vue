@@ -393,8 +393,8 @@ defineExpose({
 
 <style scoped>
 .footer {
-  background-color: transparent !important;
-  height: auto !important;
+  background-color: rgb(var(--v-theme-background));
+  height: auto!important;
   display: flex;
   align-items: center !important;
   justify-content: space-between;
@@ -408,13 +408,12 @@ defineExpose({
 .bot-logos {
   display: flex;
   flex-wrap: wrap;
-  height: 60px;
-  overflow: scroll;
+  height: 40px!important;
+  overflow: scroll!important;
   gap: 4px;
   align-items: center;
   padding-bottom: 0.5rem;
   overflow: hidden;
-  height: 40px;
   margin: auto;
 }
 
