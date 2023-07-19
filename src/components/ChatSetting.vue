@@ -142,7 +142,7 @@ function download_by_link(messages, content) {
   const hour = String(date.getHours()).padStart(2, "0");
   const minute = String(date.getMinutes()).padStart(2, "0");
   const second = String(date.getSeconds()).padStart(2, "0");
-  const fileName = `chatall-history-${year}${month}${day}-${hour}-${minute}-${second}`;
+  const fileName = `chatall-history-${year}${month}${day}-${hour}${minute}${second}`;
 
   const a = document.createElement("a");
   a.href = url;
