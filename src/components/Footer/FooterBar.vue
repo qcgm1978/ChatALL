@@ -408,6 +408,8 @@ defineExpose({
 .bot-logos {
   display: flex;
   flex-wrap: wrap;
+  height: 60px;
+  overflow: scroll;
   gap: 4px;
   align-items: center;
   padding-bottom: 0.5rem;
