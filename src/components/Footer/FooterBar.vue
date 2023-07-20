@@ -439,7 +439,7 @@ defineExpose({
   display: flex;
   flex-wrap: wrap;
   height: 40px;
-  overflow: scroll;
+  overflow: scroll!important;
   gap: 4px;
   align-items: center;
   padding-bottom: 0.5rem;
