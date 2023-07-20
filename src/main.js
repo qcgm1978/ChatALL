@@ -45,12 +45,12 @@ store.commit("setTheme", defaultTheme);
 applyTheme(defaultTheme);
 
 const vuetify = createVuetify({
+  components: { ...components, VDataTable },
+  directives,
   locale: {
     adapter: process.env.NODE_ENV !== 'development' && createVueI18nAdapter({ i18n, useI18n }),
   },
   
-  components,
-  directives,
   theme: {
     defaultTheme: defaultTheme,
     themes: {
