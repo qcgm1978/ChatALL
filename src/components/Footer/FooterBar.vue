@@ -17,13 +17,10 @@
     >
       <v-autocomplete
         :id="SHORTCUT_PROMPT_TEXTAREA.elementId"
+        v-model="prompt"
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
-        allow-input
-        clearable
-        :hide-no-data="true"
-        :persistent-hint="true"
         ref="promptTextArea"
         auto-grow
         max-rows="8.5"
@@ -33,8 +30,8 @@
         variant="solo"
         :placeholder="$t('footer.promptPlaceholder')"
         autofocus
+        @update:search="update_prompt"
         @keydown="filterEnterKey"
-        @input="input_prompt"
         style="min-width: 390px"
       >
         {{ prompt }}
@@ -55,7 +52,7 @@
         elevation="2"
         :disabled="
           !prompt ||
-          !prompt.trim() ||
+          prompt.trim() === '' ||
           favBots.filter((favBot) => activeBots[favBot.classname]).length === 0
         "
         @click="sendPromptToBots"
@@ -131,26 +128,7 @@ const customPhrases = [
   "以下翻译为简体中文",
   '以下数据提取歌曲和歌手名称，构建list json，使用这样的格式：["歌曲名（歌手名）",...]. ',
 ].map((d, i) => ({ name: `/${d}：`, ind: i }));
-const history_prompts = get_prompts();
-const autocompleteItems = ref([]);
-function get_prompts() {
-  const messages = store.getters.currentChat.messages.filter(
-    (message) => !message.hide,
-  );
-  const items = messages
-    .filter((d) => d.type == "prompt")
-    .map((d, i) => ({ name: d.content, ind: d.content }));
-  const its = setByProp(items, "name");
-  return its;
-}
 
-function setByProp(data, p) {
-  let ps = p instanceof Array ? p : [p];
-  return data.filter(
-    (value, index, self) =>
-      index === self.findIndex((t) => ps.every((p) => t[p] === value[p])),
-  );
-}
 const props = defineProps(["changeColumns"]);
 
 const confirmModal = ref(null);
@@ -159,6 +137,26 @@ const botsMenuRef = ref(null);
 const favBotLogosRef = ref();
 const isPromptManagementOpen = ref(false);
 
+const autocompleteItems = get_prompts();
+function get_prompts() {
+  const messages = store.getters.currentChat.messages;
+  const items = messages
+    .filter((d) => d.type == "prompt")
+    .map((d) => ({ name: d.content, ind: d.content }));
+  // avoid show multi same prompts
+  const its = setByProp(items, "name");
+  return its;
+}
+function setByProp(data, p) {
+  let ps = p instanceof Array ? p : [p];
+  return data.filter(
+    (value, index, self) =>
+      index === self.findIndex((t) => ps.every((p) => t[p] === value[p])),
+  );
+}
+function update_prompt(value) {
+  prompt.value = value;
+}
 const bots = ref(_bots.all);
 const activeBots = reactive({});
 const rerenderFavBotLogos = ref(0);
@@ -244,18 +242,11 @@ function filterEnterKey(event) {
     !event.altKey &&
     !event.metaKey
   ) {
+    // close autocomplete menu
     promptTextArea.value.menu = false;
-    shortkey_disabled.value = false;
     event.preventDefault();
     sendPromptToBots();
   }
-}
-function input_prompt(event) {
-  const value = event.target.value;
-  autocompleteItems.value = value.startsWith("/")
-    ? customPhrases
-    : history_prompts;
-  prompt.value = value;
 }
 
 function adaptColumns(num) {
@@ -291,7 +282,9 @@ function sendPromptToBots() {
         } else {
           // Clear the textarea after sending the prompt
           prompt.value = "";
-          // event.target.value = '';
+          // clear prompt hack
+          promptTextArea.value.blur();
+          promptTextArea.value.focus();
         }
       });
     });
@@ -483,5 +476,15 @@ span.v-autocomplete__mask {
 
 :deep() .v-field__append-inner{
   padding-top: 0;
+}
+</style>
+<style>
+/* set autocomplete selected text bg color in menu */
+span.v-autocomplete__mask {
+  background: yellowgreen;
+}
+/* Hide the autocomplete drop down menu button. */
+i.v-autocomplete__menu-icon {
+    display: none;
 }
 </style>
