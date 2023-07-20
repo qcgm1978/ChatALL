@@ -38,6 +38,17 @@
         style="min-width: 390px"
       >
         {{ prompt }}
+        <template v-slot:append-inner>
+          <v-btn
+            :id="SHORTCUT_PROMPT_MANAGEMENT.elementId"
+            @click="isPromptManagementOpen = !isPromptManagementOpen"
+            color="primary"
+            variant="plain"
+            class="h-100 w-100"
+            style="border-radius: 4px; min-width: unset !important"
+            icon="mdi-creation-outline"
+          ></v-btn>
+        </template>
       </v-autocomplete>
       <v-btn
         class="send-prompt-btn"
@@ -74,6 +85,12 @@
     </div>
     <MakeAvailableModal v-model:open="isMakeAvailableOpen" :bot="clickedBot" />
     <ConfirmModal ref="confirmModal" />
+    <PromptModal
+      v-shortkey="SHORTCUT_PROMPT_MANAGEMENT.key"
+      @shortkey="isPromptManagementOpen = !isPromptManagementOpen"
+      v-model:open="isPromptManagementOpen"
+      @after-leave="usePrompt"
+    ></PromptModal>
   </v-bottom-navigation>
 </template>
 
@@ -95,12 +112,18 @@ import MakeAvailableModal from "@/components/MakeAvailableModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import BotLogo from "./BotLogo.vue";
 import BotsMenu from "./BotsMenu.vue";
+import PromptModal from "@/components/PromptModal.vue";
+
+// Composables
+import { useMatomo } from "@/composables/matomo";
+
+import _bots from "@/bots";
 import {
   SHORTCUT_PROMPT_TEXTAREA,
+  SHORTCUT_PROMPT_MANAGEMENT,
   SHORTCUT_BOTS_MENU,
 } from "./../ShortcutGuide/shortcut.const";
 
-import _bots from "@/bots";
 const { ipcRenderer } = window.require("electron");
 const store = useStore();
 const customPhrases = [
@@ -134,6 +157,7 @@ const confirmModal = ref(null);
 const promptTextArea = ref(null);
 const botsMenuRef = ref(null);
 const favBotLogosRef = ref();
+const isPromptManagementOpen = ref(false);
 
 const bots = ref(_bots.all);
 const activeBots = reactive({});
@@ -386,6 +410,12 @@ function updateChatTitleWithFirstPrompt(isFirstPrompt) {
   }
 }
 
+async function usePrompt(value) {
+  await nextTick();
+  focusPromptTextarea();
+  document.execCommand("insertText", false, value);
+}
+
 defineExpose({
   focusPromptTextarea,
 });
@@ -408,8 +438,8 @@ defineExpose({
 .bot-logos {
   display: flex;
   flex-wrap: wrap;
-  height: 40px!important;
-  overflow: scroll!important;
+  height: 40px;
+  overflow: scroll;
   gap: 4px;
   align-items: center;
   padding-bottom: 0.5rem;
@@ -445,5 +475,13 @@ textarea::placeholder {
 <style>
 span.v-autocomplete__mask {
   background: yellowgreen;
+}
+
+:deep() .v-field.v-field--appended{
+  padding-right: 0;
+}
+
+:deep() .v-field__append-inner{
+  padding-top: 0;
 }
 </style>

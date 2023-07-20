@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import VuexPersist from "vuex-persist";
 import i18n from "@/i18n";
 import messagesPersist from "./messagesPersist";
+import promptsPersist from "./promptsPersist";
 
 let isThrottle = false;
 let messageBuffer = [];
@@ -11,7 +12,8 @@ const vuexPersist = new VuexPersist({
   storage: window.localStorage, // 使用 localStorage，你还可以选择其他存储方式，如 sessionStorage
   reducer: (state) => {
     // eslint-disable-next-line
-    const { messages, chats, updateCounter, ...persistedState } = state;
+    const { messages, chats, prompts, updateCounter, ...persistedState } =
+      state;
     return persistedState;
   },
 });
@@ -100,6 +102,7 @@ export default createStore({
     // TODO: delete following fields
     selectedBots: null,
     messages: [],
+    prompts: [],
   },
   mutations: {
     changeColumns(state, n) {
@@ -338,6 +341,17 @@ export default createStore({
       state.chats = newChats;
       state.currentChatIndex = 0;
     },
+    addPrompt(state, values) {
+      const addPrompt = { ...values };
+      addPrompt.index = state.prompts.push(addPrompt) - 1;
+    },
+    editPrompt(state, values) {
+      const { index } = values;
+      state.prompts[index] = { ...state.prompts[index], ...values };
+    },
+    deletePrompt(state, values) {
+      state.prompts[values.index].hide = true;
+    },
   },
   actions: {
     sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex, error_callback }) {
@@ -496,5 +510,5 @@ export default createStore({
   modules: {
     // ...你的模块
   },
-  plugins: [vuexPersist.plugin, messagesPersist.plugin], // 添加插件到 store
+  plugins: [vuexPersist.plugin, messagesPersist.plugin, promptsPersist.plugin], // 添加插件到 store
 });
