@@ -21,6 +21,7 @@
         :items="autocompleteItems"
         item-title="name"
         item-value="ind"
+        :hide-no-data="true"
         ref="promptTextArea"
         auto-grow
         max-rows="8.5"
