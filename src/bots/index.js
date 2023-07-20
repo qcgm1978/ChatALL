@@ -17,7 +17,6 @@ import VicunaBot from "@/bots/lmsys/VicunaBot";
 import ChatGLMBot from "@/bots/lmsys/ChatGLMBot";
 import AlpacaBot from "@/bots/lmsys/AlpacaBot";
 import ClaudeBot from "@/bots/lmsys/ClaudeBot";
-import ClaudeInSlackBot from "@/bots/ClaudeInSlackBot";
 import DevBot from "@/bots/DevBot";
 import GradioAppBot from "@/bots/huggingface/GradioAppBot";
 import HuggingChatBot from "@/bots/huggingface/HuggingChatBot";
@@ -68,7 +67,6 @@ const all = [
   OpenAIAPI35Bot.getInstance(),
   OpenAIAPI3516KBot.getInstance(),
   OpenAIAPI4Bot.getInstance(),
-  ClaudeInSlackBot.getInstance(), 
   AzureOpenAIAPIBot.getInstance(),
   OpenAssistantBot.getInstance(),
   PiBot.getInstance(),
