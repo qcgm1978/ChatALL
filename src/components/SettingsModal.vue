@@ -207,7 +207,6 @@ const modes = computed(() => [
 ]);
 
 const lang = computed(() => store.state.lang);
-const enableScroll = computed(() => store.state.enableScroll);
 const enableRepliedLang = ref(store.state.enableRepliedLang);
 const fontSize = computed(() => {
   return store.state.fontSize;
@@ -228,6 +227,7 @@ const setCurrentLanguage = (lan = lang.value) => {
   store.commit("setCurrentLanguage", lan);
   store.commit("setCurrentLanguageName", name);
 };
+const enableScroll = computed(() => store.state.enableScroll);
 const setCurrentScroll = (scroll) => {
   locale.enableScroll = scroll;
   store.commit("setCurrentScroll", scroll);
@@ -236,7 +236,7 @@ const setRepliedLang = (enable) => {
   setCurrentLanguage();
   locale.enableRepliedLang = enable;
   store.commit("enableRepliedLang", enable);
-};
+}
 const setFontSize = (fontSize) => {
   debugger;
   store.commit("setCurrentFontSize", fontSize);

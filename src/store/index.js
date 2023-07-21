@@ -242,7 +242,7 @@ export default createStore({
       currentChat.messages = messages;
     },
     incrementUpdateCounter(state) {
-      state.updateCounter += 1;
+      state.enableScroll && (state.updateCounter += 1);
     },
     setChatContext(state, { botClassname, context }) {
       const currentChat = state.chats[state.currentChatIndex];
@@ -471,7 +471,7 @@ export default createStore({
     },
     updateMessage({ commit, state }, { indexes, message: values }) {
       messageBuffer.push({ indexes, message: values });
-      if (!isThrottle && state.enableScroll) {
+      if (!isThrottle) {
         isThrottle = true;
         setTimeout(() => {
           commit("updateMessage");
