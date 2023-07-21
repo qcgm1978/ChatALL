@@ -124,11 +124,6 @@ import {
 
 const { ipcRenderer } = window.require("electron");
 const store = useStore();
-const customPhrases = [
-  "以下翻译为英语",
-  "以下翻译为简体中文",
-  '以下数据提取歌曲和歌手名称，构建list json，使用这样的格式：["歌曲名（歌手名）",...]. ',
-].map((d, i) => ({ name: `/${d}：`, ind: i }));
 
 const props = defineProps(["changeColumns"]);
 
