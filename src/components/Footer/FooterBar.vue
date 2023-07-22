@@ -230,9 +230,9 @@ function handleShortcut(event) {
 // Send the prompt when the user presses enter and prevent the default behavior
 // But if the shift, ctrl, alt, or meta keys are pressed, do as default
 function filterEnterKey(event) {
+  const keyCode = event.keyCode;
   if (
-    prompt.value &&
-    event.keyCode == 13 &&
+    keyCode == 13 &&
     !event.shiftKey &&
     !event.ctrlKey &&
     !event.altKey &&
@@ -242,6 +242,21 @@ function filterEnterKey(event) {
     promptTextArea.value.menu = false;
     event.preventDefault();
     sendPromptToBots();
+  }
+  
+  // up or down
+  const isUpOrDown =
+    keyCode == historyKeyCode.pre || keyCode == historyKeyCode.next;
+
+  const isAuxiliaryKey = event.metaKey || event.ctrlKey;
+
+  // macOS: Cmd + up/down, Windows: Ctrl + up/down
+  if (isAuxiliaryKey && isUpOrDown) {
+    event.preventDefault();
+
+    // get new prompt and set it
+    const newPrompt = getHistoryPrompt(keyCode);
+    prompt.value = newPrompt.content;
   }
 }
 
@@ -262,6 +277,8 @@ function sendPromptToBots() {
     ? `${prompt.value}. Replied by ${store.state.langName}`
     : prompt.value;
   const isFirstPrompt = store.getters.currentChat.messages.length === 0;
+  // reset prompt index
+  promptIndex = 0;
   return store
     .dispatch("sendPrompt", {
       prompt: val,
@@ -284,6 +301,30 @@ function sendPromptToBots() {
         }
       });
     });
+}
+
+// current prompt index
+let promptIndex = 0;
+
+// up and down key code
+const historyKeyCode = { pre: 38, next: 40 };
+
+// Listen to the up and down arrow keys to obtain historical records.
+function getHistoryPrompt(keyCode) {
+  const historyPrompts = store.getters.getCurrentChatPrompt;
+
+  if (!historyPrompts || !historyPrompts.length) return false;
+
+  if (keyCode === historyKeyCode.pre) {
+    // get previous prompt
+    promptIndex =
+      (promptIndex - 1 + historyPrompts.length) % historyPrompts.length;
+  } else if (keyCode === historyKeyCode.next) {
+    // get next prompt
+    promptIndex = (promptIndex + 1) % historyPrompts.length;
+  }
+
+  return historyPrompts[promptIndex];
 }
 
 async function toggleSelected(bot) {
@@ -412,15 +453,15 @@ defineExpose({
 
 <style scoped>
 .footer {
-  background-color: rgb(var(--v-theme-background));
-  height: auto!important;
+  background-color: rgba(var(--v-theme-background), 0.7) !important;
+  height: auto !important;
   display: flex;
   align-items: center !important;
   justify-content: space-between;
   padding: 8px 16px;
   gap: 8px;
   box-sizing: border-box;
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
   box-shadow: none !important;
 }
 
@@ -459,11 +500,6 @@ textarea::placeholder {
   color: rgb(var(--v-theme-on-primary));
   background-color: rgb(var(--v-theme-primary));
   border-radius: 4px !important;
-}
-</style>
-<style>
-span.v-autocomplete__mask {
-  background: yellowgreen;
 }
 
 :deep() .v-field.v-field--appended{
