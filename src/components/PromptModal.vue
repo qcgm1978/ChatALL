@@ -236,7 +236,8 @@ function add() {
 }
 
 function edit(item) {
-  isEdit.value = true;
+  // const userPromptsTitles = userPrompts.value.map(d => d.title);
+  // isEdit.value = userPromptsTitles.includes(item.title);
   title.value = item.title;
   prompt.value = item.prompt;
   editIndex.value = item.index;

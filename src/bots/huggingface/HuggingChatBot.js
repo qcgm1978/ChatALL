@@ -83,7 +83,7 @@ export default class HuggingChatBot extends Bot {
 
         let text = "";
         source.addEventListener("message", (event) => {
-          const data = JSON.parse(event.data);
+          const data = event.data && JSON.parse(event.data);
           if (data.generated_text === null) {
             text += data.token.text;
             onUpdateResponse(callbackParam, { content: text, done: false });
