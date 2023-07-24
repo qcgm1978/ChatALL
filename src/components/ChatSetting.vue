@@ -87,11 +87,6 @@ const downloadDataJson = () => {
   const messages = localStorage;
   download_by_link(messages, content);
 };
-const restoreFromLocal = () => {
-  const content = "data";
-  const messages = localStorage;
-  download_by_link(messages, content);
-};
 // Create a blob that contains the JSON data.
 // The space parameter specifies the indentation of nested objects in the string representation.
 function download_by_link(messages, name) {
