@@ -355,7 +355,7 @@ export default createStore({
     },
   },
   actions: {
-    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex, error_callback }) {
+    sendPrompt({ commit, state, dispatch }, { prompt, bots, promptIndex, error_callback,enable_resend=false }) {
       isThrottle = false;
       const currentChat = state.chats[state.currentChatIndex];
       if (promptIndex === undefined) {
@@ -393,7 +393,7 @@ export default createStore({
           prompt,
           (indexes, values) =>
             dispatch("updateMessage", { indexes, message: values }),
-          { chatIndex: state.currentChatIndex, messageIndex: message.index },
+          { chatIndex: state.currentChatIndex, messageIndex: message.index,enable_resend },
           error_callback
         );
         ret.push(bot_sendPrompt);

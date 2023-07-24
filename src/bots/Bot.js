@@ -163,7 +163,7 @@ export default class Bot {
     }
     const query=`${this.getClassname()}-${prompt}`
     const answer = requested[query];
-    if (answer){
+    if (answer && !callbackParam.enable_resend){
       return onUpdateResponse(callbackParam, {
         content: answer,
         done: true,

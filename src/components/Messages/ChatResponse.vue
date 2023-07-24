@@ -463,6 +463,7 @@ function resendPrompt(responseMessage) {
         prompt: promptMessage.content,
         bots: [botInstance.value],
         promptIndex: responseMessage.promptIndex,
+        enable_resend:true,
       });
     } else {
       // show not found
