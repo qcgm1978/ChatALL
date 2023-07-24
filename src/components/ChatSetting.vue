@@ -43,7 +43,8 @@ import i18n from "@/i18n";
 const electron = window.require("electron");
 const ipcRenderer = electron.ipcRenderer;
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import bots from "@/bots";
+import { get_messages } from '@/utils';
+
 const emit = defineEmits(["close-dialog"]);
 const confirmModal = ref();
 const store = useStore();
@@ -69,48 +70,15 @@ async function reload(value) {
 }
 
 // This function downloads the chat history as a JSON file.
+
 const downloadJson = () => {
-  // Get the chat history from localStorage.
-  const chatallMessages = localStorage.getItem("chatall-messages");
-  if (!chatallMessages) {
+  const messages = get_messages();
+  if (!messages) {
     console.error("chatall-messages not found in localStorage");
     return;
   }
 
-  const chats = JSON.parse(chatallMessages)?.chats ?? [];
-
   // Create an array of messages from the chat history.
-  const messages = chats
-    .filter((d) => !d.hide)
-    .map((chat) => ({
-      // The title of the chat.
-      title: chat.title,
-      // The messages in the chat.
-      messages: chat.messages
-        .filter((d) => !d.hide)
-        .reduce((arr, message) => {
-          const t = message.type;
-          const content = message.content;
-          if (t == "prompt") {
-            arr.push({
-              prompt: content,
-              responses: [],
-            });
-          } else {
-            const botClassname = message.className;
-            const bot = bots.getBotByClassName(botClassname);
-            const botName = bot.getFullname();
-            arr.at(-1).responses.push({
-              content,
-              botName,
-              botClassname,
-              botModel: message.model,
-              highlight: message.highlight,
-            });
-          }
-          return arr;
-        }, []),
-    }));
   const content = "history";
   download_by_link(messages, content);
 };
@@ -170,3 +138,4 @@ async function deleteChats() {
   }
 }
 </script>
+@/utils/storage
