@@ -165,7 +165,7 @@ const favBots = computed(() => {
       instance: _bots.getBotByClassName(favBot.classname),
     });
   });
-  return _favBots.sort((a, b) => a.order - b.order); // sort by order property
+  return _favBots.filter(bot=>bot.instance).sort((a, b) => a.order - b.order); // sort by order property
 });
 
 const prompt = ref("");
