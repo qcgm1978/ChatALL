@@ -75,11 +75,21 @@
                 <v-list-item-title>{{
                   $t("settings.fontSize")
                 }}</v-list-item-title>
-                <v-text-field
+                <!-- <v-text-field
                   v-model="fontSize"
                   type="number"
                   @update:model-value="setFontSize($event)"
-                ></v-text-field>
+                ></v-text-field> -->
+                <v-slider
+                  v-model="fontSize"
+                  :min="1"
+                  :max="3"
+                  :step="0.1"
+                  color="orange"
+                  thumb-label
+                  style="margin:10px;"
+                  ></v-slider>
+                  <!-- @update:model-value="setFontSize($event)" -->
               </v-list-item>
             </div>
             <div class="section" v-if="tab == 'general'">
@@ -208,12 +218,10 @@ const modes = computed(() => [
 
 const lang = computed(() => store.state.lang);
 const enableRepliedLang = ref(store.state.enableRepliedLang);
-const fontSize = computed(() => {
-  return store.state.fontSize;
-});
+const fontSize = ref(store.state.fontSize);
 watch(fontSize, async (newV, oldV) => {
   // debugger;
-    add_font_size(newV);
+  add_font_size(newV);
 });
 const currentMode = computed(() => store.state.mode);
 
@@ -236,7 +244,7 @@ const setRepliedLang = (enable) => {
   setCurrentLanguage();
   locale.enableRepliedLang = enable;
   store.commit("enableRepliedLang", enable);
-}
+};
 const setFontSize = (fontSize) => {
   debugger;
   store.commit("setCurrentFontSize", fontSize);
