@@ -196,7 +196,9 @@ async function createWindow() {
       callback({ requestHeaders });
     },
   );
-
+  win.webContents.session.setCertificateVerifyProc((req, cb) => {
+    cb(0);
+  });
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
